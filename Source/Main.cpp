@@ -1,0 +1,29 @@
+// Copyright slx7R4GDZM
+// Distributed under the terms of the MIT License.
+// Refer to the License.txt file for details.
+
+#include "Game/Game.h"
+#include <cstdlib>
+#include <ctime>
+
+int main()
+{
+    srand(time(nullptr));
+    Game game;
+}
+
+// TODO
+// implement saucer ai
+// make ship/other stuff not spawn if they will crash during spawn
+// add sound
+// figure out how the ship specific explosion graphics works
+// implement accurate vector generator and vector ROM emulation to be able to use opcodes like JSR correctly
+// add a better cropping mode
+// replace more magic numbers with constants
+// get rid of passing window and vectorgenerator to everything
+// denightmarify spaceobject deletion?
+// make the photon spawn position code less stupid
+// make the score code less stupid
+// create a makefile
+// fix some super long lines
+// do some other stuff
