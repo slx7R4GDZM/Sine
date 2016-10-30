@@ -13,10 +13,10 @@ const u8 EXPLOSION_START = 160;
 const u8 INDISCERNIBLE = 0;
 const u8 PHOTON_SIZE = 43;
 const u8 BONUS_SIZE_1 = 71;
-const u16 MAX_SCORE = 10'000;
+const u16 MAX_SCORE = 10000;
 const u8 MAX_ASTEROID_COUNT = 27;
 const u8 MAX_SHIP_PHOTON_COUNT = 4;
-const nanoseconds MAX_FRAME_TIME = 16'666'667ns;
+const nanoseconds MAX_FRAME_TIME = 16666667ns;
 
 enum Buttons : u8 // accurate order?
 {
