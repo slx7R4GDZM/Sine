@@ -44,7 +44,7 @@ Vector_Generator::Vector_Generator(const Settings_Handler settings_handler)
             x_offset = (x_resolution - y_resolution) * res_scale / 2;
         }
     }
-    line_thickness = DESIRED_LINE_WIDTH * res_scale / 4;
+    line_thickness = DESIRED_LINE_WIDTH / (res_scale / 4);
 }
 
 void Vector_Generator::flip(u16 vector_object[], const bool flip_x, const bool flip_y)
