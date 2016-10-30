@@ -1,4 +1,4 @@
-# Sine
+﻿# Sine
 Sine is an unfinished remake of Asteroids that I've made using C++ and [SFML](https://github.com/SFML/SFML).
 
 ## Controls
