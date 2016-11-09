@@ -13,8 +13,9 @@ int main()
 }
 
 // TODO
+// investigate buggy behavior on 32-bit mingw-w64 debug builds
 // implement saucer ai
-// make ship/other stuff not spawn if they will crash during spawn
+// make ship/other stuff not spawn if they will collide during spawn
 // add sound
 // figure out how the ship specific explosion graphics works
 // implement accurate vector generator and vector ROM emulation to be able to use opcodes like JSR correctly
@@ -26,4 +27,5 @@ int main()
 // make the score code less stupid
 // create a makefile
 // fix some super long lines
+// replace pragma onces with include guards and get rid of other non-standard stuff like case ranges
 // do some other stuff

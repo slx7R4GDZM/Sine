@@ -18,7 +18,7 @@ const u8 MAX_ASTEROID_COUNT = 27;
 const u8 MAX_SHIP_PHOTON_COUNT = 4;
 const nanoseconds MAX_FRAME_TIME = 16666667ns;
 
-enum Buttons : u8 // accurate order?
+enum Buttons : u8
 {
     HYPERSPACE,
     FIRE,

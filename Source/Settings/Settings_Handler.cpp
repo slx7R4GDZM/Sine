@@ -13,7 +13,7 @@ const string KEY_TABLE[TOTAL_KEYS] = {"A", "B", "C", "D", "E", "F", "G", "H", "I
 
 Settings_Handler::Settings_Handler()
     : button{sf::Keyboard::Space, sf::Keyboard::E, sf::Keyboard::Left, sf::Keyboard::Down, sf::Keyboard::Right, sf::Keyboard::Num1, sf::Keyboard::Num2, sf::Keyboard::W, sf::Keyboard::D, sf::Keyboard::A, sf::Keyboard::Escape}
-    , option_switch{ENGLISH, 1, 0, 0, 1}
+    , option_switch{ENGLISH, 1, 0, 0, 2}
     , window_mode(WIN_NORMAL)
     , x_resolution(1024)
     , y_resolution(790)

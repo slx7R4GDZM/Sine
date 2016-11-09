@@ -141,7 +141,7 @@ Right-Coin-Multiplier 0
 # 1 = 1 coin for 2 plays
 # 2 = 1 coin for 1 play (default)
 # 3 = 2 coins for 1 play
-Coinage 1
+Coinage 2
 
 #==============================================================================
 # Window Settings
