@@ -72,7 +72,7 @@ void Vector_Generator::flip(u16 vector_object[], const bool flip_x, const bool f
                     vector_object[i] ^= 1 << 10;
                 break;
             default:
-                cout << "Invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
+                cerr << "Flip: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
                 done = true;
                 break;
         }
@@ -84,18 +84,21 @@ void Vector_Generator::brighten(u16 vector_object[])
     bool done = false;
     for (u8 i = 0; !done; i++)
     {
+        u8 new_brightness;
         u8 opcode = vector_object[i] >> 12;
-        if (opcode == 13) // DRTSL, RTSL, RTS
-            done = true;
-        else if (opcode == 15) // DSVEC, SVEC
+        switch (opcode)
         {
-            u8 new_brightness = ((vector_object[i] & 0x00F0) >> 4) + 2;
-            vector_object[i] = (vector_object[i] & 0xFF0F) | new_brightness << 4;
-        }
-        else
-        {
-            cout << "Invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
-            done = true;
+            case 13: // DRTSL, RTSL, RTS
+                done = true;
+                break;
+            case 15: // DSVEC, SVEC
+                new_brightness = ((vector_object[i] & 0x00F0) >> 4) + 2;
+                vector_object[i] = (vector_object[i] & 0xFF0F) | new_brightness << 4;
+                break;
+            default:
+                cerr << "Brighten: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
+                done = true;
+                break;
         }
     }
 }
@@ -120,7 +123,7 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
                 draw_short_vector(vector_object, iteration, window);
                 break;
             default:
-                cout << "Invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
+                cerr << "Process: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
                 done = true;
                 break;
         }

@@ -38,14 +38,12 @@ private:
     bool enable_v_sync;
     Frame_Limiter_Mode frame_limiter_mode;
 
-    template <typename T>
-    static T clamp_string_value(const string& value, const T min_v, const T max_v);
     void parse_file_settings(std::ifstream& input);
     void parse_buttons(const string& setting, const string& value);
     void parse_settings(const string& setting, const string& value);
+    template <typename T>
+    static T clamp_string_value(const string& setting, const string& value, const T min_v, const T max_v);
 public:
-    const string BUTTON_TABLE[TOTAL_BUTTONS] = {"B_Hyperspace", "B_Fire", "B_Left-Coin", "B_Center-Coin", "B_Right-Coin", "B_One-Player-Start", "B_Two-Player-Start", "B_Thrust", "B_Rotate-Right", "B_Rotate-Left", "B_Exit"};
-
     Settings_Handler();
     void apply_window_settings(sf::RenderWindow& win);
     void output_settings() const;

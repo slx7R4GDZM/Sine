@@ -24,7 +24,8 @@ using s16 = int_fast16_t;
 using s32 = int_fast32_t;
 using s64 = int_fast64_t;
 
-using std::cout;
+using std::cerr;
+using std::clog;
 using std::string;
 using std::vector;
 

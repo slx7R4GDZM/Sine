@@ -74,6 +74,7 @@ void Saucer::determine_vertical_velocity()
             break;
         default: // stable y
             vel_y_major = 0;
+            break;
     }
 }
 
