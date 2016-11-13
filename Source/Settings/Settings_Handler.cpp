@@ -9,9 +9,9 @@
 #include <cstring>
 #include <iomanip>
 
+const string BUTTON_TABLE[TOTAL_BUTTONS] = {"B_Hyperspace", "B_Fire", "B_Left-Coin", "B_Center-Coin", "B_Right-Coin", "B_One-Player-Start", "B_Two-Player-Start", "B_Thrust", "B_Rotate-Right", "B_Rotate-Left", "B_Exit"};
 const u8 TOTAL_KEYS = 101;
 const string KEY_TABLE[TOTAL_KEYS] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Num0", "Num1", "Num2", "Num3", "Num4", "Num5", "Num6", "Num7", "Num8", "Num9", "Escape", "LControl", "LShift", "LAlt", "LSystem", "RControl", "RShift", "RAlt", "RSystem", "Menu", "LBracket", "RBracket", "SemiColon", "Comma", "Period", "Quote", "Slash", "BackSlash", "Tilde", "Equal", "Dash", "Space", "Return", "BackSpace", "Tab", "PageUp", "PageDown", "End", "Home", "Insert", "Delete", "Add", "Subtract", "Multiply", "Divide", "Left", "Right", "Up", "Down", "Numpad0", "Numpad1", "Numpad2", "Numpad3", "Numpad4", "Numpad5", "Numpad6", "Numpad7", "Numpad8", "Numpad9", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "Pause"};
-const string BUTTON_TABLE[TOTAL_BUTTONS] = {"B_Hyperspace", "B_Fire", "B_Left-Coin", "B_Center-Coin", "B_Right-Coin", "B_One-Player-Start", "B_Two-Player-Start", "B_Thrust", "B_Rotate-Right", "B_Rotate-Left", "B_Exit"};
 
 Settings_Handler::Settings_Handler()
     : button{sf::Keyboard::Space, sf::Keyboard::E, sf::Keyboard::Left, sf::Keyboard::Down, sf::Keyboard::Right, sf::Keyboard::Num1, sf::Keyboard::Num2, sf::Keyboard::W, sf::Keyboard::D, sf::Keyboard::A, sf::Keyboard::Escape}
@@ -79,7 +79,7 @@ void Settings_Handler::parse_file_settings(std::ifstream& input)
 void Settings_Handler::parse_buttons(const string& setting, const string& value)
 {
     // determine if the button choice exists
-    const u8 INVALID_BUTTON = 255;
+    const u8 INVALID_BUTTON = UINT8_MAX;
     u8 current_button = INVALID_BUTTON;
     for (u8 i = 0; i < TOTAL_BUTTONS && current_button == INVALID_BUTTON; i++)
     {

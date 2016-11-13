@@ -116,6 +116,7 @@ void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::Render
             break;
         case 3:
             vector_generator.process(EXPLOSION_1, window);
+            break;
     }
 }
 

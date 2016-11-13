@@ -13,7 +13,6 @@ int main()
 }
 
 // TODO
-// investigate buggy behavior on 32-bit mingw-w64 debug builds
 // implement saucer ai
 // make ship/other stuff not spawn if they will collide during spawn
 // add sound

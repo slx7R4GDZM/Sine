@@ -125,5 +125,6 @@ void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window
             break;
         case 3:
             vector_generator.process(ASTEROID_4, window);
+            break;
     }
 }
