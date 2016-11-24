@@ -24,6 +24,7 @@ private:
     float x_offset;
     float y_offset;
     float line_thickness;
+    bool simulate_DAC;
     u8 gamma_table[16];
 
     void draw_long_vector(const u8 opcode, const u16 vector_object[], u8& iteration, sf::RenderWindow& window);

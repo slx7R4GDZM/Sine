@@ -9,15 +9,15 @@
 const float PI = std::atan(1) * 4;
 const float DESIRED_LINE_WIDTH = 0.75f;
 const float MINIMUM_LINE_WIDTH = 0.5f;
-const u16 INTERNAL_RES = 4096;
-const u16 DAC_RES = 1024;
-const u8 INT_TO_DAC_RES_RATIO = INTERNAL_RES / DAC_RES;
+const u16 INTERNAL_RES = 4096; // the internal resolution axes are 12-bit due to the
+                               // two connected 6-bit Binary Rate Multipliers that
+                               // supplied the clocks to the X and Y position counters
 
 Vector_Generator::Vector_Generator(const Settings_Handler settings_handler)
     : x_offset(0)
     , y_offset(0)
 {
-    settings_handler.get_settings(x_resolution, y_resolution, crop_image, gamma_table);
+    settings_handler.get_settings(x_resolution, y_resolution, simulate_DAC, crop_image, gamma_table);
     if (crop_image)
     {
         if (x_resolution < y_resolution)
@@ -160,11 +160,11 @@ void Vector_Generator::load_absolute(const Position& pos, const s8 scale)
 {
     Coordinate current_pos = get_total_pos(pos);
     // divided by 2 to convert the 8192x6144 of the Space_Object
-    // coordinate system to the 4096x4096 res used by the VG
-    current_x =                       current_pos.position_x >> 1;
+    // coordinate system to the 4096x4096 res used by the DVG
+    current_x =                       current_pos.position_x / 2;
     // subtract from y res to reverse current_y
     // subtract 512 to make the 4:3 Space_Object space be centered in the 1:1 DVG space
-    current_y = INTERNAL_RES - 512 - (current_pos.position_y >> 1);
+    current_y = INTERNAL_RES - 512 - (current_pos.position_y / 2);
     global_scale = scale;
 }
 
@@ -209,13 +209,23 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteratio
 
 void Vector_Generator::draw_vector(const s16 delta_x, const s16 delta_y, const u8 brightness, sf::RenderWindow& window)
 {
-    // multiply and divide both the X and Y axes by the ratio of the 12-bit internal resolution
-    // to the 10-bit DAC resolution to nuke the lower two bits thus simulating the 10-bit DAC
-    float adjusted_x = current_x / INT_TO_DAC_RES_RATIO * INT_TO_DAC_RES_RATIO + x_offset;
-    float adjusted_y = current_y / INT_TO_DAC_RES_RATIO * INT_TO_DAC_RES_RATIO + y_offset;
-
     if (brightness)
     {
+        float adjusted_x;
+        float adjusted_y;
+        if (simulate_DAC)
+        {
+            // mask off the lower 2 bits of the 12-bit internal resolution
+            // thus simulating the 10-bit DAC resolution
+            adjusted_x = static_cast<s16>(current_x & 0xFFFC) + x_offset;
+            adjusted_y = static_cast<s16>(current_y & 0xFFFC) + y_offset;
+        }
+        else
+        {
+            adjusted_x = current_x + x_offset;
+            adjusted_y = current_y + y_offset;
+        }
+
         sf::Color vector_color = sf::Color(255, 255, 255, gamma_table[brightness]);
         if (line_thickness < MINIMUM_LINE_WIDTH)
             draw_thin_line_segment(adjusted_x, adjusted_y, delta_x, delta_y, vector_color, window);

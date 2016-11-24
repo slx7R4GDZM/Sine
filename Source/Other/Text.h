@@ -172,6 +172,11 @@ Inactive-Mode 0
 # Graphics Settings
 #==============================================================================
 
+## Simulate Digital-to-Analog Converter
+# 0 = Use the 12-bit internal resolution positions
+# 1 = Simulate 10-bit DAC, thus having shaky graphics (default)
+Simulate-DAC 1
+
 ## Crop image
 # 0 = Scale the 1:1 image to fit into the set window resolution
 # 1 = Crop the image from its 1:1 aspect ratio to the set resolution (default)
@@ -194,6 +199,6 @@ V-Sync-Enabled 0
 
 ## Whether to use busy waiting or sleeping to limit FPS
 # 0 = Use sleeping (default)
-# 1 = Use busy waiting; this has high CPU usage but it's more consistent
+# 1 = Use busy waiting; this has high CPU usage, but it's consistent
 Frame-Limit-Mode 0
 )";

@@ -22,6 +22,7 @@ Settings_Handler::Settings_Handler()
     , start_win_pos_x(-1)
     , start_win_pos_y(-1)
     , inactive_mode(PAUSE)
+    , simulate_DAC(true)
     , crop_image(true)
     , samples_MSAA(3)
     , gamma_correction(1.0)
@@ -134,6 +135,8 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
         start_win_pos_y = clamp_string_value(setting, value, INT32_MIN, INT32_MAX);
     else if (setting == "Inactive-Mode")
         inactive_mode = clamp_string_value(setting, value, PAUSE, RUN_WITH_INPUT);
+    else if (setting == "Simulate-DAC")
+        simulate_DAC = clamp_string_value(setting, value, false, true);
     else if (setting == "Crop-Image")
         crop_image = clamp_string_value(setting, value, false, true);
     else if (setting == "MSAA-Quality")
@@ -230,6 +233,7 @@ void Settings_Handler::output_settings() const
     clog << "\nInactive-Mode = " << static_cast<u16>(inactive_mode);
 
     clog << "\n========================================";
+    clog << "\nSimulate-DAC = " << simulate_DAC;
     clog << "\nCrop-Image = " << crop_image;
     clog << "\nMSAA-Quality = " << static_cast<u16>(samples_MSAA);
     clog << "\nGamma-Correction = " << gamma_correction;
@@ -257,10 +261,11 @@ Frame_Limiter_Mode Settings_Handler::get_frame_limiter_mode() const
     return frame_limiter_mode;
 }
 
-void Settings_Handler::get_settings(u32& x_resolution, u32& y_resolution, bool& crop_image, u8 gamma_table[]) const
+void Settings_Handler::get_settings(u32& x_resolution, u32& y_resolution, bool& simulate_DAC, bool& crop_image, u8 gamma_table[]) const
 {
     x_resolution = this->x_resolution;
     y_resolution = this->y_resolution;
+    simulate_DAC = this->simulate_DAC;
     crop_image = this->crop_image;
     for (u8 i = 0; i < 16; i++)
         gamma_table[i] = 255 * std::pow(static_cast<double>(i) * 17 / 255, 1 / gamma_correction) + 0.5;
