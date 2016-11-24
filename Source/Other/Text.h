@@ -174,7 +174,7 @@ Inactive-Mode 0
 
 ## Simulate Digital-to-Analog Converter
 # 0 = Use the 12-bit internal resolution positions
-# 1 = Simulate 10-bit DAC, thus having shaky graphics (default)
+# 1 = Simulate the 10-bit DAC, thus having shaky graphics (default)
 Simulate-DAC 1
 
 ## Crop image
