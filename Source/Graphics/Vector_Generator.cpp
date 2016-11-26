@@ -136,19 +136,18 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
 // 0-9
 void Vector_Generator::draw_long_vector(const u8 opcode, const u16 vector_object[], u8& iteration, sf::RenderWindow& window)
 {
-    s16 y = vector_object[iteration] & 0x03FF;
+    s16 delta_y = vector_object[iteration] & 0x03FF;
     if (vector_object[iteration++] & 0x0400)
-        y = -y;
+        delta_y = -delta_y;
 
-    s16 x = vector_object[iteration] & 0x03FF;
+    s16 delta_x = vector_object[iteration] & 0x03FF;
     if (vector_object[iteration] & 0x0400)
-        x = -x;
+        delta_x = -delta_x;
 
     u8 local_scale = (global_scale + opcode) & 0x0F;
 
-    const u8 MAX_SCALE = 9; // should I declare this here? idk
-    s16 delta_x = (x << 2) >> (MAX_SCALE - local_scale);
-    s16 delta_y = (y << 2) >> (MAX_SCALE - local_scale);
+    delta_x = (delta_x << 2) >> (9 - local_scale);
+    delta_y = (delta_y << 2) >> (9 - local_scale);
 
     u8 brightness = vector_object[iteration] >> 12;
     draw_vector(delta_x, delta_y, brightness, window);
@@ -187,19 +186,19 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration, s
 // 15
 void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteration, sf::RenderWindow& window)
 {
-    s16 y = vector_object[iteration] & 0x0300;
+    s16 delta_y = vector_object[iteration] & 0x0300;
     if (vector_object[iteration] & 0x0400)
-        y = -y;
+        delta_y = -delta_y;
 
-    s16 x = (vector_object[iteration] & 0x0003) << 8;
+    s16 delta_x = (vector_object[iteration] & 0x0003) << 8;
     if (vector_object[iteration] & 0x0004)
-        x = -x;
+        delta_x = -delta_x;
 
-    u8 local_scale = 2 + ((vector_object[iteration] >> 2) & 0x0002) + ((vector_object[iteration] >> 11) & 0x0001);
+    u8 local_scale = ((vector_object[iteration] >> 2) & 0x0002) + ((vector_object[iteration] >> 11) & 0x0001);
     local_scale = (global_scale + local_scale) & 0x0F;
 
-    s16 delta_x = x >> (7 - local_scale);
-    s16 delta_y = y >> (7 - local_scale);
+    delta_x = (delta_x << 2) >> (7 - local_scale);
+    delta_y = (delta_y << 2) >> (7 - local_scale);
 
     u8 brightness = (vector_object[iteration] >> 4) & 0x000F;
     draw_vector(delta_x, delta_y, brightness, window);
