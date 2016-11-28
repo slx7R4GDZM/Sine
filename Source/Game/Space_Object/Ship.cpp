@@ -8,10 +8,6 @@
 
 const s8 MIN_VEL = -64;
 const u8 MAX_VEL = 63;
-//const u8 MAX_SHIP_VECTOR_LENGTH = 13;
-//const u8 MAX_THRUST_VECTOR_LENGTH = 5;
-const u8 MAX_SHIP_VECTOR_LENGTH = 15;
-const u8 MAX_THRUST_VECTOR_LENGTH = 7;
 
 Ship::Ship()
 {
@@ -99,35 +95,9 @@ void Ship::dampen_velocity(s8& vel_major, u8& vel_minor)
 
 void Ship::draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    u8 ship_vector_offset,
-    ship_thrust_vector_offset;
     bool flip_x = false;
     bool flip_y = false;
-    calculate_ship_vector_properties(direction, ship_vector_offset, ship_thrust_vector_offset, flip_x, flip_y);
 
-    u16 ship_vector[MAX_SHIP_VECTOR_LENGTH];
-    copy_from_vector_table(ship_vector, SHIP_TABLE, ship_vector_offset);
-    vector_generator.flip(ship_vector, flip_x, flip_y);
-    vector_generator.load_absolute(pos, -2);
-    vector_generator.process(ship_vector, window);
-
-    if (draw_thrust_graphic)
-    {
-        draw_thrust(ship_thrust_vector_offset, flip_x, flip_y, vector_generator, window);
-        draw_thrust_graphic = false;
-    }
-}
-
-void Ship::draw_thrust(const u8 ship_thrust_vector_offset, const bool flip_x, const bool flip_y, Vector_Generator& vector_generator, sf::RenderWindow& window)
-{
-    u16 ship_thrust_vector[MAX_THRUST_VECTOR_LENGTH];
-    copy_from_vector_table(ship_thrust_vector, SHIP_THRUST_TABLE, ship_thrust_vector_offset);
-    vector_generator.flip(ship_thrust_vector, flip_x, flip_y);
-    vector_generator.process(ship_thrust_vector, window);
-}
-
-void Ship::calculate_ship_vector_properties(const u8 direction, u8& ship_vector_offset, u8& ship_thrust_vector_offset, bool& flip_x, bool& flip_y)
-{
     u8 vector_offset;
     if (direction < 64)
         vector_offset = direction / 4;
@@ -147,6 +117,12 @@ void Ship::calculate_ship_vector_properties(const u8 direction, u8& ship_vector_
         vector_offset = 63 - (direction - 1) / 4;
         flip_y = true;
     }
-    ship_vector_offset = SHIP_OFFSET_TABLE[vector_offset];
-    ship_thrust_vector_offset = SHIP_THRUST_OFFSET_TABLE[vector_offset];
+    vector_generator.load_absolute(pos, 14);
+    vector_generator.process(SHIP_TABLE, window, SHIP_OFFSET_TABLE[vector_offset], flip_x, flip_y);
+
+    if (draw_thrust_graphic)
+    {
+        vector_generator.process(SHIP_THRUST_TABLE, window, SHIP_THRUST_OFFSET_TABLE[vector_offset], flip_x, flip_y);
+        draw_thrust_graphic = false;
+    }
 }

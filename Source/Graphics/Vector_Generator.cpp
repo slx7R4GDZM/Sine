@@ -47,63 +47,7 @@ Vector_Generator::Vector_Generator(const Settings_Handler settings_handler)
     line_thickness = DESIRED_LINE_WIDTH / (res_scale / 4);
 }
 
-void Vector_Generator::flip(u16 vector_object[], const bool flip_x, const bool flip_y)
-{
-    bool done = false;
-    for (u8 i = 0; !done; i++)
-    {
-        u8 opcode = vector_object[i] >> 12;
-        switch (opcode) // case ranges are not an official C++ standard
-        {
-            case 0 ... 9: // DLVEC, VCTR, VEC
-                if (flip_y)
-                    vector_object[i] ^= 1 << 10;
-                i++;
-                if (flip_x)
-                    vector_object[i] ^= 1 << 10;
-                break;
-            case 13: // DRTSL, RTSL, RTS
-                done = true;
-                break;
-            case 15: // DSVEC, SVEC
-                if (flip_x)
-                    vector_object[i] ^= 1 << 2;
-                if (flip_y)
-                    vector_object[i] ^= 1 << 10;
-                break;
-            default:
-                cerr << "Flip: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
-                done = true;
-                break;
-        }
-    }
-}
-
-void Vector_Generator::brighten(u16 vector_object[])
-{
-    bool done = false;
-    for (u8 i = 0; !done; i++)
-    {
-        u8 new_brightness;
-        u8 opcode = vector_object[i] >> 12;
-        switch (opcode)
-        {
-            case 13: // DRTSL, RTSL, RTS
-                done = true;
-                break;
-            case 15: // DSVEC, SVEC
-                new_brightness = ((vector_object[i] & 0x00F0) >> 4) + 2;
-                vector_object[i] = (vector_object[i] & 0xFF0F) | new_brightness << 4;
-                break;
-            default:
-                cerr << "Brighten: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
-                done = true;
-                break;
-        }
-    }
-}
-
-void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& window, u8 iteration)
+void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& window, u8 iteration, const bool flip_x, const bool flip_y, const bool brighten)
 {
     bool done = false;
     while (!done)
@@ -112,7 +56,7 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
         switch (opcode) // case ranges are not an official C++ standard
         {
             case 0 ... 9: // DLVEC, VCTR, VEC
-                draw_long_vector(opcode, vector_object, iteration, window);
+                draw_long_vector(opcode, vector_object, iteration, flip_x, flip_y, window);
                 break;
             case 10: // DLABS, LABS, CUR
                 load_absolute(vector_object, iteration, window);
@@ -120,7 +64,7 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
                 done = true;
                 break;
             case 15: // DSVEC, SVEC
-                draw_short_vector(vector_object, iteration, window);
+                draw_short_vector(vector_object, iteration, flip_x, flip_y, brighten, window);
                 break;
             default:
                 cerr << "Process: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
@@ -134,7 +78,7 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
 // opcodes
 
 // 0-9
-void Vector_Generator::draw_long_vector(const u8 opcode, const u16 vector_object[], u8& iteration, sf::RenderWindow& window)
+void Vector_Generator::draw_long_vector(const u8 opcode, const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
 {
     s16 delta_y = vector_object[iteration] & 0x03FF;
     if (vector_object[iteration++] & 0x0400)
@@ -144,18 +88,14 @@ void Vector_Generator::draw_long_vector(const u8 opcode, const u16 vector_object
     if (vector_object[iteration] & 0x0400)
         delta_x = -delta_x;
 
-    u8 local_scale = (global_scale + opcode) & 0x0F;
-
-    delta_x = (delta_x << 2) >> (9 - local_scale);
-    delta_y = (delta_y << 2) >> (9 - local_scale);
-
     u8 brightness = vector_object[iteration] >> 12;
-    draw_vector(delta_x, delta_y, brightness, window);
+
+    draw_vector(delta_x, delta_y, opcode, brightness, flip_x, flip_y, window);
 }
 
 // 10
 // used for space objects
-void Vector_Generator::load_absolute(const Position& pos, const s8 scale)
+void Vector_Generator::load_absolute(const Position& pos, const u8 scale)
 {
     Coordinate current_pos = get_total_pos(pos);
     // divided by 2 to convert the 8192x6144 of the Space_Object
@@ -168,7 +108,7 @@ void Vector_Generator::load_absolute(const Position& pos, const s8 scale)
 }
 
 // used for letters, numbers, etc
-void Vector_Generator::load_absolute(const u8 cur_x, const u8 cur_y, const s8 scale)
+void Vector_Generator::load_absolute(const u8 cur_x, const u8 cur_y, const u8 scale)
 {
     current_x = cur_x << 4;
     current_y = cur_y << 4;
@@ -184,7 +124,7 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration, s
 }
 
 // 15
-void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteration, sf::RenderWindow& window)
+void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, const bool brighten, sf::RenderWindow& window)
 {
     s16 delta_y = vector_object[iteration] & 0x0300;
     if (vector_object[iteration] & 0x0400)
@@ -194,20 +134,23 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteratio
     if (vector_object[iteration] & 0x0004)
         delta_x = -delta_x;
 
-    u8 local_scale = ((vector_object[iteration] >> 2) & 0x0002) + ((vector_object[iteration] >> 11) & 0x0001);
-    local_scale = (global_scale + local_scale) & 0x0F;
+    u8 local_scale = 2 + ((vector_object[iteration] & 0x0008) >> 2)
+                       + ((vector_object[iteration] & 0x0800) >> 11);
 
-    delta_x = (delta_x << 2) >> (7 - local_scale);
-    delta_y = (delta_y << 2) >> (7 - local_scale);
+    u8 brightness = (vector_object[iteration] & 0x00F0) >> 4;
+    if (brighten)
+        brightness += 2;
 
-    u8 brightness = (vector_object[iteration] >> 4) & 0x000F;
-    draw_vector(delta_x, delta_y, brightness, window);
+    draw_vector(delta_x, delta_y, local_scale, brightness, flip_x, flip_y, window);
 }
 
 // drawing stuff
 
-void Vector_Generator::draw_vector(const s16 delta_x, const s16 delta_y, const u8 brightness, sf::RenderWindow& window)
+void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 local_scale, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
 {
+    u8 scale = (global_scale + local_scale) & 0x0F;
+    s16 delta_x = (flip_x ? -raw_delta_x : raw_delta_x) >> (7 - scale);
+    s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y) >> (7 - scale);
     if (brightness)
     {
         float adjusted_x;

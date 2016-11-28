@@ -39,7 +39,6 @@ protected:
     void update_position();
     static bool hit(const u16 pos1, const u16 pos2, const u8 minimum_space);
     void draw_explosion(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
-    static void copy_from_vector_table(u16 output_vector[], const u16 vector_object[], const u8 vector_offset);
 public:
     Space_Object() = default;
     static u8 limit_position(const u8 pos_major, const u8 max_pos_major);

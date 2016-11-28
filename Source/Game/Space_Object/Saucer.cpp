@@ -98,7 +98,10 @@ u8 Saucer::get_points() const
 
 void Saucer::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    vector_generator.load_absolute(pos, -1);
+    if (status == LARGE_SAUCER)
+        vector_generator.load_absolute(pos, 15);
+    else
+        vector_generator.load_absolute(pos, 14);
     vector_generator.process(SAUCER, window);
 }
 

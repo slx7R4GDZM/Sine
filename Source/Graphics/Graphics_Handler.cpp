@@ -8,13 +8,6 @@
 #include "../Other/Vectors.h"
 #include <cmath>
 
-void Graphics_Handler::draw_lives(const u8 lives, Vector_Generator& vector_generator, sf::RenderWindow& window)
-{
-    vector_generator.load_absolute(40, 43, -2);
-    for (u8 i = 0; i < lives && i < 55; i++)
-        vector_generator.process(LIVES_REMAINING_SHIP, window);
-}
-
 void Graphics_Handler::draw_message(const u16 message[], const u8 iteration, Vector_Generator& vector_generator, sf::RenderWindow& window)
 {
     bool done = false;
@@ -52,14 +45,7 @@ void Graphics_Handler::draw_character(const u8 character, Vector_Generator& vect
 
 void Graphics_Handler::draw_digit(const u8 digit, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool brighten)
 {
-    u8 vector_offset = CHARACTER_OFFSET_TABLE[digit + 1];
-    u16 character_vector[13];
-    copy_from_vector_table(character_vector, CHARACTER_TABLE, vector_offset);
-
-    if (brighten)
-        vector_generator.brighten(character_vector);
-
-    vector_generator.process(character_vector, window);
+    vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[digit + 1], false, false, brighten);
 }
 
 void Graphics_Handler::draw_score(const u16 number, const u8 rightmost_x, const u8 y, const u8 num_scale, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool brighten)
@@ -101,13 +87,4 @@ void Graphics_Handler::draw_text(const u8 text, const Language language, Vector_
             draw_message(SPANISH_TEXT_TABLE, SPANISH_OFFSET_TABLE[text], vector_generator, window);
             break;
     }
-}
-
-void Graphics_Handler::copy_from_vector_table(u16 output_vector[], const u16 vector_object[], const u8 vector_offset)
-{
-    u8 i = 0;
-    for (u8 x = vector_offset; vector_object[x] != 0xD000; x++, i++)
-        output_vector[i] = vector_object[x];
-
-    output_vector[i] = 0xD000;
 }

@@ -148,7 +148,7 @@ Game::Game()
                 draw_multiplayer_scores(vector_generator);
 
                 // draw player 2 lives
-                vector_generator.load_absolute(207, 43, -2);
+                vector_generator.load_absolute(207, 43, 14);
                 for (u8 i = 0; i < player_lives[1] && i < 13; i++)
                     vector_generator.process(LIVES_REMAINING_SHIP, window);
             }
@@ -520,7 +520,7 @@ void Game::update_player(Vector_Generator& vector_generator)
                 end_game();
         }
     }
-    vector_generator.load_absolute(40, 43, -2);
+    vector_generator.load_absolute(40, 43, 14);
     for (u8 i = 0; i < player_lives[0] && i < 55; i++)
         vector_generator.process(LIVES_REMAINING_SHIP, window);
 }

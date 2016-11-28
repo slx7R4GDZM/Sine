@@ -17,7 +17,7 @@ const u8 SMALL_ASTEROID_POINTS = 10;
 Asteroid::Asteroid()
 {
     // need to check if area is clear of other spaceobjects
-    //status = randomByte() / 8 * 8 % 32 + 4; // correct
+    //status = random_byte() / 8 * 8 % 32 + 4; // correct
     status = rand_s8(20, 23); // incorrect
     vel_x_major = get_starting_velocity();
     vel_y_major = get_starting_velocity();
@@ -109,7 +109,11 @@ u8 Asteroid::get_points() const
 
 void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    s8 scale = status / 4 - 5;
+    u8 scale;
+    if (status < 20)
+        scale = 11 + status / 4;
+    else
+        scale = 0;
     vector_generator.load_absolute(pos, scale);
 
     switch (status % 4)

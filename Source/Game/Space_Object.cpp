@@ -100,7 +100,11 @@ bool Space_Object::hit(const u16 pos_1, const u16 pos_2, const u8 minimum_space)
 
 void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    s8 scale = (status - 1) / 17 - 14;
+    u8 scale;
+    if (status < 239)
+        scale = (status + 33) / 17;
+    else
+        scale = 0;
     vector_generator.load_absolute(pos, scale);
 
     switch (status / 4 % 4)
@@ -118,15 +122,6 @@ void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::Render
             vector_generator.process(EXPLOSION_1, window);
             break;
     }
-}
-
-void Space_Object::copy_from_vector_table(u16 output_vector[], const u16 vector_object[], const u8 vector_offset)
-{
-    u8 i = 0;
-    for (u8 x = vector_offset; vector_object[x] != 0xD000; x++, i++)
-        output_vector[i] = vector_object[x];
-
-    output_vector[i] = 0xD000;
 }
 
 s8 Space_Object::get_vel_x() const

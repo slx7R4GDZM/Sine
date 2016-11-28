@@ -16,8 +16,6 @@ private:
     static void positive_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_minor);
     static void dampen_velocity(s8& vel_major, u8& vel_minor);
     void draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const;
-    static void draw_thrust(const u8 ship_thrust_vector_offset, const bool flip_x, const bool flip_y, Vector_Generator& vector_generator, sf::RenderWindow& window);
-    static void calculate_ship_vector_properties(const u8 direction, u8& ship_vector_offset, u8& ship_thrust_vector_offset, bool& flip_x, bool& flip_y);
 public:
     Ship();
     u8 update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic);
