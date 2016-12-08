@@ -632,7 +632,7 @@ void Game::update_space_objects(Player& player, Vector_Generator& vector_generat
     }
     for (u8 i = 0; i < player.saucer.size(); i++)
     {
-        if (!player.saucer[i].update(vector_generator, window))
+        if (!player.saucer[i].update(vector_generator, window, fast_timer))
         {
             player.saucer.erase(player.saucer.begin() + i);
             i--;
@@ -890,11 +890,16 @@ void Game::handle_saucer_stuff(Player& player) const
                     player.saucer_spawn_time_start = new_saucer_spawn_time_start;
 
                 player.saucer.push_back(Saucer());
+                player.saucer_spawn_and_shot_time = 18;
             }
         }
-        else
+        else if (player.saucer_spawn_and_shot_time == 0)
         {
-            // shoot photons
+            player.saucer_photon.push_back(Photon(random_byte(),
+                                                  player.saucer[0].get_vel_x(),
+                                                  player.saucer[0].get_vel_y(),
+                                                  player.saucer[0].get_position()));
+            player.saucer_spawn_and_shot_time = 10;
         }
     }
 }

@@ -37,19 +37,14 @@ Saucer::Saucer()
         pos.y_major -= 8;
 
     pos.y_minor = random * 32 % 256;
-
-    y_counter = 0; // hacky incorrect variable?
 }
 
-u8 Saucer::update(Vector_Generator& vector_generator, sf::RenderWindow& window)
+u8 Saucer::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer)
 {
     if (status == LARGE_SAUCER)
     {
-        if (!y_counter)
+        if (fast_timer == 0 || fast_timer == 128)
             determine_vertical_velocity();
-        y_counter++;
-        if (y_counter == 128)
-            y_counter = 0;
 
         update_position();
         draw(vector_generator, window);
@@ -64,15 +59,15 @@ u8 Saucer::update(Vector_Generator& vector_generator, sf::RenderWindow& window)
 
 void Saucer::determine_vertical_velocity()
 {
-    switch (rand_s8(0, 3))
+    switch (random_byte() % 4)
     {
-        case 0: // down
-            vel_y_major = -16;
-            break;
-        case 1: // up
+        case 0:
             vel_y_major = 16;
             break;
-        default: // stable y
+        case 1:
+            vel_y_major = -16;
+            break;
+        default:
             vel_y_major = 0;
             break;
     }
@@ -105,10 +100,4 @@ void Saucer::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) 
     vector_generator.process(SAUCER, window);
 }
 
-/*
-x vel can be 16 or -16
-y vel can be 16, -16, or 0 (goes nowhere, up, or down 128 frames at a time)
-X is constant direction from spawn
-Only goes across screen once before despawning (at least when status is 2)
-Can go past the y on the screen
-*/
+// only goes across screen once before despawning (at least when status is 2)

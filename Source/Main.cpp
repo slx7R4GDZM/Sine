@@ -13,7 +13,8 @@ int main()
 }
 
 // TODO
-// implement saucer ai
+// confirm velocity and start position of saucer photons
+// figure out small saucer spawning and photon aiming
 // make ship/other stuff not spawn if they will collide during spawn
 // add sound
 // figure out how the ship specific explosion graphics works

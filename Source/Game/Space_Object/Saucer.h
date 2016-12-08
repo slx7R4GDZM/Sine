@@ -12,13 +12,11 @@
 class Saucer : public Space_Object
 {
 private:
-    u8 y_counter;
-
     void determine_vertical_velocity();
     void draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
     Saucer();
-    u8 update(Vector_Generator& vector_generator, sf::RenderWindow& window);
+    u8 update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer);
     u8 get_size(bool bonus) const;
     u8 get_points() const;
 };

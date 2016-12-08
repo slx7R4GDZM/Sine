@@ -111,7 +111,7 @@ void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window
 {
     u8 scale;
     if (status < 20)
-        scale = 11 + status / 4;
+        scale = status / 4 + 11;
     else
         scale = 0;
     vector_generator.load_absolute(pos, scale);
