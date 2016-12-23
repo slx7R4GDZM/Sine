@@ -11,23 +11,21 @@
 #include "../Graphics/Vector_Generator.h"
 #include "../Input/Input_Handler.h"
 #include "../Other/Common_Things.h"
+#include "../Other/Constants.h"
 #include <SFML/Graphics.hpp>
 
 class Game
 {
 private:
-    static const u8 MAX_HS_COUNT = 10;
-    static const u8 HS_NAME_LENGTH = 3;
-    static const u8 MAX_PLAYER_COUNT = 2;
-
     struct Player
     {
-        vector<Asteroid> asteroid;
-        vector<Ship> ship;
-        vector<Saucer> saucer;
-        vector<Photon> saucer_photon;
-        vector<Photon> ship_photon;
+        Asteroid asteroid[MAX_ASTEROIDS];
+        Ship ship;
+        Saucer saucer;
+        Photon saucer_photon[MAX_SAUCER_PHOTONS];
+        Photon ship_photon[MAX_SHIP_PHOTONS];
         u8 asteroids_per_wave;
+        u8 asteroid_count;
         u8 saucer_spawn_and_shot_time;
         u8 saucer_spawn_time_start;
         u8 ship_spawn_timer;
@@ -45,11 +43,11 @@ private:
     u8 player_count;
     u16 high_score_table[MAX_HS_COUNT];
     u8 name_entry_letter_pos;
-    u8 player_HS_place[MAX_PLAYER_COUNT];
+    u8 player_HS_place[MAX_PLAYERS];
     u8 names_HS[MAX_HS_COUNT * HS_NAME_LENGTH];
-    u16 player_score[MAX_PLAYER_COUNT];
+    u16 player_score[MAX_PLAYERS];
     u8 starting_lives;
-    u8 player_lives[MAX_PLAYER_COUNT];
+    u8 player_lives[MAX_PLAYERS];
     u8 hyperspace_flag;
     u8 player_text_timer;
     u8 fast_timer;
@@ -61,7 +59,7 @@ private:
     u8 credits;
     u8 pre_credit_coins;
     Option_Switch option_switch;
-    Player player[MAX_PLAYER_COUNT];
+    Player player[MAX_PLAYERS];
 
     void draw_multiplayer_scores(Vector_Generator& vector_generator);
     void draw_copyright(Vector_Generator& vector_generator);
@@ -83,9 +81,12 @@ private:
     static void clear_space_objects(Player& player);
 
     static void attempt_asteroid_wave_spawn(Player& player);
-    static void spawn_asteroids_from_wreckage(vector<Asteroid>& asteroid, const u8 iteration);
+    static void spawn_asteroids_from_wreckage(Player& player, const u8 iteration);
     void handle_ship_stuff(Player& player);
     void handle_saucer_stuff(Player& player) const;
+
+    bool not_any(const Space_Object space_object[], const u8 max_objects);
+    static void fire_photon(Photon photon_array[], const u8 max_photons, const u8 direction, const Space_Object space_object);
 public:
     Game();
 };

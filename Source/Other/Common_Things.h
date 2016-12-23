@@ -9,7 +9,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <vector>
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -27,7 +26,6 @@ using s64 = int_fast64_t;
 using std::cerr;
 using std::clog;
 using std::string;
-using std::vector;
 
 enum Language : u8
 {

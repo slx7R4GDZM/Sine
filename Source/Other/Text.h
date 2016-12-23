@@ -162,10 +162,10 @@ Y-Resolution 790
 Start-Window-Position-X -1
 Start-Window-Position-Y -1
 
-## What to do when the window is unfocused
+## What to do when the window isn't focused
 # 0 = Pause the game (default)
-# 1 = Continue running without input
-# 2 = Continue running with input
+# 1 = Run in background without input
+# 2 = Run in background with input
 Inactive-Mode 0
 
 #==============================================================================

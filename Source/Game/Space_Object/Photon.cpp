@@ -6,9 +6,14 @@
 
 #include "../../Other/Vectors.h"
 
-Photon::Photon(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos)
-    : photon_timer(0)
+Photon::Photon()
 {
+    status = INDISCERNIBLE;
+}
+
+Photon::initialize_photon(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos)
+{
+    photon_timer = 0;
     vel_x_major = clamp_s8((lookup_cosine(direction) >> 1) + vel_x, -111, 111);
     vel_y_major = clamp_s8((lookup_sine(direction) >> 1) + vel_y, -111, 111);
 
@@ -19,7 +24,7 @@ Photon::Photon(const u8 direction, const s8 vel_x, const s8 vel_y, const Positio
     status = 17;
 }
 
-u8 Photon::update(Vector_Generator& vector_generator, sf::RenderWindow& window)
+void Photon::update(Vector_Generator& vector_generator, sf::RenderWindow& window)
 {
     if (status && status < TRUE_EXPLOSION_START)
     {
@@ -37,7 +42,6 @@ u8 Photon::update(Vector_Generator& vector_generator, sf::RenderWindow& window)
         draw_explosion(vector_generator, window);
         status += 16 - (status - 1) / 16;
     }
-    return status;
 }
 
 // there's probably a much better way to do this

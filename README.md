@@ -5,7 +5,7 @@ Sine is an unfinished remake of Asteroids that I've made using C++ and [SFML](ht
 ![Ingame](https://i.imgur.com/k80rmf8.png "Ingame")
 ![High score entry](https://i.imgur.com/7eyNO8z.png "High score entry")
 
-## Controls
+## Default Controls
 | Action         | Key    |
 | -------------- | ------ |
 | Player 1 Start | 1      |

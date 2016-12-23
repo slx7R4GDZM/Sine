@@ -18,7 +18,8 @@ private:
     void draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
     Ship();
-    u8 update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic);
+    initialize_ship();
+    void update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic);
     static void add_thrust(const u8 direction, s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor);
     static void dampen_velocity(s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor);
 };

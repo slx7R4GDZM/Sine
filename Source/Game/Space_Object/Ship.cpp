@@ -6,21 +6,20 @@
 
 #include "../../Other/Vectors.h"
 
-const s8 MIN_VEL = -64;
-const u8 MAX_VEL = 63;
-
 Ship::Ship()
+{
+    status = INDISCERNIBLE;
+}
+
+Ship::initialize_ship()
 {
     vel_x_major = 0;
     vel_y_major = 0;
-    // low velocity is not reset on ship create or respawn
-    // high velocity is set to 0 on collision, not on respawn
-    // need to check if area is clear of other spaceobjects
     //if (spawn_area_clear())
         pos = {16, 12, 96, 96};
 }
 
-u8 Ship::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic)
+void Ship::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic)
 {
     if (status == ALIVE)
     {
@@ -31,9 +30,12 @@ u8 Ship::update(Vector_Generator& vector_generator, sf::RenderWindow& window, co
     {
         draw_explosion(vector_generator, window);
         if (fast_timer % 2)
+        {
             status++;
+            if (status == INDISCERNIBLE)
+                initialize_ship();
+        }
     }
-    return status;
 }
 
 void Ship::add_thrust(const u8 direction, s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor)

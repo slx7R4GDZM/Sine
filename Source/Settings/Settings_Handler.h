@@ -5,11 +5,10 @@
 #pragma once
 
 #include "../Other/Common_Things.h"
+#include "../Other/Constants.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <fstream>
-
-const u8 TOTAL_BUTTONS = 11;
 
 class Settings_Handler
 {

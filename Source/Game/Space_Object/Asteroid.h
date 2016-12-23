@@ -12,12 +12,13 @@
 class Asteroid : public Space_Object
 {
 private:
-    static u8 get_starting_velocity();
+    s8 get_starting_velocity() const;
     void draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
     Asteroid();
-    Asteroid(const u8 status, const Position pos);
-    u8 update(Vector_Generator& vector_generator, sf::RenderWindow& window);
+    initialize_wave_asteroid();
+    initialize_crash_asteroid(const u8 status, const Position pos);
+    void update(Vector_Generator& vector_generator, sf::RenderWindow& window, u8& asteroid_count, u8& asteroid_wave_spawn_time);
     u8 get_size() const;
     u8 get_points() const;
 };

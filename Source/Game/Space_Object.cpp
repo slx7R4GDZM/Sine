@@ -6,9 +6,6 @@
 
 #include "../Other/Vectors.h"
 
-const u8 MAX_X_POS_MAJOR = 31;
-const u8 MAX_Y_POS_MAJOR = 23;
-
 s8 Space_Object::lookup_sine(const u8 direction)
 {
     if (direction <= 64)
@@ -28,13 +25,13 @@ s8 Space_Object::lookup_cosine(const u8 direction)
 
 void Space_Object::update_position()
 {
-    update_position(pos.x_major, pos.x_minor, vel_x_major);
-    update_position(pos.y_major, pos.y_minor, vel_y_major);
+    update_axis(pos.x_major, pos.x_minor, vel_x_major);
+    update_axis(pos.y_major, pos.y_minor, vel_y_major);
     wrap_position(pos.x_major, MAX_X_POS_MAJOR);
     wrap_position(pos.y_major, MAX_Y_POS_MAJOR);
 }
 
-void Space_Object::update_position(u8& pos_major, u8& pos_minor, const s8 vel_major)
+void Space_Object::update_axis(u8& pos_major, u8& pos_minor, const s8 vel_major)
 {
     u8 old_pos_minor = pos_minor;
     pos_minor += vel_major;
