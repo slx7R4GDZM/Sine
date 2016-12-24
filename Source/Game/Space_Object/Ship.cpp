@@ -11,7 +11,7 @@ Ship::Ship()
     status = INDISCERNIBLE;
 }
 
-Ship::initialize_ship()
+void Ship::initialize_ship()
 {
     vel_x_major = 0;
     vel_y_major = 0;

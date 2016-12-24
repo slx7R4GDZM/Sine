@@ -11,7 +11,7 @@ Asteroid::Asteroid()
     status = INDISCERNIBLE;
 }
 
-Asteroid::initialize_wave_asteroid()
+void Asteroid::initialize_wave_asteroid()
 {
     // need to check if area is clear of other spaceobjects
     status = random_byte() / 8 * 8 % 32 + 4;
@@ -36,7 +36,7 @@ Asteroid::initialize_wave_asteroid()
     pos.y_minor = 0;
 }
 
-Asteroid::initialize_crash_asteroid(const u8 status, const Position pos)
+void Asteroid::initialize_crash_asteroid(const u8 status, const Position pos)
 {
     this->status = random_byte() / 8 * 8 % 32 + ((status & 0x07) >> 1);
     this->pos = pos;

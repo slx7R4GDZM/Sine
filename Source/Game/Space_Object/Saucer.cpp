@@ -11,9 +11,22 @@ Saucer::Saucer()
     status = INDISCERNIBLE;
 }
 
-Saucer::initialize_saucer()
+void Saucer::initialize_saucer(const u16 player_score, const u8 saucer_spawn_time_start)
 {
-    status = LARGE_SAUCER; // or SMALL_SAUCER based on saucer_spawn_time_start?
+    if (saucer_spawn_time_start >= 128)
+        status = LARGE_SAUCER;
+    else
+    {
+        if (player_score >= 3000)
+            status = SMALL_SAUCER;
+        else
+        {
+            if (random_byte() <= saucer_spawn_time_start / 2)
+                status = LARGE_SAUCER;
+            else
+                status = SMALL_SAUCER;
+        }
+    }
 
     u8 random = random_byte();
     if (random < 128)
@@ -39,7 +52,7 @@ Saucer::initialize_saucer()
 
 void Saucer::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, u8& saucer_spawn_and_shot_time, u8& saucer_spawn_time_start)
 {
-    if (status == LARGE_SAUCER)
+    if (status == LARGE_SAUCER || status == SMALL_SAUCER)
     {
         if (fast_timer == 0 || fast_timer == 128)
             determine_vertical_velocity();

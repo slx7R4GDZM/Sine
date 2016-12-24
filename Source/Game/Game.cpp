@@ -837,7 +837,7 @@ void Game::handle_saucer_stuff(Player& player) const
                 if (new_saucer_spawn_time_start >= MINIMUM_SAUCER_SPAWN_TIME)
                     player.saucer_spawn_time_start = new_saucer_spawn_time_start;
 
-                player.saucer.initialize_saucer();
+                player.saucer.initialize_saucer(player_score[current_player], player.saucer_spawn_time_start);
                 player.saucer_spawn_and_shot_time = 18;
             }
         }

@@ -16,7 +16,7 @@ int main()
 // create formula for asteroid spawn velocity rather than using giant constant arrays
 // confirm velocity code for asteroids
 // confirm velocity and start position of saucer photons
-// figure out small saucer spawning and photon aiming
+// figure out small saucer photon aiming
 // make ship/other stuff not spawn if they will collide during spawn
 // add sound
 // figure out how the ship specific explosion graphics works
