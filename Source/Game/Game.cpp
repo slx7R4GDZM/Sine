@@ -635,7 +635,7 @@ void Game::handle_collision(Player& player)
     }
 
     // saucer
-    for (u8 i = 0; player.saucer.get_status() == LARGE_SAUCER || player.saucer.get_status() == SMALL_SAUCER && i < MAX_ASTEROIDS; i++)
+    for (u8 i = 0; (player.saucer.get_status() == LARGE_SAUCER || player.saucer.get_status() == SMALL_SAUCER) && i < MAX_ASTEROIDS; i++)
     {
         if (Space_Object::collide(player.saucer, player.asteroid[i], player.saucer.get_size(true) + player.asteroid[i].get_size()))
         {
