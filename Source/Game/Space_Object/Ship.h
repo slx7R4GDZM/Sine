@@ -14,7 +14,7 @@ class Ship : public Space_Object
 private:
     static void negative_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_minor);
     static void positive_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_minor);
-    static void dampen_velocity(s8& vel_major, u8& vel_minor);
+    static void dampen_velocity_axis(s8& vel_major, u8& vel_minor);
     void draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
     Ship();

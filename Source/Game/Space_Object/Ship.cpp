@@ -80,11 +80,11 @@ void Ship::positive_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_mi
 
 void Ship::dampen_velocity(s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor)
 {
-    dampen_velocity(vel_x_major, vel_x_minor);
-    dampen_velocity(vel_y_major, vel_y_minor);
+    dampen_velocity_axis(vel_x_major, vel_x_minor);
+    dampen_velocity_axis(vel_y_major, vel_y_minor);
 }
 
-void Ship::dampen_velocity(s8& vel_major, u8& vel_minor)
+void Ship::dampen_velocity_axis(s8& vel_major, u8& vel_minor)
 {
     if (vel_major < 0) // reduction of 2 to 128
     {
