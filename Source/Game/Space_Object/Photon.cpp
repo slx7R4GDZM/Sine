@@ -11,7 +11,7 @@ Photon::Photon()
     status = INDISCERNIBLE;
 }
 
-void Photon::initialize_photon(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos)
+void Photon::spawn(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos)
 {
     photon_timer = 0;
     vel_x_major = clamp_s8((lookup_cosine(direction) >> 1) + vel_x, -111, 111);

@@ -11,12 +11,19 @@ Ship::Ship()
     status = INDISCERNIBLE;
 }
 
-void Ship::initialize_ship()
+void Ship::spawn()
 {
     vel_x_major = 0;
     vel_y_major = 0;
     //if (spawn_area_clear())
         pos = {16, 12, 96, 96};
+}
+
+void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
+{
+	player_lives--;
+	status = EXPLOSION_START;
+	ship_spawn_timer = 129;
 }
 
 void Ship::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic)
@@ -33,7 +40,7 @@ void Ship::update(Vector_Generator& vector_generator, sf::RenderWindow& window, 
         {
             status++;
             if (status == INDISCERNIBLE)
-                initialize_ship();
+                spawn();
         }
     }
 }

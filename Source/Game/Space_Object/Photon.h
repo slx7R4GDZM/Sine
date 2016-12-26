@@ -18,6 +18,6 @@ private:
     void draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
     Photon();
-    void initialize_photon(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos);
+    void spawn(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos);
     void update(Vector_Generator& vector_generator, sf::RenderWindow& window);
 };
