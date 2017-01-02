@@ -126,7 +126,7 @@ void Ship::draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator&
         vector_offset = 63 - (direction - 1) / 4;
         flip_y = true;
     }
-    vector_generator.load_absolute(pos, 14);
+    vector_generator.load_absolute(pos, DIV_4);
     vector_generator.process(SHIP_TABLE, window, SHIP_OFFSET_TABLE[vector_offset], flip_x, flip_y);
 
     if (draw_thrust_graphic)

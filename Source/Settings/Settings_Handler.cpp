@@ -9,12 +9,8 @@
 #include <cstring>
 #include <iomanip>
 
-const string BUTTON_TABLE[TOTAL_BUTTONS] = {"B_Hyperspace", "B_Fire", "B_Left-Coin", "B_Center-Coin", "B_Right-Coin", "B_One-Player-Start", "B_Two-Player-Start", "B_Thrust", "B_Rotate-Right", "B_Rotate-Left", "B_Exit"};
-const u8 TOTAL_KEYS = 101;
-const string KEY_TABLE[TOTAL_KEYS] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Num0", "Num1", "Num2", "Num3", "Num4", "Num5", "Num6", "Num7", "Num8", "Num9", "Escape", "LControl", "LShift", "LAlt", "LSystem", "RControl", "RShift", "RAlt", "RSystem", "Menu", "LBracket", "RBracket", "SemiColon", "Comma", "Period", "Quote", "Slash", "BackSlash", "Tilde", "Equal", "Dash", "Space", "Return", "BackSpace", "Tab", "PageUp", "PageDown", "End", "Home", "Insert", "Delete", "Add", "Subtract", "Multiply", "Divide", "Left", "Right", "Up", "Down", "Numpad0", "Numpad1", "Numpad2", "Numpad3", "Numpad4", "Numpad5", "Numpad6", "Numpad7", "Numpad8", "Numpad9", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "Pause"};
-
 Settings_Handler::Settings_Handler()
-    : button{sf::Keyboard::Space, sf::Keyboard::E, sf::Keyboard::Left, sf::Keyboard::Down, sf::Keyboard::Right, sf::Keyboard::Num1, sf::Keyboard::Num2, sf::Keyboard::W, sf::Keyboard::D, sf::Keyboard::A, sf::Keyboard::Escape}
+    : button_key{kb::Space, kb::E, kb::Left, kb::Down, kb::Right, kb::Num1, kb::Num2, kb::W, kb::D, kb::A, kb::Escape}
     , option_switch{ENGLISH, 1, 0, 0, 2}
     , window_mode(WIN_NORMAL)
     , x_resolution(1024)
@@ -80,31 +76,31 @@ void Settings_Handler::parse_file_settings(std::ifstream& input)
 void Settings_Handler::parse_buttons(const string& setting, const string& value)
 {
     // determine if the button choice exists
-    const u8 INVALID_BUTTON = UINT8_MAX;
-    u8 current_button = INVALID_BUTTON;
+    const Button INVALID_BUTTON = static_cast<Button>(UINT8_MAX);
+    Button current_button = INVALID_BUTTON;
     for (u8 i = 0; i < TOTAL_BUTTONS && current_button == INVALID_BUTTON; i++)
     {
         if (setting == BUTTON_TABLE[i])
-            current_button = i;
+            current_button = static_cast<Button>(i);
     }
 
     // determine if the key choice exists
     if (current_button != INVALID_BUTTON)
     {
-        sf::Keyboard::Key key = sf::Keyboard::Unknown;
-        for (u8 i = 0; i < TOTAL_KEYS && key == sf::Keyboard::Unknown; i++)
+        kb::Key key = kb::Unknown;
+        for (u8 i = 0; i < TOTAL_KEYS && key == kb::Unknown; i++)
         {
             if (value == KEY_TABLE[i])
             {
-                key = sf::Keyboard::Key(i);
-                button[current_button] = sf::Keyboard::Key(i);
+                key = kb::Key(i);
+                button_key[current_button] = kb::Key(i);
             }
         }
-        if (key == sf::Keyboard::Unknown)
+        if (key == kb::Unknown)
         {
             cerr << "Invalid key \"" << value << "\" used for button " << setting << '\n';
             cerr << "Button " << setting
-                 << " defaulting to key " << KEY_TABLE[button[current_button]] << "\n\n";
+                 << " defaulting to key " << KEY_TABLE[button_key[current_button]] << "\n\n";
         }
     }
     else
@@ -215,7 +211,7 @@ void Settings_Handler::output_settings() const
 {
     clog << '\n';
     for (u8 i = 0; i < TOTAL_BUTTONS; i++)
-        clog << std::setw(18) << BUTTON_TABLE[i] << " = " << KEY_TABLE[button[i]] << '\n';
+        clog << std::setw(18) << BUTTON_TABLE[i] << " = " << KEY_TABLE[button_key[i]] << '\n';
 
     clog << "=======================================";
     clog << "\nLanguage = " << static_cast<u16>(option_switch.language);
@@ -241,9 +237,9 @@ void Settings_Handler::output_settings() const
     clog << "\nFrame-Limit-Mode = " << frame_limiter_mode << '\n';
 }
 
-sf::Keyboard::Key Settings_Handler::get_button_key(const u8 button_key) const
+kb::Key Settings_Handler::get_button_key(const Button button) const
 {
-    return button[button_key];
+    return button_key[button];
 }
 
 Option_Switch Settings_Handler::get_option_switch() const
@@ -251,7 +247,7 @@ Option_Switch Settings_Handler::get_option_switch() const
     return option_switch;
 }
 
-u8 Settings_Handler::get_inactive_mode() const
+Inactive_Mode Settings_Handler::get_inactive_mode() const
 {
     return inactive_mode;
 }

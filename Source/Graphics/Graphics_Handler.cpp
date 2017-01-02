@@ -48,12 +48,12 @@ void Graphics_Handler::draw_digit(const u8 digit, Vector_Generator& vector_gener
     vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[digit + 1], false, false, brighten);
 }
 
-void Graphics_Handler::draw_score(const u16 number, const u8 rightmost_x, const u8 y, const u8 num_scale, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool brighten)
+void Graphics_Handler::draw_score(const u16 number, const u8 rightmost_x, const u8 y, const Scale num_scale, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool brighten)
 {
     string num_string = std::to_string(number);
     u8 digits = num_string.length();
 
-    vector_generator.load_absolute(rightmost_x - (digits * 3 * std::pow(2, num_scale)), y, num_scale);
+    vector_generator.load_absolute(rightmost_x - (digits * 3 * std::pow(2, static_cast<u8>(num_scale))), y, num_scale);
     for (u8 i = 0; i < digits; i++)
         draw_digit(num_string[i] - '0', vector_generator, window, brighten);
 
@@ -65,12 +65,12 @@ void Graphics_Handler::draw_score(const u16 number, const u8 rightmost_x, const 
 void Graphics_Handler::draw_score(const u8 player, const u16 score, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool brighten)
 {
     if (player == 0)
-        draw_score(score, 49, 37, 1, vector_generator, window, brighten);
+        draw_score(score, 49, 37, MUL_2, vector_generator, window, brighten);
     else
-        draw_score(score, 216, 37, 1, vector_generator, window, brighten);
+        draw_score(score, 216, 37, MUL_2, vector_generator, window, brighten);
 }
 
-void Graphics_Handler::draw_text(const u8 text, const Language language, Vector_Generator& vector_generator, sf::RenderWindow& window)
+void Graphics_Handler::draw_text(const Text text, const Language language, Vector_Generator& vector_generator, sf::RenderWindow& window)
 {
     switch (language)
     {

@@ -119,17 +119,17 @@ u8 Asteroid::get_points() const
 
 void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    u8 scale;
+    Scale scale;
     switch (status & 0x07)
     {
         case 4:
-            scale = 0;
+            scale = MUL_1;
             break;
         case 2:
-            scale = 15;
+            scale = DIV_2;
             break;
         case 1:
-            scale = 14;
+            scale = DIV_4;
             break;
     }
     vector_generator.load_absolute(pos, scale);

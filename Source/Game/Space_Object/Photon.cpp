@@ -61,6 +61,6 @@ void Photon::solve_position(const s8 base_offset, u8& pos_major, u8& pos_minor)
 
 void Photon::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    vector_generator.load_absolute(pos, 0);
+    vector_generator.load_absolute(pos, MUL_1);
     vector_generator.process(PHOTON, window);
 }

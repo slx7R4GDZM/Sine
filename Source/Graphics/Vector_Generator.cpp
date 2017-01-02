@@ -95,7 +95,7 @@ void Vector_Generator::draw_long_vector(const u8 opcode, const u16 vector_object
 
 // 10
 // used for space objects
-void Vector_Generator::load_absolute(const Position& pos, const u8 scale)
+void Vector_Generator::load_absolute(const Position& pos, const Scale scale)
 {
     Coordinate current_pos = get_total_pos(pos);
     // divided by 2 to convert the 8192x6144 of the Space_Object
@@ -108,7 +108,7 @@ void Vector_Generator::load_absolute(const Position& pos, const u8 scale)
 }
 
 // used for letters, numbers, etc
-void Vector_Generator::load_absolute(const u8 cur_x, const u8 cur_y, const u8 scale)
+void Vector_Generator::load_absolute(const u8 cur_x, const u8 cur_y, const Scale scale)
 {
     current_x = cur_x << 4;
     current_y = cur_y << 4;
@@ -120,7 +120,7 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration, s
 {
     current_y = (vector_object[iteration++] & 0x03FF) << 2;
     current_x = (vector_object[iteration] & 0x03FF) << 2;
-    global_scale = vector_object[iteration] >> 12;
+    global_scale = static_cast<Scale>(vector_object[iteration] >> 12);
 }
 
 // 15
@@ -148,7 +148,7 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteratio
 
 void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 local_scale, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
 {
-    u8 scale = (global_scale + local_scale) & 0x0F;
+    Scale scale = static_cast<Scale>((global_scale + local_scale) & 0x0F);
     s16 delta_x = (flip_x ? -raw_delta_x : raw_delta_x) >> (7 - scale);
     s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y) >> (7 - scale);
     if (brightness)

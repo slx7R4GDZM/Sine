@@ -97,11 +97,9 @@ bool Space_Object::hit(const u16 pos_1, const u16 pos_2, const u8 minimum_space)
 
 void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    u8 scale;
-    if (status < 239)
-        scale = (status + 33) / 17;
-    else
-        scale = 0;
+    Scale scale = static_cast<Scale>((status + 33) / 17);
+    if (scale > DIV_2)
+        scale = MUL_1;
     vector_generator.load_absolute(pos, scale);
 
     switch (status / 4 % 4)

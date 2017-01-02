@@ -4,11 +4,14 @@
 
 #pragma once
 
+#include <SFML/Window/Keyboard.hpp>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
 #include <string>
+
+using kb = sf::Keyboard;
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
@@ -27,12 +30,69 @@ using std::cerr;
 using std::clog;
 using std::string;
 
+enum Button : u8
+{
+    HYPERSPACE,
+    FIRE,
+    LEFT_COIN,
+    CENTER_COIN,
+    RIGHT_COIN,
+    ONE_PLAYER_START,
+    TWO_PLAYER_START,
+    THRUST,
+    ROTATE_RIGHT,
+    ROTATE_LEFT,
+    EXIT
+};
+
+enum Text : u8
+{
+    HIGH_SCORES,
+    PLAYER_,
+    YOUR_SCORE_IS_ONE_OF_THE_TEN_BEST,
+    PEASE_ENTER_YOUR_INITIALS,
+    PUSH_ROTATE_TO_SELECT_LETTER,
+    PUSH_HYPERSPACE_WHEN_LETTER_IS_CORRECT,
+    PUSH_START,
+    GAME_OVER,
+    ONE_COIN_2_PLAYS,
+    ONE_COIN_1_PLAY,
+    TWO_COINS_1_PLAY
+};
+
+enum Scale : u8
+{
+	MUL_1,
+	MUL_2,
+	MUL_4,
+	MUL_8,
+	MUL_16,
+	MUL_32,
+	MUL_64,
+	MUL_128,
+	DIV_256,
+	DIV_128,
+	DIV_64,
+	DIV_32,
+	DIV_16,
+	DIV_8,
+	DIV_4,
+	DIV_2
+};
+
 enum Language : u8
 {
     ENGLISH,
     GERMAN,
     FRENCH,
     SPANISH
+};
+
+enum Window_Mode : u8
+{
+    WIN_NORMAL,
+    WIN_BORDERLESS,
+    WIN_FULLSCREEN
 };
 
 enum Inactive_Mode : u8
@@ -85,12 +145,6 @@ static bool overflowed_u8(const u8 var_current, const u8 var_previous)
 static bool underflowed_u8(const u8 var_current, const u8 var_previous)
 {
     return var_current > var_previous ? 1 : 0;
-}
-
-// could be made rand_u8, hopefully get rid of this eventually
-static s8 rand_s8(const s8 min_value, const s8 max_value)
-{
-    return rand() % (max_value - min_value + 1) + min_value;
 }
 
 static u8 random_byte()

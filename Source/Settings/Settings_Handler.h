@@ -7,20 +7,12 @@
 #include "../Other/Common_Things.h"
 #include "../Other/Constants.h"
 #include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Window/Keyboard.hpp>
 #include <fstream>
 
 class Settings_Handler
 {
 private:
-    enum Window_Mode : u8
-    {
-        WIN_NORMAL,
-        WIN_BORDERLESS,
-        WIN_FULLSCREEN
-    };
-
-    sf::Keyboard::Key button[TOTAL_BUTTONS];
+    kb::Key button_key[TOTAL_BUTTONS];
     Option_Switch option_switch;
 
     // these can probably be made to be temporary
@@ -47,9 +39,9 @@ public:
     Settings_Handler();
     void apply_window_settings(sf::RenderWindow& win);
     void output_settings() const;
-    sf::Keyboard::Key get_button_key(const u8 button_key) const;
+    kb::Key get_button_key(const Button button_key) const;
     Option_Switch get_option_switch() const;
-    u8 get_inactive_mode() const;
+    Inactive_Mode get_inactive_mode() const;
     Frame_Limiter_Mode get_frame_limiter_mode() const;
     void get_settings(u32& x_resolution, u32& y_resolution, bool& simulate_DAC, bool& crop_image, u8 gamma_table[]) const;
 };

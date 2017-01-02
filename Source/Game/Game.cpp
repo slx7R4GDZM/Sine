@@ -9,36 +9,6 @@
 #include "../Settings/Settings_Handler.h"
 #include <thread>
 
-enum Buttons : u8
-{
-    HYPERSPACE,
-    FIRE,
-    LEFT_COIN,
-    CENTER_COIN,
-    RIGHT_COIN,
-    ONE_PLAYER_START,
-    TWO_PLAYER_START,
-    THRUST,
-    ROTATE_RIGHT,
-    ROTATE_LEFT,
-    EXIT
-};
-
-enum Text : u8
-{
-    HIGH_SCORES,
-    PLAYER_,
-    YOUR_SCORE_IS_ONE_OF_THE_TEN_BEST,
-    PEASE_ENTER_YOUR_INITIALS,
-    PUSH_ROTATE_TO_SELECT_LETTER,
-    PUSH_HYPERSPACE_WHEN_LETTER_IS_CORRECT,
-    PUSH_START,
-    GAME_OVER,
-    ONE_COIN_2_PLAYS,
-    ONE_COIN_1_PLAY,
-    TWO_COINS_1_PLAY
-};
-
 Game::Game()
     : game_activity(RUN_WITH_INPUT)
     , draw_thrust_graphic(false) // hacky, don't use this var
@@ -140,11 +110,11 @@ Game::Game()
                 draw_multiplayer_scores(vector_generator);
 
                 // draw player 2 lives
-                vector_generator.load_absolute(207, 43, 14);
+                vector_generator.load_absolute(207, 43, DIV_4);
                 for (u8 i = 0; i < player_lives[1] && i < 13; i++)
                     vector_generator.process(LIVES_REMAINING_SHIP, window);
             }
-            Graphics_Handler::draw_score(high_score_table[0], 132, 37, 0, vector_generator, window);
+            Graphics_Handler::draw_score(high_score_table[0], 132, 37, MUL_1, vector_generator, window);
             draw_copyright(vector_generator);
 
             if (fast_timer == 255)
@@ -199,14 +169,14 @@ void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
 
 void Game::draw_copyright(Vector_Generator& vector_generator)
 {
-    vector_generator.load_absolute(100, 224, 0);
+    vector_generator.load_absolute(100, 224, MUL_1);
     vector_generator.process(COPYRIGHT_SYMBOL, window);
 
-    // 2016_
+    // 2017_
     Graphics_Handler::draw_character(3, vector_generator, window);
     Graphics_Handler::draw_character(1, vector_generator, window);
     Graphics_Handler::draw_character(2, vector_generator, window);
-    Graphics_Handler::draw_character(7, vector_generator, window);
+    Graphics_Handler::draw_character(8, vector_generator, window);
     Graphics_Handler::draw_character(0, vector_generator, window);
 
     // slx7R4GDZM
@@ -402,7 +372,7 @@ void Game::attract_mode(Vector_Generator& vector_generator)
         credits = 2;
     else
     {
-        vector_generator.load_absolute(80, 199, 1);
+        vector_generator.load_absolute(80, 199, MUL_2);
         if (option_switch.coinage == 1)
             Graphics_Handler::draw_text(ONE_COIN_2_PLAYS, option_switch.language, vector_generator, window);
         else if (option_switch.coinage == 2)
@@ -414,13 +384,13 @@ void Game::attract_mode(Vector_Generator& vector_generator)
     // flash "push start" after enough credits
     if (credits >= 1 && fast_timer % 64 < 32)
     {
-        vector_generator.load_absolute(100, 58, 1);
+        vector_generator.load_absolute(100, 58, MUL_2);
         Graphics_Handler::draw_text(PUSH_START, option_switch.language, vector_generator, window);
     }
 
     if (high_score_table[0] > 0 && slow_timer % 8 < 4)
     {
-        vector_generator.load_absolute(100, 74, 1);
+        vector_generator.load_absolute(100, 74, MUL_2);
         Graphics_Handler::draw_text(HIGH_SCORES, option_switch.language, vector_generator, window);
 
         // draw highscore table
@@ -429,15 +399,15 @@ void Game::attract_mode(Vector_Generator& vector_generator)
             if (high_score_table[i] > 0) // verify this
             {
                 // draw score position
-                vector_generator.load_absolute(101, 89 + i * 8, 1);
+                vector_generator.load_absolute(101, 89 + i * 8, MUL_2);
                 Graphics_Handler::draw_digit(i + 1, vector_generator, window);
                 vector_generator.process(DOT, window);
 
                 // draw score
-                Graphics_Handler::draw_score(high_score_table[i], 137, 89 + i * 8, 1, vector_generator, window);
+                Graphics_Handler::draw_score(high_score_table[i], 137, 89 + i * 8, MUL_2, vector_generator, window);
 
                 // draw score initials
-                vector_generator.load_absolute(149, 89 + i * 8, 1);
+                vector_generator.load_absolute(149, 89 + i * 8, MUL_2);
                 for (u8 c = 0; c < HS_NAME_LENGTH; c++)
                     Graphics_Handler::draw_character(names_HS[i * 3 + c], vector_generator, window);
             }
@@ -456,18 +426,18 @@ void Game::update_player(Vector_Generator& vector_generator)
 {
     if (player_text_timer)
     {
-        vector_generator.load_absolute(100, 74, 1);
+        vector_generator.load_absolute(100, 74, MUL_2);
         Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
         Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
         player_text_timer--;
     }
     else if (!player_lives[current_player] && not_any(player[current_player].ship_photon, MAX_SHIP_PHOTONS))
     {
-        vector_generator.load_absolute(100, 99, 1);
+        vector_generator.load_absolute(100, 99, MUL_2);
         Graphics_Handler::draw_text(GAME_OVER, option_switch.language, vector_generator, window);
         if (player_count == 2)
         {
-            vector_generator.load_absolute(100, 74, 1);
+            vector_generator.load_absolute(100, 74, MUL_2);
             Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
             Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
         }
@@ -512,7 +482,7 @@ void Game::update_player(Vector_Generator& vector_generator)
                 end_game();
         }
     }
-    vector_generator.load_absolute(40, 43, 14);
+    vector_generator.load_absolute(40, 43, DIV_4);
     for (u8 i = 0; i < player_lives[0] && i < 55; i++)
         vector_generator.process(LIVES_REMAINING_SHIP, window);
 }
@@ -538,22 +508,22 @@ void Game::handle_HS_entry(Vector_Generator& vector_generator)
     // draw high score entry control help
     if (last_game_player_count > 1)
     {
-        vector_generator.load_absolute(100, 74, 1);
+        vector_generator.load_absolute(100, 74, MUL_2);
         Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
         if (fast_timer % 32 >= 16)
             Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
     }
-    vector_generator.load_absolute(12, 86, 1);
+    vector_generator.load_absolute(12, 86, MUL_2);
     Graphics_Handler::draw_text(YOUR_SCORE_IS_ONE_OF_THE_TEN_BEST, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 94, 1);
+    vector_generator.load_absolute(12, 94, MUL_2);
     Graphics_Handler::draw_text(PEASE_ENTER_YOUR_INITIALS, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 102, 1);
+    vector_generator.load_absolute(12, 102, MUL_2);
     Graphics_Handler::draw_text(PUSH_ROTATE_TO_SELECT_LETTER, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 110, 1);
+    vector_generator.load_absolute(12, 110, MUL_2);
     Graphics_Handler::draw_text(PUSH_HYPERSPACE_WHEN_LETTER_IS_CORRECT, option_switch.language, vector_generator, window);
 
     // draw name entry
-    vector_generator.load_absolute(100, 199, 2);
+    vector_generator.load_absolute(100, 199, MUL_4);
     for (u8 c = 0; c < HS_NAME_LENGTH; c++)
     {
         if (names_HS[player_HS_place[current_player] + c] == 0)
@@ -844,7 +814,14 @@ void Game::handle_saucer_stuff(Player& player) const
         }
         else if (player.saucer_spawn_and_shot_time == 0)
         {
-            fire_photon(player.saucer_photon, MAX_SAUCER_PHOTONS, random_byte(), player.saucer);
+            u8 saucer_direction;
+            // if (player.saucer.get_status() == LARGE_SAUCER)
+                saucer_direction = random_byte();
+            // else if (player_score[current_player] < 3500)
+                // accuracy of +- 16;
+            // else
+                // accuracy of +- 8;
+            fire_photon(player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
             player.saucer_spawn_and_shot_time = 10;
         }
     }

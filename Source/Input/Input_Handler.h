@@ -15,6 +15,6 @@ private:
 public:
     Input_Handler() = default;
     void update(const Settings_Handler& settings_handler);
-    bool is_pressed(const u8 button) const;
-    bool on_press(const u8 button) const;
+    bool is_pressed(const Button button) const;
+    bool on_press(const Button button) const;
 };
