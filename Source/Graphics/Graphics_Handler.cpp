@@ -13,28 +13,18 @@ void Graphics_Handler::draw_message(const u16 message[], const u8 iteration, Vec
     bool done = false;
     for (u8 i = iteration; !done; i++)
     {
-        for (u8 character = 0; !done && character < 3; character++)
+        for (u8 c = 2; !done && c != 255; c--)
         {
-            u8 char_offset = character * 5;
-            done = draw_packed_character((message[i] & (0xF800 >> char_offset)) >> (11 - char_offset), vector_generator, window);
+            u8 character = (message[i] >> (c * 5 + 1)) & 0x1F;
+            if (character == 0) // null
+                done = true;
+            else if (character < 5) // space, 0, 1, 2
+                draw_character(character - 1, vector_generator, window);
+            else // letters
+                draw_character(character + 6, vector_generator, window);
         }
-        if (!done)
+        if (!done) // if no null chars then check the stop bit
             done = message[i] & 0x0001;
-    }
-}
-
-bool Graphics_Handler::draw_packed_character(const u8 character, Vector_Generator& vector_generator, sf::RenderWindow& window)
-{
-    if (!character)
-        return true;
-    else
-    {
-        if (character < 5) // space, 0, 1, 2
-            vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[character - 1]);
-        else // letters
-            vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[character + 6]);
-
-        return false;
     }
 }
 

@@ -12,7 +12,6 @@ class Graphics_Handler
 {
 private:
     static void draw_message(const u16 message[], const u8 iteration, Vector_Generator& vector_generator, sf::RenderWindow& window);
-    static bool draw_packed_character(const u8 character, Vector_Generator& vector_generator, sf::RenderWindow& window);
 public:
     static void draw_character(const u8 character, Vector_Generator& vector_generator, sf::RenderWindow& window);
     static void draw_digit(const u8 digit, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool brighten = false);

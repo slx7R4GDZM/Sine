@@ -79,7 +79,7 @@ private:
     void update_space_objects(Player& player, Vector_Generator& vector_generator);
     void handle_collision(Player& player);
     static void clear_space_objects(Player& player);
-    bool not_any(const Space_Object space_object[], const u8 max_objects);
+    static bool not_any(const Space_Object space_object[], const u8 max_objects);
 
     static void attempt_asteroid_wave_spawn(Player& player);
     static void spawn_asteroids_from_wreckage(Player& player, const u8 iteration);

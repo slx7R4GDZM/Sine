@@ -8,6 +8,7 @@ add
 	resizable window at runtime
 	configuration gui
 	support for non kb input
+	vector monitor shader
 	makefile
 
 re-do correctly
