@@ -6,11 +6,6 @@
 
 #include "../../Other/Vectors.h"
 
-Ship::Ship()
-{
-    status = INDISCERNIBLE;
-}
-
 void Ship::spawn()
 {
     vel_x_major = 0;

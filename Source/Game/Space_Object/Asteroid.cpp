@@ -6,11 +6,6 @@
 
 #include "../../Other/Vectors.h"
 
-Asteroid::Asteroid()
-{
-    status = INDISCERNIBLE;
-}
-
 void Asteroid::spawn_wave_asteroid()
 {
     // need to check if area is clear of other spaceobjects
@@ -148,4 +143,19 @@ void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window
             vector_generator.process(ASTEROID_4, window);
             break;
     }
+}
+
+bool Asteroid::blocking_spawn(const Asteroid asteroid[])
+{
+    bool asteroid_in_spawn = false;
+    for (u8 i = 0; i < MAX_ASTEROIDS && !asteroid_in_spawn; i++)
+    {
+        if (asteroid[i].status != INDISCERNIBLE)
+        {
+            if (asteroid[i].pos.x_major >= 12 && asteroid[i].pos.x_major <= 19
+             && asteroid[i].pos.y_major >=  8 && asteroid[i].pos.y_major <= 15)
+                asteroid_in_spawn = true;
+        }
+    }
+    return asteroid_in_spawn;
 }

@@ -17,7 +17,6 @@ private:
     static void dampen_velocity_axis(s8& vel_major, u8& vel_minor);
     void draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
-    Ship();
     void spawn();
     void crash(u8& player_lives, u8& ship_spawn_timer);
     void update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic);

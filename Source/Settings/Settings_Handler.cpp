@@ -168,7 +168,7 @@ T Settings_Handler::clamp_string_value(const string& setting, const string& valu
     }
 }
 
-void Settings_Handler::apply_window_settings(sf::RenderWindow& win)
+void Settings_Handler::apply_window_settings(sf::RenderWindow& win) const
 {
     u8 window_style;
     switch (window_mode)

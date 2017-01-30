@@ -85,7 +85,7 @@ private:
     static void spawn_asteroids_from_wreckage(Player& player, const u8 iteration);
     void handle_ship_stuff(Player& player);
     void handle_saucer_stuff(Player& player) const;
-    static void fire_photon(Photon photon_array[], const u8 max_photons, const u8 direction, const Space_Object space_object);
+    static void fire_photon(Photon photon[], const u8 max_photons, const u8 direction, const Space_Object space_object);
 public:
     Game();
 };

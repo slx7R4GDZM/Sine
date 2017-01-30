@@ -754,11 +754,18 @@ void Game::handle_ship_stuff(Player& player)
     }
     if (player.ship_spawn_timer > 0 && player.ship.get_status() < TRUE_EXPLOSION_START)
     {
-        player.ship_spawn_timer--;
-        if (player.ship_spawn_timer == 0)
+        if (player.ship_spawn_timer > 1)
+            player.ship_spawn_timer--;
+        else if (player.ship_spawn_timer == 1)
         {
             if (hyperspace_flag < 128)
-                player.ship.set_status(ALIVE);
+            {
+                if (!Asteroid::blocking_spawn(player.asteroid))
+                {
+                    player.ship.set_status(ALIVE);
+                    player.ship_spawn_timer = 0;
+                }
+            }
             else
             {
                 player_lives[current_player]--;
@@ -827,14 +834,14 @@ void Game::handle_saucer_stuff(Player& player) const
     }
 }
 
-void Game::fire_photon(Photon photon_array[], const u8 max_photons, const u8 direction, const Space_Object space_object)
+void Game::fire_photon(Photon photon[], const u8 max_photons, const u8 direction, const Space_Object space_object)
 {
     bool photon_added = false;
     for (u8 i = 0; i < max_photons && !photon_added; i++)
     {
-        if (photon_array[i].get_status() == INDISCERNIBLE)
+        if (photon[i].get_status() == INDISCERNIBLE)
         {
-            photon_array[i].spawn(direction,
+            photon[i].spawn(direction,
                                   space_object.get_vel_x(),
                                   space_object.get_vel_y(),
                                   space_object.get_position());

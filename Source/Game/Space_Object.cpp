@@ -6,6 +6,11 @@
 
 #include "../Other/Vectors.h"
 
+Space_Object::Space_Object()
+{
+    status = INDISCERNIBLE;
+}
+
 s8 Space_Object::lookup_sine(const u8 direction)
 {
     if (direction <= 64)

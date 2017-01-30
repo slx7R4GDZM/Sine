@@ -37,7 +37,7 @@ private:
     static T clamp_string_value(const string& setting, const string& value, const T min_v, const T max_v);
 public:
     Settings_Handler();
-    void apply_window_settings(sf::RenderWindow& win);
+    void apply_window_settings(sf::RenderWindow& win) const;
     void output_settings() const;
     kb::Key get_button_key(const Button button_key) const;
     Option_Switch get_option_switch() const;

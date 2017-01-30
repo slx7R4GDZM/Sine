@@ -6,11 +6,6 @@
 
 #include "../../Other/Vectors.h"
 
-Photon::Photon()
-{
-    status = INDISCERNIBLE;
-}
-
 void Photon::spawn(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos)
 {
     photon_timer = 0;

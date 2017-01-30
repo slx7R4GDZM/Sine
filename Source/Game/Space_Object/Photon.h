@@ -17,7 +17,6 @@ private:
     static void solve_position(const s8 base_offset, u8& pos_major, u8& pos_minor);
     void draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
-    Photon();
     void spawn(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos);
     void update(Vector_Generator& vector_generator, sf::RenderWindow& window);
 };

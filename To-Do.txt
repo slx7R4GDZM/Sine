@@ -1,5 +1,5 @@
 add
-	spawn safety for ship and saucer
+	spawn safety for saucer
 	ship specific explosion graphics
 	small saucer aiming
 	some way to simulate analog sound
@@ -9,7 +9,7 @@ add
 	configuration gui
 	support for non kb input
 	vector monitor shader
-	makefile
+	cmakefile
 
 re-do correctly
 	points

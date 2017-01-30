@@ -6,11 +6,6 @@
 
 #include "../../Other/Vectors.h"
 
-Saucer::Saucer()
-{
-    status = INDISCERNIBLE;
-}
-
 void Saucer::spawn(const u16 player_score, const u8 saucer_spawn_time_start)
 {
     if (saucer_spawn_time_start >= 128)

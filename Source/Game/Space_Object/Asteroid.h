@@ -15,10 +15,10 @@ private:
     s8 get_starting_velocity() const;
     void draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
-    Asteroid();
     void spawn_wave_asteroid();
     void spawn_crash_asteroid(const u8 status, const Position pos);
     void update(Vector_Generator& vector_generator, sf::RenderWindow& window, u8& asteroid_count, u8& asteroid_wave_spawn_time);
     u8 get_size() const;
     u8 get_points() const;
+    static bool blocking_spawn(const Asteroid asteroid[]);
 };

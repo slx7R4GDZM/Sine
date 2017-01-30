@@ -20,12 +20,12 @@ protected:
     Position pos;
     u8 status;
 
+    Space_Object();
     static s8 lookup_sine(const u8 direction);
     static s8 lookup_cosine(const u8 direction);
     void update_position();
     void draw_explosion(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
-    Space_Object() = default;
     static u8 limit_position(const u8 pos_major, const u8 max_pos_major);
     static bool collide(const Space_Object o1, const Space_Object& o2, const u8 minimum_space);
 

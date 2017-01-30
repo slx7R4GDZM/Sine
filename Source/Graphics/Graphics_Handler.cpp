@@ -13,7 +13,7 @@ void Graphics_Handler::draw_message(const u16 message[], const u8 iteration, Vec
     bool done = false;
     for (u8 i = iteration; !done; i++)
     {
-        for (u8 c = 2; !done && c != 255; c--)
+        for (u8 c = 2; !done && c != UINT8_MAX; c--)
         {
             u8 character = (message[i] >> (c * 5 + 1)) & 0x1F;
             if (character == 0) // null
