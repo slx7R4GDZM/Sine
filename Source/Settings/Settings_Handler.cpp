@@ -5,6 +5,7 @@
 #include "Settings_Handler.h"
 
 #include "../Other/Text.h"
+#include <cfloat>
 #include <cmath>
 #include <cstring>
 #include <iomanip>
@@ -19,9 +20,9 @@ Settings_Handler::Settings_Handler()
     , start_win_pos_y(-1)
     , inactive_mode(PAUSE)
     , simulate_DAC(true)
-    , crop_image(true)
+    , crop_ratio(1.2962962f)
     , samples_MSAA(3)
-    , gamma_correction(1.0)
+    , gamma_correction(1.0f)
     , enable_v_sync(false)
     , frame_limiter_mode(SLEEPING)
 {
@@ -122,9 +123,9 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
     else if (setting == "Window-Mode")
         window_mode = clamp_string_value(setting, value, WIN_NORMAL, WIN_FULLSCREEN);
     else if (setting == "X-Resolution")
-        x_resolution = clamp_string_value(setting, value, 0u, UINT32_MAX);
+        x_resolution = clamp_string_value(setting, value, 1u, UINT32_MAX);
     else if (setting == "Y-Resolution")
-        y_resolution = clamp_string_value(setting, value, 0u, UINT32_MAX);
+        y_resolution = clamp_string_value(setting, value, 1u, UINT32_MAX);
     else if (setting == "Start-Window-Position-X")
         start_win_pos_x = clamp_string_value(setting, value, INT32_MIN, INT32_MAX);
     else if (setting == "Start-Window-Position-Y")
@@ -133,17 +134,17 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
         inactive_mode = clamp_string_value(setting, value, PAUSE, RUN_WITH_INPUT);
     else if (setting == "Simulate-DAC")
         simulate_DAC = clamp_string_value(setting, value, false, true);
-    else if (setting == "Crop-Image")
-        crop_image = clamp_string_value(setting, value, false, true);
+    else if (setting == "Crop-Ratio")
+        crop_ratio = clamp_string_value(setting, value, FLT_MIN, FLT_MAX);
     else if (setting == "MSAA-Quality")
         // 8x MSAA is the best you can get on Nvidia, not sure about AMD or Intel
         // you can choose 16x in SFML but it's clearly not true MSAA
         // might be possible to get true 16x+ with SLI but no idea
         samples_MSAA = clamp_string_value(setting, value, 0, 3);
     else if (setting == "Gamma-Correction")
-        gamma_correction = clamp_string_value(setting, value, 0.0f, 2048.0f);
+        gamma_correction = clamp_string_value(setting, value, FLT_MIN, FLT_MAX);
     else if (setting == "V-Sync-Enabled")
-        enable_v_sync = clamp_string_value(setting, value, 0, 1);
+        enable_v_sync = clamp_string_value(setting, value, false, true);
     else if (setting == "Frame-Limit-Mode")
         frame_limiter_mode = clamp_string_value(setting, value, SLEEPING, BUSY_WAITING);
     else
@@ -230,7 +231,7 @@ void Settings_Handler::output_settings() const
 
     clog << "\n========================================";
     clog << "\nSimulate-DAC = " << simulate_DAC;
-    clog << "\nCrop-Image = " << crop_image;
+    clog << "\nCrop-Ratio = " << crop_ratio;
     clog << "\nMSAA-Quality = " << static_cast<u16>(samples_MSAA);
     clog << "\nGamma-Correction = " << gamma_correction;
     clog << "\nV-Sync-Enabled = " << enable_v_sync;
@@ -257,12 +258,12 @@ Frame_Limiter_Mode Settings_Handler::get_frame_limiter_mode() const
     return frame_limiter_mode;
 }
 
-void Settings_Handler::get_settings(u32& x_resolution, u32& y_resolution, bool& simulate_DAC, bool& crop_image, u8 gamma_table[]) const
+void Settings_Handler::get_settings(u32& x_resolution, u32& y_resolution, bool& simulate_DAC, float& crop_ratio, u8 gamma_table[]) const
 {
     x_resolution = this->x_resolution;
     y_resolution = this->y_resolution;
     simulate_DAC = this->simulate_DAC;
-    crop_image = this->crop_image;
+    crop_ratio = this->crop_ratio;
     for (u8 i = 0; i < 16; i++)
-        gamma_table[i] = 255 * std::pow(static_cast<double>(i) * 17 / 255, 1 / gamma_correction) + 0.5;
+        gamma_table[i] = 255 * std::pow(static_cast<float>(i) * 17 / 255, 1 / gamma_correction) + 0.5f;
 }

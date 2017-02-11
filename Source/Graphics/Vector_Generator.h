@@ -25,7 +25,7 @@ private:
     u32 x_resolution;
     u32 y_resolution;
     bool simulate_DAC;
-    bool crop_image;
+    float crop_ratio;
     u8 gamma_table[16];
 
     void draw_long_vector(const u8 opcode, const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, sf::RenderWindow& window);

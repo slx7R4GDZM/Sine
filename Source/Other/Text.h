@@ -177,10 +177,11 @@ Inactive-Mode 0
 # 1 = Simulate the 10-bit DAC, thus having shaky graphics (default)
 Simulate-DAC 1
 
-## Crop image
-# 0 = Scale the 1:1 image to fit into the set window resolution
-# 1 = Crop the image from its 1:1 aspect ratio to the set resolution (default)
-Crop-Image 1
+## The x:y ratio to crop the image to
+# < 1 = Crops the image starting with the left and right sides
+# 1.0 = Scales the image to the lower resolution axis
+# > 1 = Crops the image starting with the top and bottom (default)
+Crop-Ratio 1.2962962
 
 ## MSAA toggle and quality setting
 # 0 = Off

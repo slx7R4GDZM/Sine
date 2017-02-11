@@ -4,7 +4,6 @@ add
 	small saucer aiming
 	some way to simulate analog sound
 	sounds
-	better cropping mode
 	resizable window at runtime
 	configuration gui
 	support for non kb input
@@ -12,7 +11,7 @@ add
 	cmakefile
 
 re-do correctly
-	points
+	score
 	asteroid spawn velocity
 	ship thrust graphics
 	photon spawn position

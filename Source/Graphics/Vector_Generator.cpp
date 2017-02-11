@@ -17,32 +17,22 @@ Vector_Generator::Vector_Generator(const Settings_Handler settings_handler)
     : x_offset(0)
     , y_offset(0)
 {
-    settings_handler.get_settings(x_resolution, y_resolution, simulate_DAC, crop_image, gamma_table);
-    if (crop_image)
+    settings_handler.get_settings(x_resolution, y_resolution, simulate_DAC, crop_ratio, gamma_table);
+    if (x_resolution <= y_resolution && crop_ratio >= 1.0f)
     {
-        if (x_resolution < y_resolution)
-        {
-            res_scale = static_cast<float>(INTERNAL_RES) / y_resolution;
-            x_offset = (y_resolution - x_resolution) * res_scale / -2;
-        }
-        else
-        {
-            res_scale = static_cast<float>(INTERNAL_RES) / x_resolution;
-            y_offset = (x_resolution - y_resolution) * res_scale / -2;
-        }
+        res_scale = static_cast<float>(INTERNAL_RES) / x_resolution;
+        y_offset = (y_resolution - x_resolution) * res_scale / 2;
+    }
+    else if (x_resolution >= y_resolution && crop_ratio <= 1.0f)
+    {
+        res_scale = static_cast<float>(INTERNAL_RES) / y_resolution;
+        x_offset = (x_resolution - y_resolution) * res_scale / 2;
     }
     else
     {
-        if (x_resolution < y_resolution)
-        {
-            res_scale = static_cast<float>(INTERNAL_RES) / x_resolution;
-            y_offset = (y_resolution - x_resolution) * res_scale / 2;
-        }
-        else
-        {
-            res_scale = static_cast<float>(INTERNAL_RES) / y_resolution;
-            x_offset = (x_resolution - y_resolution) * res_scale / 2;
-        }
+        res_scale = INTERNAL_RES / (y_resolution * crop_ratio);
+        x_offset = (x_resolution - y_resolution * crop_ratio) * res_scale / 2;
+        y_offset = (y_resolution - y_resolution * crop_ratio) * res_scale / 2;
     }
     line_thickness = DESIRED_LINE_WIDTH / (res_scale / 4);
 }

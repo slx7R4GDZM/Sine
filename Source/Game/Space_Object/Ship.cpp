@@ -10,8 +10,7 @@ void Ship::spawn()
 {
     vel_x_major = 0;
     vel_y_major = 0;
-    //if (spawn_area_clear())
-        pos = {16, 12, 96, 96};
+    pos = {16, 12, 96, 96};
 }
 
 void Ship::crash(u8& player_lives, u8& ship_spawn_timer)

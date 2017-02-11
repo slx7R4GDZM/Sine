@@ -24,7 +24,7 @@ private:
     s32 start_win_pos_y;
     Inactive_Mode inactive_mode;
     bool simulate_DAC;
-    bool crop_image;
+    float crop_ratio;
     u8 samples_MSAA;
     float gamma_correction;
     bool enable_v_sync;
@@ -43,5 +43,5 @@ public:
     Option_Switch get_option_switch() const;
     Inactive_Mode get_inactive_mode() const;
     Frame_Limiter_Mode get_frame_limiter_mode() const;
-    void get_settings(u32& x_resolution, u32& y_resolution, bool& simulate_DAC, bool& crop_image, u8 gamma_table[]) const;
+    void get_settings(u32& x_resolution, u32& y_resolution, bool& simulate_DAC, float& crop_ratio, u8 gamma_table[]) const;
 };
