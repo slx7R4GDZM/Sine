@@ -120,8 +120,9 @@ Game::Game()
             if (fast_timer == 255)
                 slow_timer++;
             fast_timer++;
+
+            window.display();
         }
-        window.display();
 
         if (settings.get_frame_limiter_mode() == SLEEPING)
         {
