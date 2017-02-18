@@ -55,9 +55,9 @@ void Graphics_Handler::draw_score(const u16 number, const u8 rightmost_x, const 
 void Graphics_Handler::draw_score(const u8 player, const u16 score, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool brighten)
 {
     if (player == 0)
-        draw_score(score, 49, 37, MUL_2, vector_generator, window, brighten);
+        draw_score(score, 49, 219, MUL_2, vector_generator, window, brighten);
     else
-        draw_score(score, 216, 37, MUL_2, vector_generator, window, brighten);
+        draw_score(score, 216, 219, MUL_2, vector_generator, window, brighten);
 }
 
 void Graphics_Handler::draw_text(const Text text, const Language language, Vector_Generator& vector_generator, sf::RenderWindow& window)

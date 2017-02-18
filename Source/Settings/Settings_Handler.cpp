@@ -48,7 +48,7 @@ void Settings_Handler::parse_file_settings(std::ifstream& input)
     string value;
     while (getline(input, line))
     {
-        if (line[0] != '#' && !line.empty())
+        if (!line.empty() && line[0] != '#')
         {
             while (line[0] == ' ')
                 line.erase(0, 1);

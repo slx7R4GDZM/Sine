@@ -147,15 +147,14 @@ void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window
 
 bool Asteroid::blocking_spawn(const Asteroid asteroid[])
 {
-    bool asteroid_in_spawn = false;
-    for (u8 i = 0; i < MAX_ASTEROIDS && !asteroid_in_spawn; i++)
+    for (u8 i = 0; i < MAX_ASTEROIDS; i++)
     {
         if (asteroid[i].status != INDISCERNIBLE)
         {
             if (asteroid[i].pos.x_major >= 12 && asteroid[i].pos.x_major <= 19
              && asteroid[i].pos.y_major >=  8 && asteroid[i].pos.y_major <= 15)
-                asteroid_in_spawn = true;
+                return true;
         }
     }
-    return asteroid_in_spawn;
+    return false;
 }

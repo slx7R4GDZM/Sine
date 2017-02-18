@@ -28,13 +28,15 @@ private:
     float crop_ratio;
     u8 gamma_table[16];
 
-    void draw_long_vector(const u8 opcode, const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, sf::RenderWindow& window);
+    void draw_long_vector(const Opcode opcode, const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, sf::RenderWindow& window);
     void load_absolute(const u16 vector_object[], u8& iteration, sf::RenderWindow& window);
     void draw_short_vector(const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, const bool brighten, sf::RenderWindow& window);
 
     void draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 local_scale, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window);
     void draw_wide_line_segment(const float starting_x, const float starting_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;
-    void draw_thin_line_segment(const float starting_x, const float starting_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;
+    void draw_thin_line_segment(const float scaled_x_start, const float scaled_y_start, const float x_start, const float y_start, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;
+
+    s8 get_final_scale(const u8 local_scale) const;
 public:
     Vector_Generator(const Settings_Handler settings_handler);
     void process(const u16 vector_object[], sf::RenderWindow& window, u8 iteration = 0, const bool flip_x = false, const bool flip_y = false, const bool brighten = false);

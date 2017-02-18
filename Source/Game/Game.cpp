@@ -110,11 +110,11 @@ Game::Game()
                 draw_multiplayer_scores(vector_generator);
 
                 // draw player 2 lives
-                vector_generator.load_absolute(207, 43, DIV_4);
+                vector_generator.load_absolute(207, 213, DIV_4);
                 for (u8 i = 0; i < player_lives[1] && i < 13; i++)
                     vector_generator.process(LIVES_REMAINING_SHIP, window);
             }
-            Graphics_Handler::draw_score(high_score_table[0], 132, 37, MUL_1, vector_generator, window);
+            Graphics_Handler::draw_score(high_score_table[0], 132, 219, MUL_1, vector_generator, window);
             draw_copyright(vector_generator);
 
             if (fast_timer == 255)
@@ -170,7 +170,6 @@ void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
 
 void Game::draw_copyright(Vector_Generator& vector_generator)
 {
-    vector_generator.load_absolute(100, 224, MUL_1);
     vector_generator.process(COPYRIGHT_SYMBOL, window);
 
     // 2017_
@@ -373,7 +372,7 @@ void Game::attract_mode(Vector_Generator& vector_generator)
         credits = 2;
     else
     {
-        vector_generator.load_absolute(80, 199, MUL_2);
+        vector_generator.load_absolute(80, 57, MUL_2);
         if (option_switch.coinage == 1)
             Graphics_Handler::draw_text(ONE_COIN_2_PLAYS, option_switch.language, vector_generator, window);
         else if (option_switch.coinage == 2)
@@ -385,13 +384,13 @@ void Game::attract_mode(Vector_Generator& vector_generator)
     // flash "push start" after enough credits
     if (credits >= 1 && fast_timer % 64 < 32)
     {
-        vector_generator.load_absolute(100, 58, MUL_2);
+        vector_generator.load_absolute(100, 198, MUL_2);
         Graphics_Handler::draw_text(PUSH_START, option_switch.language, vector_generator, window);
     }
 
     if (high_score_table[0] > 0 && slow_timer % 8 < 4)
     {
-        vector_generator.load_absolute(100, 74, MUL_2);
+        vector_generator.load_absolute(100, 182, MUL_2);
         Graphics_Handler::draw_text(HIGH_SCORES, option_switch.language, vector_generator, window);
 
         // draw highscore table
@@ -400,15 +399,15 @@ void Game::attract_mode(Vector_Generator& vector_generator)
             if (high_score_table[i] > 0) // verify this
             {
                 // draw score position
-                vector_generator.load_absolute(101, 89 + i * 8, MUL_2);
+                vector_generator.load_absolute(101, 167 - i * 8, MUL_2);
                 Graphics_Handler::draw_digit(i + 1, vector_generator, window);
                 vector_generator.process(DOT, window);
 
                 // draw score
-                Graphics_Handler::draw_score(high_score_table[i], 137, 89 + i * 8, MUL_2, vector_generator, window);
+                Graphics_Handler::draw_score(high_score_table[i], 137, 167 - i * 8, MUL_2, vector_generator, window);
 
                 // draw score initials
-                vector_generator.load_absolute(149, 89 + i * 8, MUL_2);
+                vector_generator.load_absolute(149, 167 - i * 8, MUL_2);
                 for (u8 c = 0; c < HS_NAME_LENGTH; c++)
                     Graphics_Handler::draw_character(names_HS[i * 3 + c], vector_generator, window);
             }
@@ -427,18 +426,18 @@ void Game::update_player(Vector_Generator& vector_generator)
 {
     if (player_text_timer)
     {
-        vector_generator.load_absolute(100, 74, MUL_2);
+        vector_generator.load_absolute(100, 182, MUL_2);
         Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
         Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
         player_text_timer--;
     }
-    else if (!player_lives[current_player] && not_any(player[current_player].ship_photon, MAX_SHIP_PHOTONS))
+    else if (!player_lives[current_player] && !Photon::any(player[current_player].ship_photon, MAX_SHIP_PHOTONS))
     {
-        vector_generator.load_absolute(100, 99, MUL_2);
+        vector_generator.load_absolute(100, 157, MUL_2);
         Graphics_Handler::draw_text(GAME_OVER, option_switch.language, vector_generator, window);
         if (player_count == 2)
         {
-            vector_generator.load_absolute(100, 74, MUL_2);
+            vector_generator.load_absolute(100, 182, MUL_2);
             Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
             Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
         }
@@ -483,7 +482,7 @@ void Game::update_player(Vector_Generator& vector_generator)
                 end_game();
         }
     }
-    vector_generator.load_absolute(40, 43, DIV_4);
+    vector_generator.load_absolute(40, 213, DIV_4);
     for (u8 i = 0; i < player_lives[0] && i < 55; i++)
         vector_generator.process(LIVES_REMAINING_SHIP, window);
 }
@@ -509,22 +508,22 @@ void Game::handle_HS_entry(Vector_Generator& vector_generator)
     // draw high score entry control help
     if (last_game_player_count > 1)
     {
-        vector_generator.load_absolute(100, 74, MUL_2);
+        vector_generator.load_absolute(100, 182, MUL_2);
         Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
         if (fast_timer % 32 >= 16)
             Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
     }
-    vector_generator.load_absolute(12, 86, MUL_2);
+    vector_generator.load_absolute(12, 170, MUL_2);
     Graphics_Handler::draw_text(YOUR_SCORE_IS_ONE_OF_THE_TEN_BEST, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 94, MUL_2);
+    vector_generator.load_absolute(12, 162, MUL_2);
     Graphics_Handler::draw_text(PEASE_ENTER_YOUR_INITIALS, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 102, MUL_2);
+    vector_generator.load_absolute(12, 154, MUL_2);
     Graphics_Handler::draw_text(PUSH_ROTATE_TO_SELECT_LETTER, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 110, MUL_2);
+    vector_generator.load_absolute(12, 146, MUL_2);
     Graphics_Handler::draw_text(PUSH_HYPERSPACE_WHEN_LETTER_IS_CORRECT, option_switch.language, vector_generator, window);
 
     // draw name entry
-    vector_generator.load_absolute(100, 199, MUL_4);
+    vector_generator.load_absolute(100, 57, MUL_4);
     for (u8 c = 0; c < HS_NAME_LENGTH; c++)
     {
         if (names_HS[player_HS_place[current_player] + c] == 0)
@@ -674,16 +673,6 @@ void Game::clear_space_objects(Player& player)
         player.ship_photon[i].set_status(INDISCERNIBLE);
 }
 
-bool Game::not_any(const Space_Object space_object[], const u8 max_objects)
-{
-    for (u8 i = 0; i < max_objects; i++)
-    {
-        if (space_object[i].get_status() != INDISCERNIBLE)
-            return false;
-    }
-    return true;
-}
-
 void Game::attempt_asteroid_wave_spawn(Player& player)
 {
     if (player.asteroid_wave_spawn_time)
@@ -730,7 +719,7 @@ void Game::handle_ship_stuff(Player& player)
 
     // on_press should be handled slightly differently, also need a limit on the photon shooting speed?
     if (input.on_press(FIRE) && !player_text_timer && !player.ship_spawn_timer)
-        fire_photon(player.ship_photon, MAX_SHIP_PHOTONS, ship_direction, player.ship);
+        Photon::fire_photon(player.ship_photon, MAX_SHIP_PHOTONS, ship_direction, player.ship);
     if (input.is_pressed(HYPERSPACE) && !player_text_timer && !player.ship_spawn_timer)
     {
         player.ship.set_status(INDISCERNIBLE);
@@ -829,24 +818,8 @@ void Game::handle_saucer_stuff(Player& player) const
                 // accuracy of +- 16;
             // else
                 // accuracy of +- 8;
-            fire_photon(player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
+            Photon::fire_photon(player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
             player.saucer_spawn_and_shot_time = 10;
-        }
-    }
-}
-
-void Game::fire_photon(Photon photon[], const u8 max_photons, const u8 direction, const Space_Object space_object)
-{
-    bool photon_added = false;
-    for (u8 i = 0; i < max_photons && !photon_added; i++)
-    {
-        if (photon[i].get_status() == INDISCERNIBLE)
-        {
-            photon[i].spawn(direction,
-                                  space_object.get_vel_x(),
-                                  space_object.get_vel_y(),
-                                  space_object.get_position());
-            photon_added = true;
         }
     }
 }

@@ -19,4 +19,6 @@ private:
 public:
     void spawn(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos);
     void update(Vector_Generator& vector_generator, sf::RenderWindow& window);
+    static void fire_photon(Photon photon[], const u8 max_photons, const u8 direction, const Space_Object space_object);
+    static bool any(const Photon photon[], const u8 max_photons);
 };

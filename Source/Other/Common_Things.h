@@ -80,6 +80,26 @@ enum Scale : u8
 	DIV_2
 };
 
+enum Opcode : u8
+{
+	VCTR_0,
+	VCTR_1,
+	VCTR_2,
+	VCTR_3,
+	VCTR_4,
+	VCTR_5,
+	VCTR_6,
+	VCTR_7,
+	VCTR_8,
+	VCTR_9,
+	LABS,
+	HALT,
+	JSRL,
+	RTSL,
+	JMPL,
+	SVEC
+};
+
 enum Language : u8
 {
     ENGLISH,

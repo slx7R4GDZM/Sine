@@ -59,3 +59,29 @@ void Photon::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) 
     vector_generator.load_absolute(pos, MUL_1);
     vector_generator.process(PHOTON, window);
 }
+
+void Photon::fire_photon(Photon photon[], const u8 max_photons, const u8 direction, const Space_Object space_object)
+{
+    bool photon_added = false;
+    for (u8 i = 0; i < max_photons && !photon_added; i++)
+    {
+        if (photon[i].status == INDISCERNIBLE)
+        {
+            photon[i].spawn(direction,
+                            space_object.get_vel_x(),
+                            space_object.get_vel_y(),
+                            space_object.get_position());
+            photon_added = true;
+        }
+    }
+}
+
+bool Photon::any(const Photon photon[], const u8 max_photons)
+{
+    for (u8 i = 0; i < max_photons; i++)
+    {
+        if (photon[i].status != INDISCERNIBLE)
+            return true;
+    }
+    return false;
+}
