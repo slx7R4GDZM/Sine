@@ -11,7 +11,7 @@
 
 Game::Game()
     : game_activity(RUN_WITH_INPUT)
-    , draw_thrust_graphic(false) // hacky, don't use this var
+    , draw_thrust(false) // hacky, don't use this var
     , current_player(0)
     , last_game_player_count(0)
     , player_count(0)
@@ -576,7 +576,7 @@ void Game::update_space_objects(Player& player, Vector_Generator& vector_generat
     for (u8 i = 0; i < MAX_ASTEROIDS; i++)
         player.asteroid[i].update(vector_generator, window, player.asteroid_count, player.asteroid_wave_spawn_time);
 
-    player.ship.update(vector_generator, window, fast_timer, ship_direction, draw_thrust_graphic);
+    player.ship.update(vector_generator, window, fast_timer, ship_direction, draw_thrust);
     player.saucer.update(vector_generator, window, fast_timer, player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start);
 
     for (u8 i = 0; i < MAX_SAUCER_PHOTONS; i++)
@@ -594,7 +594,7 @@ void Game::handle_collision(Player& player)
 	// ship
 	for (u8 i = 0; player.ship.get_status() == ALIVE && i < MAX_ASTEROIDS; i++)
 	{
-		if (Space_Object::collide(player.ship, player.asteroid[i], BONUS_SIZE_1 + player.asteroid[i].get_size()))
+		if (player.ship.collide(player.asteroid[i], BONUS_SIZE_1 + player.asteroid[i].get_size()))
 		{
 			add_points(player.asteroid[i].get_points());
 			spawn_asteroids_from_wreckage(player, i);
@@ -605,13 +605,13 @@ void Game::handle_collision(Player& player)
 	// saucer
 	for (u8 i = 0; (player.saucer.get_status() == LARGE_SAUCER || player.saucer.get_status() == SMALL_SAUCER) && i < MAX_ASTEROIDS; i++)
 	{
-		if (Space_Object::collide(player.saucer, player.asteroid[i], player.saucer.get_size(true) + player.asteroid[i].get_size()))
+		if (player.saucer.collide(player.asteroid[i], player.saucer.get_size(true) + player.asteroid[i].get_size()))
 		{
 			spawn_asteroids_from_wreckage(player, i);
 			player.saucer.crash(player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start);
 		}
 	}
-	if (Space_Object::collide(player.saucer, player.ship, player.saucer.get_size(true)))
+	if (player.saucer.collide(player.ship, player.saucer.get_size(true)))
 	{
 		add_points(player.saucer.get_points());
 		player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
@@ -624,14 +624,14 @@ void Game::handle_collision(Player& player)
 		bool crashed = false;
 		for (u8 x = 0; x < MAX_ASTEROIDS && !crashed; x++)
 		{
-			if (Space_Object::collide(player.saucer_photon[i], player.asteroid[x], PHOTON_SIZE + player.asteroid[x].get_size()))
+			if (player.saucer_photon[i].collide(player.asteroid[x], PHOTON_SIZE + player.asteroid[x].get_size()))
 			{
 				spawn_asteroids_from_wreckage(player, x);
 				player.saucer_photon[i].set_status(INDISCERNIBLE);
 				crashed = true;
 			}
 		}
-		if (Space_Object::collide(player.saucer_photon[i], player.ship, PHOTON_SIZE))
+		if (player.saucer_photon[i].collide(player.ship, PHOTON_SIZE))
 		{
 			player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
 			player.saucer_photon[i].set_status(INDISCERNIBLE);
@@ -644,7 +644,7 @@ void Game::handle_collision(Player& player)
 		bool crashed = false;
 		for (u8 x = 0; x < MAX_ASTEROIDS && !crashed; x++)
 		{
-			if (Space_Object::collide(player.ship_photon[i], player.asteroid[x], PHOTON_SIZE + player.asteroid[x].get_size()))
+			if (player.ship_photon[i].collide(player.asteroid[x], PHOTON_SIZE + player.asteroid[x].get_size()))
 			{
 				add_points(player.asteroid[x].get_points());
 				spawn_asteroids_from_wreckage(player, x);
@@ -652,7 +652,7 @@ void Game::handle_collision(Player& player)
 				crashed = true;
 			}
 		}
-		if (Space_Object::collide(player.ship_photon[i], player.saucer, PHOTON_SIZE + player.saucer.get_size(false)))
+		if (player.ship_photon[i].collide(player.saucer, PHOTON_SIZE + player.saucer.get_size(false)))
 		{
 			add_points(player.saucer.get_points());
 			player.saucer.crash(player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start);
@@ -714,8 +714,8 @@ void Game::spawn_asteroids_from_wreckage(Player& player, const u8 iteration)
 
 void Game::handle_ship_stuff(Player& player)
 {
-    if (input.is_pressed(THRUST) && fast_timer % 8 >= 4)
-        draw_thrust_graphic = true;
+    if (input.is_pressed(THRUST) && player.ship.get_status() == ALIVE && fast_timer % 8 >= 4)
+        draw_thrust = true;
 
     // on_press should be handled slightly differently, also need a limit on the photon shooting speed?
     if (input.on_press(FIRE) && !player_text_timer && !player.ship_spawn_timer)
@@ -757,11 +757,8 @@ void Game::handle_ship_stuff(Player& player)
                 }
             }
             else
-            {
-                player_lives[current_player]--;
-                player.ship.set_status(EXPLOSION_START);
-                player.ship_spawn_timer = 129;
-            }
+                player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
+
             hyperspace_flag = 0;
         }
     }
@@ -812,11 +809,11 @@ void Game::handle_saucer_stuff(Player& player) const
         else if (player.saucer_spawn_and_shot_time == 0)
         {
             u8 saucer_direction;
-            // if (player.saucer.get_status() == LARGE_SAUCER)
+            //if (player.saucer.get_status() == LARGE_SAUCER)
                 saucer_direction = random_byte();
-            // else if (player_score[current_player] < 3500)
+            //else if (player_score[current_player] < 3500)
                 // accuracy of +- 16;
-            // else
+            //else
                 // accuracy of +- 8;
             Photon::fire_photon(player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
             player.saucer_spawn_and_shot_time = 10;

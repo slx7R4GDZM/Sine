@@ -8,7 +8,7 @@ add
 	configuration gui
 	support for non kb input
 	vector monitor shader
-	cmakefile
+	cmake file
 
 re-do correctly
 	score

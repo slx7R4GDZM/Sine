@@ -71,13 +71,13 @@ u8 Space_Object::limit_position(const u8 pos_major, const u8 max_pos_major)
         return pos_major;
 }
 
-bool Space_Object::collide(const Space_Object o_1, const Space_Object& o_2, const u8 minimum_space)
+bool Space_Object::collide(const Space_Object& object, const u8 minimum_space) const
 {
-    if (o_1.get_status() && o_1.get_status() < TRUE_EXPLOSION_START
-     && o_2.get_status() && o_2.get_status() < TRUE_EXPLOSION_START)
+    if (status && status < TRUE_EXPLOSION_START
+     && object.status && object.status < TRUE_EXPLOSION_START)
     {
-        Coordinate pos_1 = get_total_pos(o_1.get_position());
-        Coordinate pos_2 = get_total_pos(o_2.get_position());
+        Coordinate pos_1 = get_total_pos(get_position());
+        Coordinate pos_2 = get_total_pos(object.get_position());
         if (hit(pos_1.position_x, pos_2.position_x, minimum_space)
          && hit(pos_1.position_y, pos_2.position_y, minimum_space))
             return true;
@@ -124,6 +124,11 @@ void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::Render
     }
 }
 
+u8 Space_Object::get_status() const
+{
+    return status;
+}
+
 s8 Space_Object::get_vel_x() const
 {
     return vel_x_major;
@@ -139,9 +144,9 @@ Position Space_Object::get_position() const
     return pos;
 }
 
-u8 Space_Object::get_status() const
+void Space_Object::set_status(const u8 status)
 {
-    return status;
+    this->status = status;
 }
 
 void Space_Object::set_velocity(const s8 vel_x_major, const s8 vel_y_major)
@@ -154,9 +159,4 @@ void Space_Object::set_position_major(const u8 pos_x_major, const u8 pos_y_major
 {
     pos.x_major = pos_x_major;
     pos.y_major = pos_y_major;
-}
-
-void Space_Object::set_status(const u8 status)
-{
-    this->status = status;
 }

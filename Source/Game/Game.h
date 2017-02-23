@@ -36,7 +36,7 @@ private:
     sf::RenderWindow window;
     Input_Handler input;
     Inactive_Mode game_activity;
-    bool draw_thrust_graphic; // this is a kinda hacky variable to deal with how the dvg is simulated super inaccurately
+    bool draw_thrust; // this is a kinda hacky variable to deal with how the dvg is simulated super inaccurately
 
     u8 current_player;
     u8 last_game_player_count;

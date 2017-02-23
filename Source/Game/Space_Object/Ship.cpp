@@ -20,12 +20,12 @@ void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
 	ship_spawn_timer = 129;
 }
 
-void Ship::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic)
+void Ship::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust)
 {
     if (status == ALIVE)
     {
         update_position();
-        draw(draw_thrust_graphic, direction, vector_generator, window);
+        draw(draw_thrust, direction, vector_generator, window);
     }
     else if (status >= TRUE_EXPLOSION_START)
     {
@@ -96,7 +96,7 @@ void Ship::dampen_velocity_axis(s8& vel_major, u8& vel_minor)
     }
 }
 
-void Ship::draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const
+void Ship::draw(bool& draw_thrust, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
     bool flip_x = false;
     bool flip_y = false;
@@ -123,9 +123,9 @@ void Ship::draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator&
     vector_generator.load_absolute(pos, DIV_4);
     vector_generator.process(SHIP_TABLE, window, SHIP_OFFSET_TABLE[vector_offset], flip_x, flip_y);
 
-    if (draw_thrust_graphic)
+    if (draw_thrust)
     {
         vector_generator.process(SHIP_THRUST_TABLE, window, SHIP_THRUST_OFFSET_TABLE[vector_offset], flip_x, flip_y);
-        draw_thrust_graphic = false;
+        draw_thrust = false;
     }
 }

@@ -15,11 +15,11 @@ private:
     static void negative_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_minor);
     static void positive_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_minor);
     static void dampen_velocity_axis(s8& vel_major, u8& vel_minor);
-    void draw(bool& draw_thrust_graphic, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const;
+    void draw(bool& draw_thrust, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const;
 public:
     void spawn();
     void crash(u8& player_lives, u8& ship_spawn_timer);
-    void update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust_graphic);
+    void update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust);
     static void add_thrust(const u8 direction, s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor);
     static void dampen_velocity(s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor);
 };
