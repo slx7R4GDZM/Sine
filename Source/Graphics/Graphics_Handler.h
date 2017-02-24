@@ -20,4 +20,5 @@ public:
     static void draw_text(const Text text, const Language language, Vector_Generator& vector_generator, sf::RenderWindow& window);
     static void draw_multiplayer_scores(Vector_Generator& vector_generator);
     static void draw_copyright(Vector_Generator& vector_generator, sf::RenderWindow& window);
+    static void set_position_and_size(const u8 cur_x, const u8 cur_y, const Scale scale, Vector_Generator& vector_generator, sf::RenderWindow& window);
 };

@@ -105,7 +105,7 @@ void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::Render
     Scale scale = static_cast<Scale>((status + 33) / 17);
     if (scale > DIV_2)
         scale = MUL_1;
-    vector_generator.load_absolute(pos, scale);
+    set_position_and_size(scale, vector_generator, window);
 
     switch (status / 4 % 4)
     {
@@ -122,6 +122,18 @@ void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::Render
             vector_generator.process(EXPLOSION_1, window);
             break;
     }
+}
+
+void Space_Object::set_position_and_size(const Scale scale, Vector_Generator& vector_generator, sf::RenderWindow& window) const
+{
+    // add 128 to y making the 4:3 Space_Object space centered inside the 1:1 DVG space
+    u16 vector_object[] =
+    {
+         (LABS << 12) + (pos.y_major << 5) + (pos.y_minor >> 3) + 128,
+        (scale << 12) + (pos.x_major << 5) + (pos.x_minor >> 3),
+         (RTSL << 12)
+    };
+    vector_generator.process(vector_object, window);
 }
 
 u8 Space_Object::get_status() const

@@ -110,7 +110,7 @@ Game::Game()
                 draw_multiplayer_scores(vector_generator);
 
                 // draw player 2 lives
-                vector_generator.load_absolute(207, 213, DIV_4);
+                Graphics_Handler::set_position_and_size(207, 213, DIV_4, vector_generator, window);
                 for (u8 i = 0; i < player_lives[1] && i < 13; i++)
                     vector_generator.process(LIVES_REMAINING_SHIP, window);
             }
@@ -372,7 +372,7 @@ void Game::attract_mode(Vector_Generator& vector_generator)
         credits = 2;
     else
     {
-        vector_generator.load_absolute(80, 57, MUL_2);
+        Graphics_Handler::set_position_and_size(80, 57, MUL_2, vector_generator, window);
         if (option_switch.coinage == 1)
             Graphics_Handler::draw_text(ONE_COIN_2_PLAYS, option_switch.language, vector_generator, window);
         else if (option_switch.coinage == 2)
@@ -384,13 +384,13 @@ void Game::attract_mode(Vector_Generator& vector_generator)
     // flash "push start" after enough credits
     if (credits >= 1 && fast_timer % 64 < 32)
     {
-        vector_generator.load_absolute(100, 198, MUL_2);
+        Graphics_Handler::set_position_and_size(100, 198, MUL_2, vector_generator, window);
         Graphics_Handler::draw_text(PUSH_START, option_switch.language, vector_generator, window);
     }
 
     if (high_score_table[0] > 0 && slow_timer % 8 < 4)
     {
-        vector_generator.load_absolute(100, 182, MUL_2);
+        Graphics_Handler::set_position_and_size(100, 182, MUL_2, vector_generator, window);
         Graphics_Handler::draw_text(HIGH_SCORES, option_switch.language, vector_generator, window);
 
         // draw highscore table
@@ -399,7 +399,7 @@ void Game::attract_mode(Vector_Generator& vector_generator)
             if (high_score_table[i] > 0) // verify this
             {
                 // draw score position
-                vector_generator.load_absolute(101, 167 - i * 8, MUL_2);
+                Graphics_Handler::set_position_and_size(101, 167 - i * 8, MUL_2, vector_generator, window);
                 Graphics_Handler::draw_digit(i + 1, vector_generator, window);
                 vector_generator.process(DOT, window);
 
@@ -407,7 +407,7 @@ void Game::attract_mode(Vector_Generator& vector_generator)
                 Graphics_Handler::draw_score(high_score_table[i], 137, 167 - i * 8, MUL_2, vector_generator, window);
 
                 // draw score initials
-                vector_generator.load_absolute(149, 167 - i * 8, MUL_2);
+                Graphics_Handler::set_position_and_size(149, 167 - i * 8, MUL_2, vector_generator, window);
                 for (u8 c = 0; c < HS_NAME_LENGTH; c++)
                     Graphics_Handler::draw_character(names_HS[i * 3 + c], vector_generator, window);
             }
@@ -426,18 +426,18 @@ void Game::update_player(Vector_Generator& vector_generator)
 {
     if (player_text_timer)
     {
-        vector_generator.load_absolute(100, 182, MUL_2);
+        Graphics_Handler::set_position_and_size(100, 182, MUL_2, vector_generator, window);
         Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
         Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
         player_text_timer--;
     }
     else if (!player_lives[current_player] && !Photon::any(player[current_player].ship_photon, MAX_SHIP_PHOTONS))
     {
-        vector_generator.load_absolute(100, 157, MUL_2);
+        Graphics_Handler::set_position_and_size(100, 157, MUL_2, vector_generator, window);
         Graphics_Handler::draw_text(GAME_OVER, option_switch.language, vector_generator, window);
         if (player_count == 2)
         {
-            vector_generator.load_absolute(100, 182, MUL_2);
+            Graphics_Handler::set_position_and_size(100, 182, MUL_2, vector_generator, window);
             Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
             Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
         }
@@ -482,7 +482,7 @@ void Game::update_player(Vector_Generator& vector_generator)
                 end_game();
         }
     }
-    vector_generator.load_absolute(40, 213, DIV_4);
+    Graphics_Handler::set_position_and_size(40, 213, DIV_4, vector_generator, window);
     for (u8 i = 0; i < player_lives[0] && i < 55; i++)
         vector_generator.process(LIVES_REMAINING_SHIP, window);
 }
@@ -508,22 +508,22 @@ void Game::handle_HS_entry(Vector_Generator& vector_generator)
     // draw high score entry control help
     if (last_game_player_count > 1)
     {
-        vector_generator.load_absolute(100, 182, MUL_2);
+        Graphics_Handler::set_position_and_size(100, 182, MUL_2, vector_generator, window);
         Graphics_Handler::draw_text(PLAYER_, option_switch.language, vector_generator, window);
         if (fast_timer % 32 >= 16)
             Graphics_Handler::draw_digit(current_player + 1, vector_generator, window);
     }
-    vector_generator.load_absolute(12, 170, MUL_2);
+    Graphics_Handler::set_position_and_size(12, 170, MUL_2, vector_generator, window);
     Graphics_Handler::draw_text(YOUR_SCORE_IS_ONE_OF_THE_TEN_BEST, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 162, MUL_2);
+    Graphics_Handler::set_position_and_size(12, 162, MUL_2, vector_generator, window);
     Graphics_Handler::draw_text(PEASE_ENTER_YOUR_INITIALS, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 154, MUL_2);
+    Graphics_Handler::set_position_and_size(12, 154, MUL_2, vector_generator, window);
     Graphics_Handler::draw_text(PUSH_ROTATE_TO_SELECT_LETTER, option_switch.language, vector_generator, window);
-    vector_generator.load_absolute(12, 146, MUL_2);
+    Graphics_Handler::set_position_and_size(12, 146, MUL_2, vector_generator, window);
     Graphics_Handler::draw_text(PUSH_HYPERSPACE_WHEN_LETTER_IS_CORRECT, option_switch.language, vector_generator, window);
 
     // draw name entry
-    vector_generator.load_absolute(100, 57, MUL_4);
+    Graphics_Handler::set_position_and_size(100, 57, MUL_4, vector_generator, window);
     for (u8 c = 0; c < HS_NAME_LENGTH; c++)
     {
         if (names_HS[player_HS_place[current_player] + c] == 0)
@@ -574,10 +574,10 @@ void Game::handle_HS_entry(Vector_Generator& vector_generator)
 void Game::update_space_objects(Player& player, Vector_Generator& vector_generator)
 {
     for (u8 i = 0; i < MAX_ASTEROIDS; i++)
-        player.asteroid[i].update(vector_generator, window, player.asteroid_count, player.asteroid_wave_spawn_time);
+        player.asteroid[i].update(player.asteroid_count, player.asteroid_wave_spawn_time, vector_generator, window);
 
-    player.ship.update(vector_generator, window, fast_timer, ship_direction, draw_thrust);
-    player.saucer.update(vector_generator, window, fast_timer, player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start);
+    player.ship.update(fast_timer, ship_direction, draw_thrust, vector_generator, window);
+    player.saucer.update(fast_timer, player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start, vector_generator, window);
 
     for (u8 i = 0; i < MAX_SAUCER_PHOTONS; i++)
         player.saucer_photon[i].update(vector_generator, window);

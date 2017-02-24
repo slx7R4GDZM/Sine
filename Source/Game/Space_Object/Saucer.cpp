@@ -51,7 +51,7 @@ void Saucer::crash(u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_st
 	saucer_spawn_and_shot_time = saucer_spawn_time_start;
 }
 
-void Saucer::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start)
+void Saucer::update(const u8 fast_timer, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start, Vector_Generator& vector_generator, sf::RenderWindow& window)
 {
     if (status == LARGE_SAUCER || status == SMALL_SAUCER)
     {
@@ -121,8 +121,9 @@ u8 Saucer::get_points() const
 void Saucer::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
     if (status == LARGE_SAUCER)
-        vector_generator.load_absolute(pos, DIV_2);
+        set_position_and_size(DIV_2, vector_generator, window);
     else
-        vector_generator.load_absolute(pos, DIV_4);
+        set_position_and_size(DIV_4, vector_generator, window);
+
     vector_generator.process(SAUCER, window);
 }

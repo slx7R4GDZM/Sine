@@ -8,7 +8,6 @@
 
 void Asteroid::spawn_wave_asteroid()
 {
-    // need to check if area is clear of other spaceobjects
     status = random_byte() / 8 * 8 % 32 + 4;
     vel_x_major = get_starting_velocity();
     vel_y_major = get_starting_velocity();
@@ -60,7 +59,7 @@ s8 Asteroid::get_starting_velocity() const
     }
 }
 
-void Asteroid::update(Vector_Generator& vector_generator, sf::RenderWindow& window, u8& asteroid_count, u8& asteroid_wave_spawn_time)
+void Asteroid::update(u8& asteroid_count, u8& asteroid_wave_spawn_time, Vector_Generator& vector_generator, sf::RenderWindow& window)
 {
     if (status && status <= 0x1C)
     {
@@ -127,7 +126,7 @@ void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window
             scale = DIV_4;
             break;
     }
-    vector_generator.load_absolute(pos, scale);
+    set_position_and_size(scale, vector_generator, window);
     switch (status >> 3)
     {
         case 0:

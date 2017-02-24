@@ -20,7 +20,7 @@ void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
 	ship_spawn_timer = 129;
 }
 
-void Ship::update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, const u8 direction, bool& draw_thrust)
+void Ship::update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Vector_Generator& vector_generator, sf::RenderWindow& window)
 {
     if (status == ALIVE)
     {
@@ -120,7 +120,7 @@ void Ship::draw(bool& draw_thrust, const u8 direction, Vector_Generator& vector_
         vector_offset = 63 - (direction - 1) / 4;
         flip_y = true;
     }
-    vector_generator.load_absolute(pos, DIV_4);
+    set_position_and_size(DIV_4, vector_generator, window);
     vector_generator.process(SHIP_TABLE, window, SHIP_OFFSET_TABLE[vector_offset], flip_x, flip_y);
 
     if (draw_thrust)

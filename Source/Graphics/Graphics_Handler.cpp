@@ -43,7 +43,7 @@ void Graphics_Handler::draw_score(const u16 number, const u8 rightmost_x, const 
     string num_string = std::to_string(number);
     u8 digits = num_string.length();
 
-    vector_generator.load_absolute(rightmost_x - (digits * 3 * std::pow(2, static_cast<u8>(num_scale))), y, num_scale);
+    set_position_and_size(rightmost_x - (digits * 3 * std::pow(2, static_cast<u8>(num_scale))), y, num_scale, vector_generator, window);
     for (u8 i = 0; i < digits; i++)
         draw_digit(num_string[i] - '0', vector_generator, window, brighten);
 
@@ -77,4 +77,15 @@ void Graphics_Handler::draw_text(const Text text, const Language language, Vecto
             draw_message(SPANISH_TEXT_TABLE, SPANISH_OFFSET_TABLE[text], vector_generator, window);
             break;
     }
+}
+
+void Graphics_Handler::set_position_and_size(const u8 cur_x, const u8 cur_y, const Scale scale, Vector_Generator& vector_generator, sf::RenderWindow& window)
+{
+    u16 vector_object[] =
+    {
+         (LABS << 12) + (cur_y << 2),
+        (scale << 12) + (cur_x << 2),
+         (RTSL << 12)
+    };
+    vector_generator.process(vector_object, window);
 }

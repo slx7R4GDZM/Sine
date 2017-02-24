@@ -18,7 +18,7 @@ private:
 public:
     void spawn(const u16 player_score, const u8 saucer_spawn_time_start);
     void crash(u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start);
-    void update(Vector_Generator& vector_generator, sf::RenderWindow& window, const u8 fast_timer, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start);
+    void update(const u8 fast_timer, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start, Vector_Generator& vector_generator, sf::RenderWindow& window);
     u8 get_size(bool bonus) const;
     u8 get_points() const;
 };

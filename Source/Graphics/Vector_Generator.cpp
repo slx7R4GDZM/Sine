@@ -49,7 +49,7 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
                 draw_long_vector(opcode, vector_object, iteration, flip_x, flip_y, window);
                 break;
             case LABS:
-                load_absolute(vector_object, iteration, window);
+                load_absolute(vector_object, iteration);
                 break;
             case RTSL:
                 done = true;
@@ -88,7 +88,7 @@ void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_ob
     draw_vector(delta_x, delta_y, opcode, brightness, flip_x, flip_y, window);
 }
 
-void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration, sf::RenderWindow& window)
+void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration)
 {
     current_y = (vector_object[iteration++] & 0x03FF) << 2;
     current_x = (vector_object[iteration] & 0x03FF) << 2;
@@ -117,6 +117,15 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteratio
         brightness += 2;
 
     draw_vector(delta_x, delta_y, local_scale, brightness, flip_x, flip_y, window);
+}
+
+s8 Vector_Generator::get_final_scale(const u8 local_scale) const
+{
+    s8 final_scale = (global_scale + local_scale) & 0x0F;
+    if (final_scale > 9)
+        final_scale = -1;
+
+    return final_scale;
 }
 
 // drawing stuff
@@ -197,36 +206,4 @@ void Vector_Generator::draw_thin_line_segment(const float scaled_x_start, const 
         sf::Vertex point[1] = sf::Vertex(sf::Vector2f(scaled_x_start, scaled_y_start), vector_color);
         window.draw(point, 1, sf::Points);
     }
-}
-
-// other
-
-// possibly too accurate, not sure if spaceobjects should
-// only have 10-bit position accuracy rather than 12-bit
-void Vector_Generator::load_absolute(const Position& pos, const Scale scale)
-{
-    Coordinate current_pos = get_total_pos(pos);
-    // divided by two to convert the 8192x6144 res of the Space_Object coordinate system
-    // to 4096x3072, thus fitting it inside the 4096x4096 res used by the DVG
-    current_x = current_pos.position_x / 2;
-    // add 512 to make the 4:3 Space_Object space centered inside the 1:1 DVG space
-    current_y = current_pos.position_y / 2 + 512;
-    global_scale = scale;
-}
-
-// used for letters, numbers, etc
-void Vector_Generator::load_absolute(const u8 cur_x, const u8 cur_y, const Scale scale)
-{
-    current_x = cur_x << 4;
-    current_y = cur_y << 4;
-    global_scale = scale;
-}
-
-s8 Vector_Generator::get_final_scale(const u8 local_scale) const
-{
-    s8 final_scale = (global_scale + local_scale) & 0x0F;
-    if (final_scale > 9)
-        final_scale = -1;
-
-    return final_scale;
 }
