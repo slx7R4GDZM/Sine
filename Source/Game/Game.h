@@ -74,7 +74,10 @@ private:
     void attract_mode(Vector_Generator& vector_generator);
     void update_player(Vector_Generator& vector_generator);
     void add_points(const u8 points);
+
     void handle_HS_entry(Vector_Generator& vector_generator);
+    void draw_HS_entry_text(Vector_Generator& vector_generator);
+    void handle_HS_entry_input();
 
     void update_space_objects(Player& player, Vector_Generator& vector_generator);
     void handle_collision(Player& player);

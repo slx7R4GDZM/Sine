@@ -92,6 +92,9 @@ Game::Game()
                 Graphics_Handler::draw_score(0, player_score[0], vector_generator, window);
                 Graphics_Handler::draw_score(1, player_score[1], vector_generator, window);
 
+                if (option_switch.coinage == 0)
+                    credits = 2;
+
                 if (player_HS_place[0] < 128 || player_HS_place[1] < 128)
                     handle_HS_entry(vector_generator);
                 else
@@ -137,8 +140,9 @@ Game::Game()
 
 void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
 {
-    // make score flash and brighten score for current player
-    if (player_text_timer != 0)
+    // while waiting to spawn make the score of the current player flash
+    // and otherwise brighten the score of the current player
+    if (!hyperspace_flag && player[current_player].ship.get_status() == INDISCERNIBLE)
     {
         if (current_player == 0)
         {
@@ -283,6 +287,7 @@ void Game::handle_game_start()
     clear_space_objects(player[0]);
     clear_space_objects(player[1]); // maybe? untested
     current_player = 0; // maybe? untested
+    // names_HS[MAX_HS_COUNT * HS_NAME_LENGTH - 1] = 0; // bug that sets the final initial of the 10th high score to space
     player_score[0] = 0;
     player_score[1] = 0;
     player_HS_place[0] = 255;
@@ -325,14 +330,22 @@ void Game::end_game()
         }
     }
 
-    // deal with players having the same score
-    if (player_HS_place[0] != 255 && player_HS_place[1] != 255)
+    // if a new high score is set
+    if (player_HS_place[0] != 255 || player_HS_place[1] != 255)
     {
-        if (player_score[0] > player_score[1])
-            player_HS_place[1] += HS_NAME_LENGTH;
-        else
-            player_HS_place[0] += HS_NAME_LENGTH;
+        slow_timer = 240;
+
+        // deal with players having the same score
+        if (player_HS_place[0] != 255 && player_HS_place[1] != 255)
+        {
+            if (player_score[0] > player_score[1])
+                player_HS_place[1] += HS_NAME_LENGTH;
+            else
+                player_HS_place[0] += HS_NAME_LENGTH;
+        }
     }
+    else
+        slow_timer = 255;
 
     // move the old scores and initals down and insert the new high scores
     for (u8 p = 0; p < MAX_PLAYERS; p++)
@@ -368,9 +381,7 @@ void Game::end_game()
 
 void Game::attract_mode(Vector_Generator& vector_generator)
 {
-    if (option_switch.coinage == 0)
-        credits = 2;
-    else
+    if (option_switch.coinage != 0)
     {
         Graphics_Handler::set_position_and_size(80, 57, MUL_2, vector_generator, window);
         if (option_switch.coinage == 1)
@@ -501,10 +512,28 @@ void Game::add_points(const u8 points)
 
 void Game::handle_HS_entry(Vector_Generator& vector_generator)
 {
-    // if p1 gets a hs in mp and p2 doesn't then just skip p2 entering their name
-    if (player_HS_place[current_player] == 255)
-        current_player--;
+    // player took too long to enter name, time out back to attract mode
+    if (slow_timer == 0)
+    {
+        current_player = 0;
+        name_entry_letter_pos = 0;
+        player_HS_place[0] = 255;
+        player_HS_place[1] = 255;
+        slow_timer = 240;
+    }
+    else
+    {
+        // if p1 gets a hs in mp and p2 doesn't then just skip p2 entering their name
+        if (player_HS_place[current_player] == 255)
+            current_player--;
 
+        draw_HS_entry_text(vector_generator);
+        handle_HS_entry_input();
+    }
+}
+
+void Game::draw_HS_entry_text(Vector_Generator& vector_generator)
+{
     // draw high score entry control help
     if (last_game_player_count > 1)
     {
@@ -531,8 +560,10 @@ void Game::handle_HS_entry(Vector_Generator& vector_generator)
         else
             Graphics_Handler::draw_character(names_HS[player_HS_place[current_player] + c], vector_generator, window);
     }
+}
 
-    // handle input
+void Game::handle_HS_entry_input()
+{
     if (input.on_press(HYPERSPACE))
     {
         name_entry_letter_pos++;
@@ -542,9 +573,14 @@ void Game::handle_HS_entry(Vector_Generator& vector_generator)
             player_HS_place[current_player] = 255;
             if (current_player > 0)
                 current_player--;
+
+            slow_timer = 240;
         }
         else
+        {
             names_HS[player_HS_place[current_player] + name_entry_letter_pos] = 11;
+            slow_timer = 244;
+        }
     }
     if (fast_timer % 8 == 0) // i wonder if this is off by 1 because I didn't freeze the value of fast timer when I checked it
     {
@@ -567,8 +603,6 @@ void Game::handle_HS_entry(Vector_Generator& vector_generator)
                 names_HS[player_HS_place[current_player] + name_entry_letter_pos]--;
         }
     }
-    if (option_switch.coinage == 0)
-        credits = 2;
 }
 
 void Game::update_space_objects(Player& player, Vector_Generator& vector_generator)
@@ -748,7 +782,8 @@ void Game::handle_ship_stuff(Player& player)
             player.ship_spawn_timer--;
         else if (player.ship_spawn_timer == 1)
         {
-            if (hyperspace_flag < 128)
+            // ship trying to spawn
+            if (hyperspace_flag == 0)
             {
                 if (!Asteroid::blocking_spawn(player.asteroid))
                 {
@@ -756,10 +791,19 @@ void Game::handle_ship_stuff(Player& player)
                     player.ship_spawn_timer = 0;
                 }
             }
+            // hyperspace re-entry
+            else if (hyperspace_flag < 128)
+            {
+                player.ship.set_status(ALIVE);
+                player.ship_spawn_timer = 0;
+                hyperspace_flag = 0;
+            }
+            // hyperspace failure
             else
+            {
                 player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
-
-            hyperspace_flag = 0;
+                hyperspace_flag = 0;
+            }
         }
     }
     if (input.is_pressed(ROTATE_LEFT))
