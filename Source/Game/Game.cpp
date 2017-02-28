@@ -117,7 +117,7 @@ Game::Game()
                 for (u8 i = 0; i < player_lives[1] && i < 13; i++)
                     vector_generator.process(LIVES_REMAINING_SHIP, window);
             }
-            Graphics_Handler::draw_score(high_score_table[0], 132, 219, MUL_1, vector_generator, window);
+            Graphics_Handler::draw_number(high_score_table[0], 132, 219, MUL_1, vector_generator, window, true);
             draw_copyright(vector_generator);
 
             if (fast_timer == 255)
@@ -335,7 +335,11 @@ void Game::end_game()
     {
         slow_timer = 240;
 
-        // deal with players having the same score
+        // if p1 gets a hs in mp and p2 doesn't then just skip p2 entering their name
+        if (player_HS_place[current_player] == 255)
+            current_player--;
+
+        // deal with both players getting high scores
         if (player_HS_place[0] != 255 && player_HS_place[1] != 255)
         {
             if (player_score[0] > player_score[1])
@@ -343,40 +347,10 @@ void Game::end_game()
             else
                 player_HS_place[0] += HS_NAME_LENGTH;
         }
+        insert_any_new_high_scores();
     }
     else
         slow_timer = 255;
-
-    // move the old scores and initals down and insert the new high scores
-    for (u8 p = 0; p < MAX_PLAYERS; p++)
-    {
-        if (player_HS_place[p] != 255)
-        {
-            for (u8 s = 0; s < MAX_HS_COUNT; s++)
-            {
-                if (player_score[p] > high_score_table[s])
-                {
-                    // move the high score list down by one from where the new score is added
-                    for (u8 i = MAX_HS_COUNT - 1; i > s; i--)
-                    {
-                        high_score_table[i] = high_score_table[i - 1];
-
-                        // also move high score initials list down one
-                        for (u8 c = 0; c < HS_NAME_LENGTH; c++)
-                            names_HS[i * HS_NAME_LENGTH + c] = names_HS[(i - 1) * HS_NAME_LENGTH + c];
-                    }
-                    high_score_table[s] = player_score[p];
-
-                    // set initials to "A  "
-                    names_HS[s * HS_NAME_LENGTH] = 11;
-                    names_HS[s * HS_NAME_LENGTH + 1] = 0;
-                    names_HS[s * HS_NAME_LENGTH + 2] = 0;
-
-                    s = MAX_HS_COUNT; // cheeky loop escape
-                }
-            }
-        }
-    }
 }
 
 void Game::attract_mode(Vector_Generator& vector_generator)
@@ -410,12 +384,11 @@ void Game::attract_mode(Vector_Generator& vector_generator)
             if (high_score_table[i] > 0) // verify this
             {
                 // draw score position
-                Graphics_Handler::set_position_and_size(101, 167 - i * 8, MUL_2, vector_generator, window);
-                Graphics_Handler::draw_digit(i + 1, vector_generator, window);
+                Graphics_Handler::draw_number(i + 1, 107, 167 - i * 8, MUL_2, vector_generator, window);
                 vector_generator.process(DOT, window);
 
                 // draw score
-                Graphics_Handler::draw_score(high_score_table[i], 137, 167 - i * 8, MUL_2, vector_generator, window);
+                Graphics_Handler::draw_number(high_score_table[i], 137, 167 - i * 8, MUL_2, vector_generator, window, true);
 
                 // draw score initials
                 Graphics_Handler::set_position_and_size(149, 167 - i * 8, MUL_2, vector_generator, window);
@@ -510,6 +483,41 @@ void Game::add_points(const u8 points)
         player_score[current_player] -= MAX_SCORE;
 }
 
+void Game::insert_any_new_high_scores()
+{
+    // move the old scores and initals down and insert the new high scores
+    for (u8 p = 0; p < MAX_PLAYERS; p++)
+    {
+        if (player_HS_place[p] != 255)
+        {
+            for (u8 s = 0; s < MAX_HS_COUNT; s++)
+            {
+                if (player_score[p] > high_score_table[s])
+                {
+                    // move the high score list down by one from where the new score is added
+                    for (u8 i = MAX_HS_COUNT - 1; i > s; i--)
+                    {
+                        high_score_table[i] = high_score_table[i - 1];
+
+                        // also move high score initials list down one
+                        for (u8 c = 0; c < HS_NAME_LENGTH; c++)
+                            names_HS[i * HS_NAME_LENGTH + c] = names_HS[(i - 1) * HS_NAME_LENGTH + c];
+                    }
+                    // insert new score
+                    high_score_table[s] = player_score[p];
+
+                    // set initials to "A  "
+                    names_HS[s * HS_NAME_LENGTH] = 11;
+                    names_HS[s * HS_NAME_LENGTH + 1] = 0;
+                    names_HS[s * HS_NAME_LENGTH + 2] = 0;
+
+                    s = MAX_HS_COUNT; // cheeky loop escape
+                }
+            }
+        }
+    }
+}
+
 void Game::handle_HS_entry(Vector_Generator& vector_generator)
 {
     // player took too long to enter name, time out back to attract mode
@@ -523,16 +531,12 @@ void Game::handle_HS_entry(Vector_Generator& vector_generator)
     }
     else
     {
-        // if p1 gets a hs in mp and p2 doesn't then just skip p2 entering their name
-        if (player_HS_place[current_player] == 255)
-            current_player--;
-
-        draw_HS_entry_text(vector_generator);
+        draw_HS_entry_screen(vector_generator);
         handle_HS_entry_input();
     }
 }
 
-void Game::draw_HS_entry_text(Vector_Generator& vector_generator)
+void Game::draw_HS_entry_screen(Vector_Generator& vector_generator)
 {
     // draw high score entry control help
     if (last_game_player_count > 1)
