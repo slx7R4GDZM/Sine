@@ -21,6 +21,7 @@ The compressed source and a prebuilt Windows binary can be found [here](https://
 | Left Coin      | 🡨      |
 | Center Coin    | 🡫      |
 | Right Coin     | 🡪      |
+| Fullscreen     | F11    |
 | Exit           | Escape |
 
 ## Compiling

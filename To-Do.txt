@@ -4,7 +4,6 @@ add
 	small saucer aiming
 	some way to simulate analog sound
 	sounds
-	resizable window at runtime
 	configuration gui
 	support for non kb input
 	vector monitor shader
