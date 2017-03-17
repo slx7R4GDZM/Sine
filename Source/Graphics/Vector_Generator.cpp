@@ -14,25 +14,31 @@ const u16 INTERNAL_RES = 4096; // the internal resolution axes are 12-bit due to
                                // supplied the clocks to the X and Y position counters
 
 Vector_Generator::Vector_Generator(const Settings_Handler settings_handler)
-    : x_offset(0)
-    , y_offset(0)
 {
-    settings_handler.get_settings(x_resolution, y_resolution, simulate_DAC, crop_ratio, gamma_table);
-    if (x_resolution <= y_resolution && crop_ratio >= 1.0f)
+    settings_handler.get_settings(simulate_DAC, crop_ratio, gamma_table);
+    set_resolution_scale(settings_handler.get_resolution());
+}
+
+void Vector_Generator::set_resolution_scale(const sf::Vector2u resolution)
+{
+    this->resolution = resolution;
+    if (resolution.x <= resolution.y && crop_ratio >= 1.0f)
     {
-        res_scale = static_cast<float>(INTERNAL_RES) / x_resolution;
-        y_offset = (y_resolution - x_resolution) * res_scale / 2;
+        res_scale = static_cast<float>(INTERNAL_RES) / resolution.x;
+        x_offset = 0;
+        y_offset = (resolution.y - resolution.x) * res_scale / 2;
     }
-    else if (x_resolution >= y_resolution && crop_ratio <= 1.0f)
+    else if (resolution.x >= resolution.y && crop_ratio <= 1.0f)
     {
-        res_scale = static_cast<float>(INTERNAL_RES) / y_resolution;
-        x_offset = (x_resolution - y_resolution) * res_scale / 2;
+        res_scale = static_cast<float>(INTERNAL_RES) / resolution.y;
+        x_offset = (resolution.x - resolution.y) * res_scale / 2;
+        y_offset = 0;
     }
     else
     {
-        res_scale = INTERNAL_RES / (y_resolution * crop_ratio);
-        x_offset = (x_resolution - y_resolution * crop_ratio) * res_scale / 2;
-        y_offset = (y_resolution - y_resolution * crop_ratio) * res_scale / 2;
+        res_scale = INTERNAL_RES / (resolution.y * crop_ratio);
+        x_offset = (resolution.x - resolution.y * crop_ratio) * res_scale / 2;
+        y_offset = (resolution.y - resolution.y * crop_ratio) * res_scale / 2;
     }
     line_thickness = DESIRED_LINE_WIDTH / (res_scale / 4);
 }
@@ -45,22 +51,22 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
         Opcode opcode = static_cast<Opcode>(vector_object[iteration] >> 12);
         switch (opcode) // case ranges are not an official C++ standard
         {
-            case VCTR_0 ... VCTR_9:
-                draw_long_vector(opcode, vector_object, iteration, flip_x, flip_y, window);
-                break;
-            case LABS:
-                load_absolute(vector_object, iteration);
-                break;
-            case RTSL:
-                done = true;
-                break;
-            case SVEC:
-                draw_short_vector(vector_object, iteration, flip_x, flip_y, brighten, window);
-                break;
-            default:
-                cerr << "Process: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
-                done = true;
-                break;
+        case VCTR_0 ... VCTR_9:
+            draw_long_vector(opcode, vector_object, iteration, flip_x, flip_y, window);
+            break;
+        case LABS:
+            load_absolute(vector_object, iteration);
+            break;
+        case RTSL:
+            done = true;
+            break;
+        case SVEC:
+            draw_short_vector(vector_object, iteration, flip_x, flip_y, brighten, window);
+            break;
+        default:
+            cerr << "Process: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
+            done = true;
+            break;
         }
         iteration++;
     }
@@ -152,7 +158,7 @@ void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y,
         }
 
         float scaled_x_start = adjusted_x / res_scale;
-        float scaled_y_start = y_resolution - adjusted_y / res_scale;
+        float scaled_y_start = resolution.y - adjusted_y / res_scale;
         sf::Color vector_color = sf::Color(255, 255, 255, gamma_table[brightness]);
         if (line_thickness >= MINIMUM_LINE_WIDTH)
             draw_wide_line_segment(scaled_x_start, scaled_y_start, delta_x, delta_y, vector_color, window);
@@ -193,7 +199,7 @@ void Vector_Generator::draw_thin_line_segment(const float scaled_x_start, const 
     if (delta_x || delta_y)
     {
         float x_end = (x_start + delta_x) / res_scale;
-        float y_end = y_resolution - (y_start + delta_y) / res_scale;
+        float y_end = resolution.y - (y_start + delta_y) / res_scale;
         sf::Vertex line[2] =
         {
             sf::Vertex(sf::Vector2f(scaled_x_start, scaled_y_start), vector_color),

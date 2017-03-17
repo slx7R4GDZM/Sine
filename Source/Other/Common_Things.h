@@ -42,6 +42,7 @@ enum Button : u8
     THRUST,
     ROTATE_RIGHT,
     ROTATE_LEFT,
+    TOGGLE_FULLSCREEN,
     EXIT
 };
 

@@ -109,18 +109,18 @@ void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::Render
 
     switch (status / 4 % 4)
     {
-        case 0:
-            vector_generator.process(EXPLOSION_4, window);
-            break;
-        case 1:
-            vector_generator.process(EXPLOSION_3, window);
-            break;
-        case 2:
-            vector_generator.process(EXPLOSION_2, window);
-            break;
-        case 3:
-            vector_generator.process(EXPLOSION_1, window);
-            break;
+    case 0:
+        vector_generator.process(EXPLOSION_4, window);
+        break;
+    case 1:
+        vector_generator.process(EXPLOSION_3, window);
+        break;
+    case 2:
+        vector_generator.process(EXPLOSION_2, window);
+        break;
+    case 3:
+        vector_generator.process(EXPLOSION_1, window);
+        break;
     }
 }
 

@@ -9,9 +9,9 @@
 
 const nanoseconds MAX_FRAME_TIME = 16666667ns;
 
-const u8 TOTAL_BUTTONS = 11;
+const u8 TOTAL_BUTTONS = 12;
 const u8 TOTAL_KEYS = 101;
-const string BUTTON_TABLE[TOTAL_BUTTONS] = {"B_Hyperspace", "B_Fire", "B_Left-Coin", "B_Center-Coin", "B_Right-Coin", "B_One-Player-Start", "B_Two-Player-Start", "B_Thrust", "B_Rotate-Right", "B_Rotate-Left", "B_Exit"};
+const string BUTTON_TABLE[TOTAL_BUTTONS] = {"B_Hyperspace", "B_Fire", "B_Left-Coin", "B_Center-Coin", "B_Right-Coin", "B_One-Player-Start", "B_Two-Player-Start", "B_Thrust", "B_Rotate-Right", "B_Rotate-Left", "B_Toggle-Fullscreen", "B_Exit"};
 const string KEY_TABLE[TOTAL_KEYS] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Num0", "Num1", "Num2", "Num3", "Num4", "Num5", "Num6", "Num7", "Num8", "Num9", "Escape", "LControl", "LShift", "LAlt", "LSystem", "RControl", "RShift", "RAlt", "RSystem", "Menu", "LBracket", "RBracket", "SemiColon", "Comma", "Period", "Quote", "Slash", "BackSlash", "Tilde", "Equal", "Dash", "Space", "Return", "BackSpace", "Tab", "PageUp", "PageDown", "End", "Home", "Insert", "Delete", "Add", "Subtract", "Multiply", "Divide", "Left", "Right", "Up", "Down", "Numpad0", "Numpad1", "Numpad2", "Numpad3", "Numpad4", "Numpad5", "Numpad6", "Numpad7", "Numpad8", "Numpad9", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "Pause"};
 
 const u16 MAX_SCORE = 10000;

@@ -32,7 +32,7 @@ Game::Game()
     , pre_credit_coins(0)
 {
     // window
-    settings.apply_window_settings(window);
+    settings.create_window(window);
     settings.output_settings();
     Vector_Generator vector_generator(settings);
 
@@ -54,26 +54,7 @@ Game::Game()
     while (window.isOpen())
     {
         high_resolution_clock::time_point start_time = high_resolution_clock::now();
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-            else if (settings.get_inactive_mode() == PAUSE)
-            {
-                if (event.type == sf::Event::LostFocus)
-                    game_activity = PAUSE;
-                else if (event.type == sf::Event::GainedFocus)
-                    game_activity = RUN_WITH_INPUT;
-            }
-            else if (settings.get_inactive_mode() == RUN_WITHOUT_INPUT)
-            {
-                if (event.type == sf::Event::LostFocus)
-                    game_activity = RUN_WITHOUT_INPUT;
-                else if (event.type == sf::Event::GainedFocus)
-                    game_activity = RUN_WITH_INPUT;
-            }
-        }
+        process_events(vector_generator, window);
         if (game_activity != PAUSE)
         {
             window.clear();
@@ -81,7 +62,12 @@ Game::Game()
             if (game_activity == RUN_WITH_INPUT)
             {
                 input.update(settings);
-                if (input.on_press(EXIT))
+                if (input.on_press(TOGGLE_FULLSCREEN))
+                {
+                    settings.create_window(true, true, settings.get_resolution(), window);
+                    vector_generator.set_resolution_scale(settings.get_resolution());
+                }
+                else if (input.on_press(EXIT))
                     window.close();
             }
 
@@ -138,6 +124,35 @@ Game::Game()
     }
 }
 
+void Game::process_events(Vector_Generator& vector_generator, sf::RenderWindow& window)
+{
+    sf::Event event;
+    while (window.pollEvent(event))
+    {
+        if (event.type == sf::Event::Resized)
+        {
+            settings.create_window(false, true, sf::Vector2u(event.size.width, event.size.height), window);
+            vector_generator.set_resolution_scale(sf::Vector2u(event.size.width, event.size.height));
+        }
+        else if (event.type == sf::Event::Closed)
+            window.close();
+        else if (settings.get_inactive_mode() == PAUSE)
+        {
+            if (event.type == sf::Event::LostFocus)
+                game_activity = PAUSE;
+            else if (event.type == sf::Event::GainedFocus)
+                game_activity = RUN_WITH_INPUT;
+        }
+        else if (settings.get_inactive_mode() == RUN_WITHOUT_INPUT)
+        {
+            if (event.type == sf::Event::LostFocus)
+                game_activity = RUN_WITHOUT_INPUT;
+            else if (event.type == sf::Event::GainedFocus)
+                game_activity = RUN_WITH_INPUT;
+        }
+    }
+}
+
 void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
 {
     // while waiting to spawn make the score of the current player flash
@@ -148,12 +163,14 @@ void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
         {
             if (fast_timer % 32 >= 16)
                 Graphics_Handler::draw_score(0, player_score[0], vector_generator, window, true);
+
             Graphics_Handler::draw_score(1, player_score[1], vector_generator, window);
         }
         else
         {
             if (fast_timer % 32 >= 16)
                 Graphics_Handler::draw_score(1, player_score[1], vector_generator, window, true);
+
             Graphics_Handler::draw_score(0, player_score[0], vector_generator, window);
         }
     }
@@ -213,18 +230,18 @@ void Game::coin_input_to_credit()
     {
         switch (option_switch.right_coin_multiplier)
         {
-            case 0:
-                pre_credit_coins++;
-                break;
-            case 1:
-                pre_credit_coins += 4;
-                break;
-            case 2:
-                pre_credit_coins += 5;
-                break;
-            case 3:
-                pre_credit_coins += 6;
-                break;
+        case 0:
+            pre_credit_coins++;
+            break;
+        case 1:
+            pre_credit_coins += 4;
+            break;
+        case 2:
+            pre_credit_coins += 5;
+            break;
+        case 3:
+            pre_credit_coins += 6;
+            break;
         }
     }
 
@@ -250,13 +267,13 @@ void Game::add_credit()
 {
     switch (option_switch.coinage)
     {
-        case 1:
-            credits += 2;
-            break;
-        case 2:
-        case 3:
-            credits += 1;
-            break;
+    case 1:
+        credits += 2;
+        break;
+    case 2:
+    case 3:
+        credits += 1;
+        break;
     }
 }
 

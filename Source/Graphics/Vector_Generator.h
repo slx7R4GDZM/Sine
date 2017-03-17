@@ -22,8 +22,7 @@ private:
     float y_offset;
     float line_thickness;
 
-    u32 x_resolution;
-    u32 y_resolution;
+    sf::Vector2u resolution;
     bool simulate_DAC;
     float crop_ratio;
     u8 gamma_table[16];
@@ -39,5 +38,6 @@ private:
     void draw_thin_line_segment(const float scaled_x_start, const float scaled_y_start, const float x_start, const float y_start, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;
 public:
     Vector_Generator(const Settings_Handler settings_handler);
+    void set_resolution_scale(const sf::Vector2u resolution);
     void process(const u16 vector_object[], sf::RenderWindow& window, u8 iteration = 0, const bool flip_x = false, const bool flip_y = false, const bool brighten = false);
 };

@@ -47,15 +47,15 @@ s8 Asteroid::get_starting_velocity() const
         random = random % 16 + 16;
     switch (status & 0x07)
     {
-        case 4:
-            return LARGE_ASTEROID_SPAWN_VELOCITY[random];
-            break;
-        case 2:
-            return MEDIUM_ASTEROID_SPAWN_VELOCITY[random];
-            break;
-        case 1:
-            return SMALL_ASTEROID_SPAWN_VELOCITY[random];
-            break;
+    case 4:
+        return LARGE_ASTEROID_SPAWN_VELOCITY[random];
+        break;
+    case 2:
+        return MEDIUM_ASTEROID_SPAWN_VELOCITY[random];
+        break;
+    case 1:
+        return SMALL_ASTEROID_SPAWN_VELOCITY[random];
+        break;
     }
 }
 
@@ -83,15 +83,15 @@ u8 Asteroid::get_size() const
 {
     switch (status & 0x07)
     {
-        case 4:
-            return LARGE_ASTEROID_SIZE;
-            break;
-        case 2:
-            return MEDIUM_ASTEROID_SIZE;
-            break;
-        case 1:
-            return SMALL_ASTEROID_SIZE;
-            break;
+    case 4:
+        return LARGE_ASTEROID_SIZE;
+        break;
+    case 2:
+        return MEDIUM_ASTEROID_SIZE;
+        break;
+    case 1:
+        return SMALL_ASTEROID_SIZE;
+        break;
     }
 }
 
@@ -99,15 +99,15 @@ u8 Asteroid::get_points() const
 {
     switch (status & 0x07)
     {
-        case 4:
-            return LARGE_ASTEROID_POINTS;
-            break;
-        case 2:
-            return MEDIUM_ASTEROID_POINTS;
-            break;
-        case 1:
-            return SMALL_ASTEROID_POINTS;
-            break;
+    case 4:
+        return LARGE_ASTEROID_POINTS;
+        break;
+    case 2:
+        return MEDIUM_ASTEROID_POINTS;
+        break;
+    case 1:
+        return SMALL_ASTEROID_POINTS;
+        break;
     }
 }
 
@@ -116,31 +116,31 @@ void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window
     Scale scale;
     switch (status & 0x07)
     {
-        case 4:
-            scale = MUL_1;
-            break;
-        case 2:
-            scale = DIV_2;
-            break;
-        case 1:
-            scale = DIV_4;
-            break;
+    case 4:
+        scale = MUL_1;
+        break;
+    case 2:
+        scale = DIV_2;
+        break;
+    case 1:
+        scale = DIV_4;
+        break;
     }
     set_position_and_size(scale, vector_generator, window);
     switch (status >> 3)
     {
-        case 0:
-            vector_generator.process(ASTEROID_1, window);
-            break;
-        case 1:
-            vector_generator.process(ASTEROID_2, window);
-            break;
-        case 2:
-            vector_generator.process(ASTEROID_3, window);
-            break;
-        case 3:
-            vector_generator.process(ASTEROID_4, window);
-            break;
+    case 0:
+        vector_generator.process(ASTEROID_1, window);
+        break;
+    case 1:
+        vector_generator.process(ASTEROID_2, window);
+        break;
+    case 2:
+        vector_generator.process(ASTEROID_3, window);
+        break;
+    case 3:
+        vector_generator.process(ASTEROID_4, window);
+        break;
     }
 }
 

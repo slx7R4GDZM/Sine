@@ -79,15 +79,15 @@ void Saucer::determine_vertical_velocity()
 {
     switch (random_byte() % 4)
     {
-        case 0:
-            vel_y_major = 16;
-            break;
-        case 1:
-            vel_y_major = -16;
-            break;
-        default:
-            vel_y_major = 0;
-            break;
+    case 0:
+        vel_y_major = 16;
+        break;
+    case 1:
+        vel_y_major = -16;
+        break;
+    default:
+        vel_y_major = 0;
+        break;
     }
 }
 

@@ -13,6 +13,7 @@ void Input_Handler::update(const Settings_Handler& settings_handler)
             button_held[i] = true;
         else
             button_held[i] = false;
+
         button_pushed[i] = !was_button_pushed && button_held[i] ? 1 : 0;
     }
 }

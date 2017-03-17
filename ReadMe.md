@@ -5,6 +5,9 @@ Sine is an unfinished remake of Asteroids that I've made using C++ and [SFML](ht
 ![Ingame](https://i.imgur.com/k80rmf8.png "Ingame")
 ![High score entry](https://i.imgur.com/7eyNO8z.png "High score entry")
 
+## Download
+The compressed source and a prebuilt Windows binary can be found [here](https://github.com/slx7R4GDZM/Sine/releases).
+
 ## Default Controls
 | Action         | Key    |
 | -------------- | ------ |
@@ -19,9 +22,6 @@ Sine is an unfinished remake of Asteroids that I've made using C++ and [SFML](ht
 | Center Coin    | 🡫      |
 | Right Coin     | 🡪      |
 | Exit           | Escape |
-
-## Download
-The compressed source and a prebuilt Windows binary can be found [here](https://github.com/slx7R4GDZM/Sine/releases).
 
 ## Compiling
 Sine was designed to compile with SFML 2.4.1 under MinGW-w64 6.2.0 POSIX Threads using the C++14 flag.

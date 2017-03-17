@@ -64,18 +64,18 @@ void Graphics_Handler::draw_text(const Text text, const Language language, Vecto
 {
     switch (language)
     {
-        case ENGLISH:
-            draw_message(ENGLISH_TEXT_TABLE, ENGLISH_OFFSET_TABLE[text], vector_generator, window);
-            break;
-        case GERMAN:
-            draw_message(GERMAN_TEXT_TABLE, GERMAN_OFFSET_TABLE[text], vector_generator, window);
-            break;
-        case FRENCH:
-            draw_message(FRENCH_TEXT_TABLE, FRENCH_OFFSET_TABLE[text], vector_generator, window);
-            break;
-        case SPANISH:
-            draw_message(SPANISH_TEXT_TABLE, SPANISH_OFFSET_TABLE[text], vector_generator, window);
-            break;
+    case ENGLISH:
+        draw_message(ENGLISH_TEXT_TABLE, ENGLISH_OFFSET_TABLE[text], vector_generator, window);
+        break;
+    case GERMAN:
+        draw_message(GERMAN_TEXT_TABLE, GERMAN_OFFSET_TABLE[text], vector_generator, window);
+        break;
+    case FRENCH:
+        draw_message(FRENCH_TEXT_TABLE, FRENCH_OFFSET_TABLE[text], vector_generator, window);
+        break;
+    case SPANISH:
+        draw_message(SPANISH_TEXT_TABLE, SPANISH_OFFSET_TABLE[text], vector_generator, window);
+        break;
     }
 }
 

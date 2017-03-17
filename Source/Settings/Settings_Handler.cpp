@@ -11,13 +11,11 @@
 #include <iomanip>
 
 Settings_Handler::Settings_Handler()
-    : button_key{kb::Space, kb::E, kb::Left, kb::Down, kb::Right, kb::Num1, kb::Num2, kb::W, kb::D, kb::A, kb::Escape}
+    : button_key{kb::Space, kb::E, kb::Left, kb::Down, kb::Right, kb::Num1, kb::Num2, kb::W, kb::D, kb::A, kb::F11, kb::Escape}
     , option_switch{ENGLISH, 1, 0, 0, 2}
     , window_mode(WIN_NORMAL)
-    , x_resolution(1024)
-    , y_resolution(790)
-    , start_win_pos_x(-1)
-    , start_win_pos_y(-1)
+    , fallback_res(1024, 790)
+    , fallback_win_pos(-1, -1)
     , inactive_mode(PAUSE)
     , simulate_DAC(true)
     , crop_ratio(1.2962962f)
@@ -123,13 +121,13 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
     else if (setting == "Window-Mode")
         window_mode = clamp_string_value(setting, value, WIN_NORMAL, WIN_FULLSCREEN);
     else if (setting == "X-Resolution")
-        x_resolution = clamp_string_value(setting, value, 1u, UINT32_MAX);
+        fallback_res.x = clamp_string_value(setting, value, 1u, UINT32_MAX);
     else if (setting == "Y-Resolution")
-        y_resolution = clamp_string_value(setting, value, 1u, UINT32_MAX);
+        fallback_res.y = clamp_string_value(setting, value, 1u, UINT32_MAX);
     else if (setting == "Start-Window-Position-X")
-        start_win_pos_x = clamp_string_value(setting, value, INT32_MIN, INT32_MAX);
+        fallback_win_pos.x = clamp_string_value(setting, value, INT32_MIN, INT32_MAX);
     else if (setting == "Start-Window-Position-Y")
-        start_win_pos_y = clamp_string_value(setting, value, INT32_MIN, INT32_MAX);
+        fallback_win_pos.y = clamp_string_value(setting, value, INT32_MIN, INT32_MAX);
     else if (setting == "Inactive-Mode")
         inactive_mode = clamp_string_value(setting, value, PAUSE, RUN_WITH_INPUT);
     else if (setting == "Simulate-DAC")
@@ -169,42 +167,83 @@ T Settings_Handler::clamp_string_value(const string& setting, const string& valu
     }
 }
 
-void Settings_Handler::apply_window_settings(sf::RenderWindow& win) const
+void Settings_Handler::create_window(sf::RenderWindow& win)
 {
-    u8 window_style;
-    switch (window_mode)
-    {
-        case WIN_NORMAL:
-            window_style = sf::Style::Titlebar | sf::Style::Close;
-            break;
-        case WIN_BORDERLESS:
-            window_style = sf::Style::None;
-            break;
-        case WIN_FULLSCREEN:
-            window_style = sf::Style::Fullscreen;
-            break;
-    }
-
-    sf::ContextSettings context_settings;
     if (!samples_MSAA)
         context_settings.antialiasingLevel = 0;
     else
         context_settings.antialiasingLevel = std::pow(2, samples_MSAA);
 
-    win.create(sf::VideoMode(x_resolution, y_resolution), "Sine", window_style, context_settings);
+    create_window(false, false, fallback_res, win);
+}
 
-    if (window_mode == WIN_FULLSCREEN)
-        win.setMouseCursorVisible(false);
+void Settings_Handler::create_window(const bool toggle_fullscreen, const bool reuse_pos, const sf::Vector2u new_res, sf::RenderWindow& win)
+{
+    if (toggle_fullscreen)
+    {
+        if (window_style != sf::Style::Fullscreen)
+        {
+            fallback_res = current_res;
+            current_res = new_res;
+            fallback_win_pos = win.getPosition();
+            window_style = sf::Style::Fullscreen;
+        }
+        else
+        {
+            current_res = fallback_res;
+            switch (window_mode)
+            {
+            case WIN_NORMAL:
+            case WIN_FULLSCREEN:
+                window_style = sf::Style::Default;
+                break;
+            case WIN_BORDERLESS:
+                window_style = sf::Style::None;
+                break;
+            }
+        }
+    }
     else
     {
-        if (start_win_pos_x != -1 && start_win_pos_y != -1)
-            win.setPosition(sf::Vector2i(start_win_pos_x, start_win_pos_y));
-        else if (start_win_pos_x != -1)
-            win.setPosition(sf::Vector2i(start_win_pos_x, win.getPosition().y));
-        else if (start_win_pos_y != -1)
-            win.setPosition(sf::Vector2i(win.getPosition().x, start_win_pos_y));
+        // if creating the window for the first time or resizing it
+        current_res = new_res;
+        if (reuse_pos)
+            fallback_win_pos = win.getPosition();
+        switch (window_mode)
+        {
+        case WIN_NORMAL:
+            window_style = sf::Style::Default;
+            break;
+        case WIN_BORDERLESS:
+            window_style = sf::Style::None;
+            break;
+        case WIN_FULLSCREEN:
+            if (reuse_pos)
+                window_style = sf::Style::Default;
+            else
+                window_style = sf::Style::Fullscreen;
+            break;
+        }
     }
 
+    win.create(sf::VideoMode(current_res.x, current_res.y), "Sine", window_style, context_settings);
+
+    // set current res to window size in case the window couldn't be created at the desired size
+    current_res = win.getSize();
+
+    if (window_style == sf::Style::Fullscreen)
+        win.setMouseCursorVisible(false);
+    else if (reuse_pos)
+        win.setPosition(fallback_win_pos);
+    else
+    {
+        if (fallback_win_pos.x != -1 && fallback_win_pos.y != -1)
+            win.setPosition(sf::Vector2i(fallback_win_pos.x, fallback_win_pos.y));
+        else if (fallback_win_pos.x != -1)
+            win.setPosition(sf::Vector2i(fallback_win_pos.x, win.getPosition().y));
+        else if (fallback_win_pos.y != -1)
+            win.setPosition(sf::Vector2i(win.getPosition().x, fallback_win_pos.y));
+    }
     win.setVerticalSyncEnabled(enable_v_sync);
 }
 
@@ -212,24 +251,24 @@ void Settings_Handler::output_settings() const
 {
     clog << '\n';
     for (u8 i = 0; i < TOTAL_BUTTONS; i++)
-        clog << std::setw(18) << BUTTON_TABLE[i] << " = " << KEY_TABLE[button_key[i]] << '\n';
+        clog << std::setw(19) << BUTTON_TABLE[i] << " = " << KEY_TABLE[button_key[i]] << '\n';
 
-    clog << "=======================================";
+    clog << "----------------------------------------";
     clog << "\nLanguage = " << static_cast<u16>(option_switch.language);
     clog << "\nStarting-Lives = " << static_cast<u16>(option_switch.starting_lives);
     clog << "\nCenter-Coin-Multiplier = " << static_cast<u16>(option_switch.center_coin_multiplier);
     clog << "\nRight-Coin-Multiplier = " << static_cast<u16>(option_switch.right_coin_multiplier);
     clog << "\nCoinage = " << static_cast<u16>(option_switch.coinage);
 
-    clog << "\n========================================";
+    clog << "\n----------------------------------------";
     clog << "\nWindow-Mode = " << static_cast<u16>(window_mode);
-    clog << "\nX-Resolution = " << x_resolution;
-    clog << "\nY-Resolution = " << y_resolution;
-    clog << "\nStart-Window-Position-X = " << start_win_pos_x;
-    clog << "\nStart-Window-Position-Y = " << start_win_pos_y;
+    clog << "\nX-Resolution = " << fallback_res.x;
+    clog << "\nY-Resolution = " << fallback_res.y;
+    clog << "\nStart-Window-Position-X = " << fallback_win_pos.x;
+    clog << "\nStart-Window-Position-Y = " << fallback_win_pos.y;
     clog << "\nInactive-Mode = " << static_cast<u16>(inactive_mode);
 
-    clog << "\n========================================";
+    clog << "\n----------------------------------------";
     clog << "\nSimulate-DAC = " << simulate_DAC;
     clog << "\nCrop-Ratio = " << crop_ratio;
     clog << "\nMSAA-Quality = " << static_cast<u16>(samples_MSAA);
@@ -248,6 +287,11 @@ Option_Switch Settings_Handler::get_option_switch() const
     return option_switch;
 }
 
+sf::Vector2u Settings_Handler::get_resolution() const
+{
+    return current_res;
+}
+
 Inactive_Mode Settings_Handler::get_inactive_mode() const
 {
     return inactive_mode;
@@ -258,10 +302,8 @@ Frame_Limiter_Mode Settings_Handler::get_frame_limiter_mode() const
     return frame_limiter_mode;
 }
 
-void Settings_Handler::get_settings(u32& x_resolution, u32& y_resolution, bool& simulate_DAC, float& crop_ratio, u8 gamma_table[]) const
+void Settings_Handler::get_settings(bool& simulate_DAC, float& crop_ratio, u8 gamma_table[]) const
 {
-    x_resolution = this->x_resolution;
-    y_resolution = this->y_resolution;
     simulate_DAC = this->simulate_DAC;
     crop_ratio = this->crop_ratio;
     for (u8 i = 0; i < 16; i++)

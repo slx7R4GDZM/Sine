@@ -96,17 +96,18 @@ R"(# Lines starting with # are ignored by the program
 # Button Settings
 #==============================================================================
 
-B_One-Player-Start Num1
-B_Two-Player-Start Num2
-     B_Rotate-Left A
-    B_Rotate-Right D
-          B_Thrust W
-            B_Fire E
-      B_Hyperspace Space
-       B_Left-Coin Left
-     B_Center-Coin Down
-      B_Right-Coin Right
-            B_Exit Escape
+ B_One-Player-Start Num1
+ B_Two-Player-Start Num2
+      B_Rotate-Left A
+     B_Rotate-Right D
+           B_Thrust W
+             B_Fire E
+       B_Hyperspace Space
+        B_Left-Coin Left
+      B_Center-Coin Down
+       B_Right-Coin Right
+B_Toggle-Fullscreen F11
+             B_Exit Escape
 
 #==============================================================================
 # 8-Toggle Switch
@@ -157,7 +158,7 @@ Window-Mode 0
 X-Resolution 1024
 Y-Resolution 790
 
-## Starting position for the game window (n/a with exclusive fullscreen)
+## Starting position for the game window
 # -1 = Don't set the starting position (default)
 Start-Window-Position-X -1
 Start-Window-Position-Y -1

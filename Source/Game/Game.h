@@ -61,6 +61,8 @@ private:
     Option_Switch option_switch;
     Player player[MAX_PLAYERS];
 
+    void process_events(Vector_Generator& vector_generator, sf::RenderWindow& window);
+
     void draw_multiplayer_scores(Vector_Generator& vector_generator);
     void draw_copyright(Vector_Generator& vector_generator);
 
