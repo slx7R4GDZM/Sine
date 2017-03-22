@@ -146,7 +146,10 @@ void Game::process_events(Vector_Generator& vector_generator, sf::RenderWindow& 
         else if (settings.get_inactive_mode() == RUN_WITHOUT_INPUT)
         {
             if (event.type == sf::Event::LostFocus)
+            {
                 game_activity = RUN_WITHOUT_INPUT;
+                input.release_all_buttons();
+            }
             else if (event.type == sf::Event::GainedFocus)
                 game_activity = RUN_WITH_INPUT;
         }

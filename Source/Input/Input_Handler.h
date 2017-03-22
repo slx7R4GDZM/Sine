@@ -17,4 +17,5 @@ public:
     void update(const Settings_Handler& settings_handler);
     bool is_pressed(const Button button) const;
     bool on_press(const Button button) const;
+    void release_all_buttons();
 };

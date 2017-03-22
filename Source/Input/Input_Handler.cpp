@@ -27,3 +27,12 @@ bool Input_Handler::on_press(const Button button) const
 {
     return button_pushed[button];
 }
+
+void Input_Handler::release_all_buttons()
+{
+    for (u8 i = 0; i < TOTAL_BUTTONS; i++)
+    {
+        button_held[i] = false;
+        button_pushed[i] = false;
+    }
+}
