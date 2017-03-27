@@ -13,8 +13,8 @@ The compressed source and a prebuilt Windows binary can be found [here](https://
 ## Default Controls
 | Action         | Key    |
 | -------------- | ------ |
-| Player 1 Start | 1      |
-| Player 2 Start | 2      |
+| 1 Player Start | 1      |
+| 2 Player Start | 2      |
 | Rotate Left    | A      |
 | Rotate Right   | D      |
 | Thrust         | W      |
