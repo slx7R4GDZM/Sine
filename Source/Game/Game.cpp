@@ -196,11 +196,11 @@ void Game::draw_copyright(Vector_Generator& vector_generator)
 {
     vector_generator.process(COPYRIGHT_SYMBOL, window);
 
-    // 2017_
+    // 2016_
     Graphics_Handler::draw_character(3, vector_generator, window);
     Graphics_Handler::draw_character(1, vector_generator, window);
     Graphics_Handler::draw_character(2, vector_generator, window);
-    Graphics_Handler::draw_character(8, vector_generator, window);
+    Graphics_Handler::draw_character(7, vector_generator, window);
     Graphics_Handler::draw_character(0, vector_generator, window);
 
     // slx7R4GDZM

@@ -1,6 +1,6 @@
 MIT License
 
-Copyright slx7R4GDZM
+Copyright 2016 slx7R4GDZM
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
