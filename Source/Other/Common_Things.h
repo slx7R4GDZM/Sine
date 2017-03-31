@@ -63,42 +63,42 @@ enum Text : u8
 
 enum Global_Scale : u8
 {
-	MUL_1,
-	MUL_2,
-	MUL_4,
-	MUL_8,
-	MUL_16,
-	MUL_32,
-	MUL_64,
-	MUL_128,
-	DIV_256,
-	DIV_128,
-	DIV_64,
-	DIV_32,
-	DIV_16,
-	DIV_8,
-	DIV_4,
-	DIV_2
+    MUL_1,
+    MUL_2,
+    MUL_4,
+    MUL_8,
+    MUL_16,
+    MUL_32,
+    MUL_64,
+    MUL_128,
+    DIV_256,
+    DIV_128,
+    DIV_64,
+    DIV_32,
+    DIV_16,
+    DIV_8,
+    DIV_4,
+    DIV_2
 };
 
 enum Opcode : u8
 {
-	VCTR_0,
-	VCTR_1,
-	VCTR_2,
-	VCTR_3,
-	VCTR_4,
-	VCTR_5,
-	VCTR_6,
-	VCTR_7,
-	VCTR_8,
-	VCTR_9,
-	LABS,
-	HALT,
-	JSRL,
-	RTSL,
-	JMPL,
-	SVEC
+    VCTR_0,
+    VCTR_1,
+    VCTR_2,
+    VCTR_3,
+    VCTR_4,
+    VCTR_5,
+    VCTR_6,
+    VCTR_7,
+    VCTR_8,
+    VCTR_9,
+    LABS,
+    HALT,
+    JSRL,
+    RTSL,
+    JMPL,
+    SVEC
 };
 
 enum Language : u8

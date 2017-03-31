@@ -47,8 +47,8 @@ void Saucer::spawn(const u16 player_score, const u8 saucer_spawn_time_start)
 
 void Saucer::crash(u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start)
 {
-	status = EXPLOSION_START;
-	saucer_spawn_and_shot_time = saucer_spawn_time_start;
+    status = EXPLOSION_START;
+    saucer_spawn_and_shot_time = saucer_spawn_time_start;
 }
 
 void Saucer::update(const u8 fast_timer, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start, Vector_Generator& vector_generator, sf::RenderWindow& window)

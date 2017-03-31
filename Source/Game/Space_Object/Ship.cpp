@@ -15,9 +15,9 @@ void Ship::spawn()
 
 void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
 {
-	player_lives--;
-	status = EXPLOSION_START;
-	ship_spawn_timer = 129;
+    player_lives--;
+    status = EXPLOSION_START;
+    ship_spawn_timer = 129;
 }
 
 void Ship::update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Vector_Generator& vector_generator, sf::RenderWindow& window)
