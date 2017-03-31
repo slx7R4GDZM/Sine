@@ -84,10 +84,8 @@ void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_ob
     if (vector_object[iteration] & 0x0400)
         delta_x = -delta_x;
 
-    s8 final_scale = get_final_scale(opcode);
-
-    delta_x = (delta_x << 2) >> (9 - final_scale);
-    delta_y = (delta_y << 2) >> (9 - final_scale);
+    delta_x = apply_global_scale((delta_x << 2) >> (9 - opcode));
+    delta_y = apply_global_scale((delta_y << 2) >> (9 - opcode));
 
     u8 brightness = vector_object[iteration] >> 12;
 
@@ -98,7 +96,7 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration)
 {
     current_y = (vector_object[iteration++] & 0x03FF) << 2;
     current_x = (vector_object[iteration] & 0x03FF) << 2;
-    global_scale = static_cast<Scale>(vector_object[iteration] >> 12);
+    global_scale = static_cast<Global_Scale>(vector_object[iteration] >> 12);
 }
 
 void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, const bool brighten, sf::RenderWindow& window)
@@ -113,10 +111,9 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteratio
 
     u8 local_scale = ((vector_object[iteration] & 0x0008) >> 2)
                    + ((vector_object[iteration] & 0x0800) >> 11);
-    s8 final_scale = get_final_scale(local_scale);
 
-    delta_x = (delta_x << 2) >> (7 - final_scale);
-    delta_y = (delta_y << 2) >> (7 - final_scale);
+    delta_x = apply_global_scale((delta_x << 2) >> (7 - local_scale));
+    delta_y = apply_global_scale((delta_y << 2) >> (7 - local_scale));
 
     u8 brightness = (vector_object[iteration] & 0x00F0) >> 4;
     if (brighten)
@@ -125,13 +122,12 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteratio
     draw_vector(delta_x, delta_y, local_scale, brightness, flip_x, flip_y, window);
 }
 
-s8 Vector_Generator::get_final_scale(const u8 local_scale) const
+s16 Vector_Generator::apply_global_scale(const s16 delta) const
 {
-    s8 final_scale = (global_scale + local_scale) & 0x0F;
-    if (final_scale > 9)
-        final_scale = -1;
-
-    return final_scale;
+    if (global_scale <= MUL_128)
+        return delta << global_scale;
+    else
+        return delta >> (16 - global_scale);
 }
 
 // drawing stuff

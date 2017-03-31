@@ -14,7 +14,7 @@ private:
     // vector generator variables
     s16 current_x;
     s16 current_y;
-    Scale global_scale;
+    Global_Scale global_scale;
 
     // modern graphics variables
     float res_scale;
@@ -31,7 +31,7 @@ private:
     void load_absolute(const u16 vector_object[], u8& iteration);
     void draw_short_vector(const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, const bool brighten, sf::RenderWindow& window);
 
-    s8 get_final_scale(const u8 local_scale) const;
+    s16 apply_global_scale(const s16 delta) const;
 
     void draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 local_scale, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window);
     void draw_wide_line_segment(const float starting_x, const float starting_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;

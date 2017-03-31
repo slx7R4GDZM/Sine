@@ -113,7 +113,7 @@ u8 Asteroid::get_points() const
 
 void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    Scale scale;
+    Global_Scale scale;
     switch (status & 0x07)
     {
     case 4:

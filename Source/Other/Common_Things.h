@@ -61,7 +61,7 @@ enum Text : u8
     TWO_COINS_1_PLAY
 };
 
-enum Scale : u8
+enum Global_Scale : u8
 {
 	MUL_1,
 	MUL_2,

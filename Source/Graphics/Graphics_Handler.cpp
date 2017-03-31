@@ -38,7 +38,7 @@ void Graphics_Handler::draw_digit(const u8 digit, Vector_Generator& vector_gener
     vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[digit + 1], false, false, brighten);
 }
 
-void Graphics_Handler::draw_number(const u16 number, const u8 rightmost_x, const u8 y, const Scale num_scale, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool add_zero, const bool brighten)
+void Graphics_Handler::draw_number(const u16 number, const u8 rightmost_x, const u8 y, const Global_Scale num_scale, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool add_zero, const bool brighten)
 {
     string num_string = std::to_string(number);
     u8 digits = num_string.length();
@@ -79,7 +79,7 @@ void Graphics_Handler::draw_text(const Text text, const Language language, Vecto
     }
 }
 
-void Graphics_Handler::set_position_and_size(const u8 cur_x, const u8 cur_y, const Scale scale, Vector_Generator& vector_generator, sf::RenderWindow& window)
+void Graphics_Handler::set_position_and_size(const u8 cur_x, const u8 cur_y, const Global_Scale scale, Vector_Generator& vector_generator, sf::RenderWindow& window)
 {
     u16 vector_object[] =
     {
