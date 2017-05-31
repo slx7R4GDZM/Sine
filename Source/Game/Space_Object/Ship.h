@@ -20,6 +20,6 @@ public:
     void spawn();
     void crash(u8& player_lives, u8& ship_spawn_timer);
     void update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Vector_Generator& vector_generator, sf::RenderWindow& window);
-    static void add_thrust(const u8 direction, s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor);
-    static void dampen_velocity(s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor);
+    void add_thrust(const u8 direction, u8& vel_x_minor, u8& vel_y_minor);
+    void dampen_velocity(u8& vel_x_minor, u8& vel_y_minor);
 };

@@ -842,15 +842,10 @@ void Game::handle_ship_stuff(Player& player)
     }
     if (fast_timer % 2 == 0 && !player.ship_spawn_timer)
     {
-        // this could be better done with pointers but ehhhh
-        s8 vel_x_major = player.ship.get_vel_x();
-        s8 vel_y_major = player.ship.get_vel_y();
         if (input.is_pressed(THRUST))
-            Ship::add_thrust(ship_direction, vel_x_major, ship_vel_x_minor, vel_y_major, ship_vel_y_minor);
+            player.ship.add_thrust(ship_direction, ship_vel_x_minor, ship_vel_y_minor);
         else
-            Ship::dampen_velocity(vel_x_major, ship_vel_x_minor, vel_y_major, ship_vel_y_minor);
-
-        player.ship.set_velocity(vel_x_major, vel_y_major);
+            player.ship.dampen_velocity(ship_vel_x_minor, ship_vel_y_minor);
     }
     u8 status = player.ship.get_status();
     if (status && status < TRUE_EXPLOSION_START)

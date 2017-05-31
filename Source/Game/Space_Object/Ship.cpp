@@ -39,7 +39,7 @@ void Ship::update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Ve
     }
 }
 
-void Ship::add_thrust(const u8 direction, s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor)
+void Ship::add_thrust(const u8 direction, u8& vel_x_minor, u8& vel_y_minor)
 {
     // x
     u8 old_vel_minor = vel_x_minor;
@@ -72,7 +72,7 @@ void Ship::positive_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_mi
         vel_major == MAX_VEL ? vel_minor = 255 : vel_major++;
 }
 
-void Ship::dampen_velocity(s8& vel_x_major, u8& vel_x_minor, s8& vel_y_major, u8& vel_y_minor)
+void Ship::dampen_velocity(u8& vel_x_minor, u8& vel_y_minor)
 {
     dampen_velocity_axis(vel_x_major, vel_x_minor);
     dampen_velocity_axis(vel_y_major, vel_y_minor);
