@@ -1,6 +1,4 @@
-﻿Sine
-====
-
+# Sine
 Sine is an unfinished remake of Asteroids that I've made using C++ and [SFML](https://github.com/SFML/SFML).
 
 ## Screenshots
@@ -11,20 +9,20 @@ Sine is an unfinished remake of Asteroids that I've made using C++ and [SFML](ht
 The compressed source and a prebuilt Windows binary can be found [here](https://github.com/slx7R4GDZM/Sine/releases).
 
 ## Default Controls
-| Action         | Key    |
-| -------------- | ------ |
-| 1 Player Start | 1      |
-| 2 Player Start | 2      |
-| Rotate Left    | A      |
-| Rotate Right   | D      |
-| Thrust         | W      |
-| Fire Photon    | E      |
-| Hyperspace     | Space  |
-| Left Coin      | 🡨      |
-| Center Coin    | 🡫      |
-| Right Coin     | 🡪      |
-| Fullscreen     | F11    |
-| Exit           | Escape |
+| Action         | Key              |
+| -------------- | ---------------- |
+| 1 Player Start | <kbd>1</kbd>     |
+| 2 Player Start | <kbd>2</kbd>     |
+| Rotate Left    | <kbd>A</kbd>     |
+| Rotate Right   | <kbd>D</kbd>     |
+| Thrust         | <kbd>W</kbd>     |
+| Fire Photon    | <kbd>E</kbd>     |
+| Hyperspace     | <kbd>Space</kbd> |
+| Left Coin      | <kbd>🡨</kbd>     |
+| Center Coin    | <kbd>🡫</kbd>     |
+| Right Coin     | <kbd>🡪</kbd>     |
+| Fullscreen     | <kbd>F11</kbd>   |
+| Exit           | <kbd>Esc</kbd>   |
 
 ## Compiling
 Sine was designed to compile with SFML 2.4.1 under MinGW-w64 6.2.0 POSIX Threads using the C++14 flag.
