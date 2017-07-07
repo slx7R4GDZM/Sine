@@ -12,7 +12,7 @@ void Asteroid::spawn_wave_asteroid()
     vel_x_major = get_starting_velocity();
     vel_y_major = get_starting_velocity();
 
-    u8 random = random_byte();
+    const u8 random = random_byte();
     if (random % 2)
     {
         pos.x_major = 0;
@@ -45,6 +45,7 @@ s8 Asteroid::get_starting_velocity() const
         random %= 16;
     else
         random = random % 16 + 16;
+
     switch (status & 0x07)
     {
     case 4:

@@ -87,7 +87,7 @@ void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_ob
     delta_x = apply_global_scale((delta_x << 2) >> (9 - opcode));
     delta_y = apply_global_scale((delta_y << 2) >> (9 - opcode));
 
-    u8 brightness = vector_object[iteration] >> 12;
+    const u8 brightness = vector_object[iteration] >> 12;
 
     draw_vector(delta_x, delta_y, opcode, brightness, flip_x, flip_y, window);
 }
@@ -109,8 +109,8 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteratio
     if (vector_object[iteration] & 0x0004)
         delta_x = -delta_x;
 
-    u8 local_scale = ((vector_object[iteration] & 0x0008) >> 2)
-                   + ((vector_object[iteration] & 0x0800) >> 11);
+    const u8 local_scale = ((vector_object[iteration] & 0x0008) >> 2)
+                         + ((vector_object[iteration] & 0x0800) >> 11);
 
     delta_x = apply_global_scale((delta_x << 2) >> (7 - local_scale));
     delta_y = apply_global_scale((delta_y << 2) >> (7 - local_scale));
@@ -134,8 +134,8 @@ s16 Vector_Generator::apply_global_scale(const s16 delta) const
 
 void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 local_scale, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
 {
-    s16 delta_x = (flip_x ? -raw_delta_x : raw_delta_x);
-    s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y);
+    const s16 delta_x = (flip_x ? -raw_delta_x : raw_delta_x);
+    const s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y);
     if (brightness)
     {
         float adjusted_x;
@@ -153,8 +153,8 @@ void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y,
             adjusted_y = current_y + y_offset;
         }
 
-        float scaled_x_start = adjusted_x / res_scale;
-        float scaled_y_start = resolution.y - adjusted_y / res_scale;
+        const float scaled_x_start = adjusted_x / res_scale;
+        const float scaled_y_start = resolution.y - adjusted_y / res_scale;
         sf::Color vector_color = sf::Color(255, 255, 255, gamma_table[brightness]);
         if (line_thickness >= MINIMUM_LINE_WIDTH)
             draw_wide_line_segment(scaled_x_start, scaled_y_start, delta_x, delta_y, vector_color, window);
@@ -169,7 +169,7 @@ void Vector_Generator::draw_wide_line_segment(const float starting_x, const floa
 {
     if (delta_x || delta_y)
     {
-        float length = std::sqrt(std::pow(delta_x, 2) + std::pow(delta_y, 2)) / res_scale;
+        const float length = std::sqrt(std::pow(delta_x, 2) + std::pow(delta_y, 2)) / res_scale;
         sf::RectangleShape line(sf::Vector2f(length, 0.0f));
         line.setOutlineThickness(line_thickness);
         line.setRotation(std::atan2(-delta_y, delta_x) * 180 / PI);
@@ -180,7 +180,7 @@ void Vector_Generator::draw_wide_line_segment(const float starting_x, const floa
     }
     else
     {
-        float dot_radius = PI / res_scale;
+        const float dot_radius = PI / res_scale;
         sf::CircleShape dot(dot_radius);
         dot.setOrigin(dot_radius, dot_radius);
 
@@ -194,9 +194,9 @@ void Vector_Generator::draw_thin_line_segment(const float scaled_x_start, const 
 {
     if (delta_x || delta_y)
     {
-        float x_end = (x_start + delta_x) / res_scale;
-        float y_end = resolution.y - (y_start + delta_y) / res_scale;
-        sf::Vertex line[2] =
+        const float x_end = (x_start + delta_x) / res_scale;
+        const float y_end = resolution.y - (y_start + delta_y) / res_scale;
+        const sf::Vertex line[2] =
         {
             sf::Vertex(sf::Vector2f(scaled_x_start, scaled_y_start), vector_color),
             sf::Vertex(sf::Vector2f(x_end, y_end), vector_color)
@@ -205,7 +205,7 @@ void Vector_Generator::draw_thin_line_segment(const float scaled_x_start, const 
     }
     else
     {
-        sf::Vertex point[1] = sf::Vertex(sf::Vector2f(scaled_x_start, scaled_y_start), vector_color);
+        const sf::Vertex point[1] = sf::Vertex(sf::Vector2f(scaled_x_start, scaled_y_start), vector_color);
         window.draw(point, 1, sf::Points);
     }
 }

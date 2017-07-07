@@ -8,7 +8,7 @@ void Input_Handler::update(const Settings_Handler& settings_handler)
 {
     for (u8 i = 0; i < TOTAL_BUTTONS; i++)
     {
-        bool was_button_pushed = button_held[i];
+        const bool was_button_pushed = button_held[i];
         if (kb::isKeyPressed(settings_handler.get_button_key(static_cast<Button>(i))))
             button_held[i] = true;
         else

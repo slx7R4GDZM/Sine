@@ -152,7 +152,7 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
 template <typename T>
 T Settings_Handler::clamp_string_value(const string& setting, const string& value, const T min_v, const T max_v)
 {
-    T var_v = static_cast<T>(std::stod(value));
+    const T var_v = static_cast<T>(std::stod(value));
     if (var_v >= min_v && var_v <= max_v)
         return var_v;
     else if (var_v < min_v)

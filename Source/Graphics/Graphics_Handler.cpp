@@ -15,7 +15,7 @@ void Graphics_Handler::draw_message(const u16 message[], const u8 iteration, Vec
     {
         for (u8 c = 2; !done && c != UINT8_MAX; c--)
         {
-            u8 character = (message[i] >> (c * 5 + 1)) & 0x1F;
+            const u8 character = (message[i] >> (c * 5 + 1)) & 0x1F;
             if (character == 0) // null
                 done = true;
             else if (character < 5) // space, 0, 1, 2
@@ -40,8 +40,8 @@ void Graphics_Handler::draw_digit(const u8 digit, Vector_Generator& vector_gener
 
 void Graphics_Handler::draw_number(const u16 number, const u8 rightmost_x, const u8 y, const Global_Scale num_scale, Vector_Generator& vector_generator, sf::RenderWindow& window, const bool add_zero, const bool brighten)
 {
-    string num_string = std::to_string(number);
-    u8 digits = num_string.length();
+    const string num_string = std::to_string(number);
+    const u8 digits = num_string.length();
 
     set_position_and_size(rightmost_x - (digits * 3 * std::pow(2, static_cast<u8>(num_scale))), y, num_scale, vector_generator, window);
     for (u8 i = 0; i < digits; i++)
@@ -81,7 +81,7 @@ void Graphics_Handler::draw_text(const Text text, const Language language, Vecto
 
 void Graphics_Handler::set_position_and_size(const u8 cur_x, const u8 cur_y, const Global_Scale scale, Vector_Generator& vector_generator, sf::RenderWindow& window)
 {
-    u16 vector_object[] =
+    const u16 vector_object[] =
     {
          (LABS << 12) + (cur_y << 2),
         (scale << 12) + (cur_x << 2),

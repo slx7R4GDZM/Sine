@@ -23,8 +23,8 @@ void Saucer::spawn(const u16 player_score, const u8 saucer_spawn_time_start)
         }
     }
 
-    u8 random = random_byte();
-    if (random < 128)
+    const u8 x_random = random_byte();
+    if (x_random < 128)
     {
         vel_x_major = -16;
         pos.x_major = 31;
@@ -36,13 +36,14 @@ void Saucer::spawn(const u16 player_score, const u8 saucer_spawn_time_start)
         pos.x_major = 0;
         pos.x_minor = 0;
     }
+
+    const u8 y_random = random_byte();
     vel_y_major = 0;
-    random = random_byte();
-    pos.y_major = random / 8;
+    pos.y_major = y_random / 8;
     if (pos.y_major > 23)
         pos.y_major -= 8;
 
-    pos.y_minor = random * 32 % 256;
+    pos.y_minor = y_random * 32 % 256;
 }
 
 void Saucer::crash(u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start)

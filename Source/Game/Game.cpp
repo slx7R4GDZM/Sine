@@ -110,17 +110,12 @@ Game::Game()
                 slow_timer++;
             fast_timer++;
 
+            limit_FPS(start_time);
+
             window.display();
         }
-
-        if (settings.get_frame_limiter_mode() == SLEEPING)
-        {
-            nanoseconds frame_time = high_resolution_clock::now() - start_time;
-            if (frame_time < MAX_FRAME_TIME)
-                std::this_thread::sleep_for(MAX_FRAME_TIME - frame_time);
-        }
         else
-            while (high_resolution_clock::now() - start_time < MAX_FRAME_TIME);
+            limit_FPS(start_time);
     }
 }
 
@@ -154,6 +149,18 @@ void Game::process_events(Vector_Generator& vector_generator, sf::RenderWindow& 
                 game_activity = RUN_WITH_INPUT;
         }
     }
+}
+
+void Game::limit_FPS(const high_resolution_clock::time_point start_time) const
+{
+    if (settings.get_frame_limiter_mode() == SLEEPING)
+    {
+        const nanoseconds frame_time = high_resolution_clock::now() - start_time;
+        if (frame_time < MAX_FRAME_TIME)
+            std::this_thread::sleep_for(MAX_FRAME_TIME - frame_time);
+    }
+    else
+        while (high_resolution_clock::now() - start_time < MAX_FRAME_TIME);
 }
 
 void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
@@ -452,6 +459,7 @@ void Game::update_player(Vector_Generator& vector_generator)
     attempt_asteroid_wave_spawn(player[current_player]);
     update_space_objects(player[current_player], vector_generator);
 
+    // if the ship is destroyed, determine if there's enough lives to keep playing
     if (!player_text_timer && player[current_player].ship.get_status() == INDISCERNIBLE && player[current_player].ship_spawn_timer >= 128)
     {
         if (player_count == 1)
@@ -493,7 +501,7 @@ void Game::update_player(Vector_Generator& vector_generator)
 
 void Game::add_points(const u8 points)
 {
-    u16 old_thousandth = player_score[current_player] / 1000;
+    const u16 old_thousandth = player_score[current_player] / 1000;
     player_score[current_player] += points;
 
     if (player_score[current_player] / 1000 != old_thousandth)
@@ -723,10 +731,13 @@ void Game::clear_space_objects(Player& player)
 {
     for (u8 i = 0; i < MAX_ASTEROIDS; i++)
         player.asteroid[i].set_status(INDISCERNIBLE);
+
     player.ship.set_status(INDISCERNIBLE);
     player.saucer.set_status(INDISCERNIBLE);
+
     for (u8 i = 0; i < MAX_SAUCER_PHOTONS; i++)
         player.saucer_photon[i].set_status(INDISCERNIBLE);
+
     for (u8 i = 0; i < MAX_SHIP_PHOTONS; i++)
         player.ship_photon[i].set_status(INDISCERNIBLE);
 }
@@ -735,6 +746,7 @@ void Game::attempt_asteroid_wave_spawn(Player& player)
 {
     if (player.asteroid_wave_spawn_time)
         player.asteroid_wave_spawn_time--;
+
     if (player.asteroid_count == 0 && player.saucer.get_status() == INDISCERNIBLE && !player.asteroid_wave_spawn_time)
     {
         if (player.asteroids_per_wave < 10)
@@ -753,7 +765,7 @@ void Game::attempt_asteroid_wave_spawn(Player& player)
 
 void Game::spawn_asteroids_from_wreckage(Player& player, const u8 iteration)
 {
-    u8 status = player.asteroid[iteration].get_status();
+    const u8 status = player.asteroid[iteration].get_status();
     if ((status & 0x07) > 1)
     {
         u8 asteroids_created = 0;
@@ -783,7 +795,7 @@ void Game::handle_ship_stuff(Player& player)
         player.ship.set_status(INDISCERNIBLE);
         player.ship_spawn_timer = 48;
 
-        u8 pos_x_major = Space_Object::limit_position(random_byte() % 32, 28);
+        const u8 pos_x_major = Space_Object::limit_position(random_byte() % 32, 28);
         u8 pos_y_major = random_byte() % 32;
 
         if (pos_y_major >= 24)
@@ -847,7 +859,7 @@ void Game::handle_ship_stuff(Player& player)
         else
             player.ship.dampen_velocity(ship_vel_x_minor, ship_vel_y_minor);
     }
-    u8 status = player.ship.get_status();
+    const u8 status = player.ship.get_status();
     if (status && status < TRUE_EXPLOSION_START)
         handle_saucer_stuff(player);
 }
@@ -861,7 +873,7 @@ void Game::handle_saucer_stuff(Player& player) const
         {
             if (player.saucer_spawn_and_shot_time == 0)
             {
-                u8 new_saucer_spawn_time_start = player.saucer_spawn_time_start - 6;
+                const u8 new_saucer_spawn_time_start = player.saucer_spawn_time_start - 6;
                 if (new_saucer_spawn_time_start >= MINIMUM_SAUCER_SPAWN_TIME)
                     player.saucer_spawn_time_start = new_saucer_spawn_time_start;
 

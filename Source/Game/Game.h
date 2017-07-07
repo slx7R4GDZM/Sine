@@ -62,6 +62,7 @@ private:
     Player player[MAX_PLAYERS];
 
     void process_events(Vector_Generator& vector_generator, sf::RenderWindow& window);
+    void limit_FPS(const high_resolution_clock::time_point start_time) const;
 
     void draw_multiplayer_scores(Vector_Generator& vector_generator);
     void draw_copyright(Vector_Generator& vector_generator);

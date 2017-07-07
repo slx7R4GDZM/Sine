@@ -38,7 +38,7 @@ void Space_Object::update_position()
 
 void Space_Object::update_position_axis(u8& pos_major, u8& pos_minor, const s8 vel_major)
 {
-    u8 old_pos_minor = pos_minor;
+    const u8 old_pos_minor = pos_minor;
     pos_minor += vel_major;
 
     if (vel_major < 0) // down or left
@@ -76,8 +76,8 @@ bool Space_Object::collide(const Space_Object& object, const u8 minimum_space) c
     if (status && status < TRUE_EXPLOSION_START
      && object.status && object.status < TRUE_EXPLOSION_START)
     {
-        Coordinate pos_1 = get_total_pos(get_position());
-        Coordinate pos_2 = get_total_pos(object.get_position());
+        Coordinate pos_1 = get_total_pos(pos);
+        Coordinate pos_2 = get_total_pos(object.pos);
         if (hit(pos_1.position_x, pos_2.position_x, minimum_space)
          && hit(pos_1.position_y, pos_2.position_y, minimum_space))
             return true;
@@ -102,7 +102,7 @@ bool Space_Object::hit(const u16 pos_1, const u16 pos_2, const u8 minimum_space)
 
 void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
-    Global_Scale scale = static_cast<Global_Scale>((status + 33) / 17);
+    const Global_Scale scale = static_cast<Global_Scale>((status + 33) / 17);
     set_position_and_size(scale, vector_generator, window);
 
     switch (status / 4 % 4)
@@ -125,7 +125,7 @@ void Space_Object::draw_explosion(Vector_Generator& vector_generator, sf::Render
 void Space_Object::set_position_and_size(const Global_Scale scale, Vector_Generator& vector_generator, sf::RenderWindow& window) const
 {
     // add 128 to y making the 4:3 Space_Object space centered inside the 1:1 DVG space
-    u16 vector_object[] =
+    const u16 vector_object[] =
     {
          (LABS << 12) + (pos.y_major << 5) + (pos.y_minor >> 3) + 128,
         (scale << 12) + (pos.x_major << 5) + (pos.x_minor >> 3),

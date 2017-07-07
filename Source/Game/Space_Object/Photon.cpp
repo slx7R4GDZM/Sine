@@ -42,10 +42,15 @@ void Photon::update(Vector_Generator& vector_generator, sf::RenderWindow& window
 // there's probably a much better way to do this
 void Photon::solve_position(const s8 base_offset, u8& pos_major, u8& pos_minor)
 {
-    float temp_offset = (base_offset >> 1) * 1.5f;
+    float temp_offset = base_offset / 2;
+    if (base_offset < 0 && base_offset % 2)
+        temp_offset--;
+
+    temp_offset *= 1.5f;
+
     s8 pos_offset = temp_offset;
-    if (temp_offset < 0 && pos_offset > temp_offset)
-        pos_offset = temp_offset - 1;
+    if (pos_offset < 0 && pos_offset > temp_offset)
+        pos_offset--;
 
     pos_minor += pos_offset;
     if (pos_offset < 0 && underflowed_u8(pos_minor, pos_minor - pos_offset))

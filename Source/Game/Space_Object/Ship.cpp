@@ -42,22 +42,22 @@ void Ship::update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Ve
 void Ship::add_thrust(const u8 direction, u8& vel_x_minor, u8& vel_y_minor)
 {
     // x
-    u8 old_vel_minor = vel_x_minor;
+    const u8 old_vel_x_minor = vel_x_minor;
     vel_x_minor += lookup_cosine(direction) * 2;
 
     if (direction > 64 && direction < 192) // left
-        negative_vel_change(vel_x_major, vel_x_minor, old_vel_minor);
+        negative_vel_change(vel_x_major, vel_x_minor, old_vel_x_minor);
     else // right
-        positive_vel_change(vel_x_major, vel_x_minor, old_vel_minor);
+        positive_vel_change(vel_x_major, vel_x_minor, old_vel_x_minor);
 
     // y
-    old_vel_minor = vel_y_minor;
+    const u8 old_vel_y_minor = vel_y_minor;
     vel_y_minor += lookup_sine(direction) * 2;
 
     if (direction > 128) // down
-        negative_vel_change(vel_y_major, vel_y_minor, old_vel_minor);
+        negative_vel_change(vel_y_major, vel_y_minor, old_vel_y_minor);
     else // up
-        positive_vel_change(vel_y_major, vel_y_minor, old_vel_minor);
+        positive_vel_change(vel_y_major, vel_y_minor, old_vel_y_minor);
 }
 
 void Ship::negative_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_minor)
@@ -82,14 +82,14 @@ void Ship::dampen_velocity_axis(s8& vel_major, u8& vel_minor)
 {
     if (vel_major < 0) // reduction of 2 to 128
     {
-        u8 old_vel_minor = vel_minor;
+        const u8 old_vel_minor = vel_minor;
         vel_minor -= vel_major * 2; // subtract the negative vel_major to increase value
         if (overflowed_u8(vel_minor, old_vel_minor))
             vel_major++;
     }
     else if (vel_minor || vel_major) // reduction of 1 to 127
     {
-        u8 old_vel_minor = vel_minor;
+        const u8 old_vel_minor = vel_minor;
         vel_minor -= vel_major * 2 + 1;
         if (underflowed_u8(vel_minor, old_vel_minor))
             vel_major--;
