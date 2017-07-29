@@ -110,12 +110,9 @@ Game::Game()
                 slow_timer++;
             fast_timer++;
 
-            limit_FPS(start_time);
-
             window.display();
         }
-        else
-            limit_FPS(start_time);
+        limit_FPS(start_time);
     }
 }
 
@@ -654,7 +651,6 @@ void Game::update_space_objects(Player& player, Vector_Generator& vector_generat
     handle_collision(player);
 }
 
-// not sure if points are added or if lives are reduced first, gotta test
 void Game::handle_collision(Player& player)
 {
     // ship

@@ -76,20 +76,18 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
 
 void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
 {
-    s16 delta_y = vector_object[iteration] & 0x03FF;
-    if (vector_object[iteration++] & 0x0400)
-        delta_y = -delta_y;
+    u16 delta_y = vector_object[iteration] & 0x03FF;
+    u16 delta_x = vector_object[iteration + 1] & 0x03FF;
 
-    s16 delta_x = vector_object[iteration] & 0x03FF;
-    if (vector_object[iteration] & 0x0400)
-        delta_x = -delta_x;
-
-    delta_x = apply_global_scale((delta_x << 2) >> (9 - opcode));
     delta_y = apply_global_scale((delta_y << 2) >> (9 - opcode));
+    delta_x = apply_global_scale((delta_x << 2) >> (9 - opcode));
+
+    const s16 final_delta_y = (vector_object[iteration++] & 0x0400 ? -delta_y : delta_y);
+    const s16 final_delta_x = (vector_object[iteration] & 0x0400 ? -delta_x : delta_x);
 
     const u8 brightness = vector_object[iteration] >> 12;
 
-    draw_vector(delta_x, delta_y, opcode, brightness, flip_x, flip_y, window);
+    draw_vector(final_delta_x, final_delta_y, brightness, flip_x, flip_y, window);
 }
 
 void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration)
@@ -101,13 +99,8 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration)
 
 void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, const bool brighten, sf::RenderWindow& window)
 {
-    s16 delta_y = vector_object[iteration] & 0x0300;
-    if (vector_object[iteration] & 0x0400)
-        delta_y = -delta_y;
-
-    s16 delta_x = (vector_object[iteration] & 0x0003) << 8;
-    if (vector_object[iteration] & 0x0004)
-        delta_x = -delta_x;
+    u16 delta_x = (vector_object[iteration] & 0x0003) << 8;
+    u16 delta_y = vector_object[iteration] & 0x0300;
 
     const u8 local_scale = ((vector_object[iteration] & 0x0008) >> 2)
                          + ((vector_object[iteration] & 0x0800) >> 11);
@@ -115,14 +108,17 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteratio
     delta_x = apply_global_scale((delta_x << 2) >> (7 - local_scale));
     delta_y = apply_global_scale((delta_y << 2) >> (7 - local_scale));
 
+    const s16 final_delta_x = (vector_object[iteration] & 0x0004 ? -delta_x : delta_x);
+    const s16 final_delta_y = (vector_object[iteration] & 0x0400 ? -delta_y : delta_y);
+
     u8 brightness = (vector_object[iteration] & 0x00F0) >> 4;
     if (brighten)
         brightness += 2;
 
-    draw_vector(delta_x, delta_y, local_scale, brightness, flip_x, flip_y, window);
+    draw_vector(final_delta_x, final_delta_y, brightness, flip_x, flip_y, window);
 }
 
-s16 Vector_Generator::apply_global_scale(const s16 delta) const
+u16 Vector_Generator::apply_global_scale(const u16 delta) const
 {
     if (global_scale <= MUL_128)
         return delta << global_scale;
@@ -132,7 +128,7 @@ s16 Vector_Generator::apply_global_scale(const s16 delta) const
 
 // drawing stuff
 
-void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 local_scale, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
+void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
 {
     const s16 delta_x = (flip_x ? -raw_delta_x : raw_delta_x);
     const s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y);

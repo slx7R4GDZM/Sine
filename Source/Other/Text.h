@@ -182,7 +182,7 @@ Simulate-DAC 1
 # < 1 = Crops the image starting with the left and right sides
 # 1.0 = Scales the image to the lower resolution axis
 # > 1 = Crops the image starting with the top and bottom (default)
-Crop-Ratio 1.2962962
+Crop-Ratio 1.2962025
 
 ## MSAA toggle and quality setting
 # 0 = Off
