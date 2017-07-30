@@ -34,8 +34,8 @@ private:
     u16 apply_global_scale(const u16 delta) const;
 
     void draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window);
-    void draw_wide_line_segment(const float starting_x, const float starting_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;
-    void draw_thin_line_segment(const float scaled_x_start, const float scaled_y_start, const float x_start, const float y_start, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;
+    void draw_wide_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;
+    void draw_thin_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;
 public:
     Vector_Generator(const Settings_Handler settings_handler);
     void set_resolution_scale(const sf::Vector2u resolution);

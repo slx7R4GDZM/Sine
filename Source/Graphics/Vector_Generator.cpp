@@ -155,13 +155,13 @@ void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y,
         if (line_thickness >= MINIMUM_LINE_WIDTH)
             draw_wide_line_segment(scaled_x_start, scaled_y_start, delta_x, delta_y, vector_color, window);
         else
-            draw_thin_line_segment(scaled_x_start, scaled_y_start, adjusted_x, adjusted_y, delta_x, delta_y, vector_color, window);
+            draw_thin_line_segment(scaled_x_start, scaled_y_start, delta_x, delta_y, vector_color, window);
     }
     current_x += delta_x;
     current_y += delta_y;
 }
 
-void Vector_Generator::draw_wide_line_segment(const float starting_x, const float starting_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const
+void Vector_Generator::draw_wide_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const
 {
     if (delta_x || delta_y)
     {
@@ -170,7 +170,7 @@ void Vector_Generator::draw_wide_line_segment(const float starting_x, const floa
         line.setOutlineThickness(line_thickness);
         line.setRotation(std::atan2(-delta_y, delta_x) * 180 / PI);
 
-        line.setPosition(starting_x, starting_y);
+        line.setPosition(start_x, start_y);
         line.setOutlineColor(vector_color);
         window.draw(line);
     }
@@ -180,28 +180,28 @@ void Vector_Generator::draw_wide_line_segment(const float starting_x, const floa
         sf::CircleShape dot(dot_radius);
         dot.setOrigin(dot_radius, dot_radius);
 
-        dot.setPosition(starting_x, starting_y);
+        dot.setPosition(start_x, start_y);
         dot.setFillColor(vector_color);
         window.draw(dot);
     }
 }
 
-void Vector_Generator::draw_thin_line_segment(const float scaled_x_start, const float scaled_y_start, const float x_start, const float y_start, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const
+void Vector_Generator::draw_thin_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const
 {
     if (delta_x || delta_y)
     {
-        const float x_end = (x_start + delta_x) / res_scale;
-        const float y_end = resolution.y - (y_start + delta_y) / res_scale;
+        const float end_x = start_x + delta_x / res_scale;
+        const float end_y = start_y - delta_y / res_scale;
         const sf::Vertex line[2] =
         {
-            sf::Vertex(sf::Vector2f(scaled_x_start, scaled_y_start), vector_color),
-            sf::Vertex(sf::Vector2f(x_end, y_end), vector_color)
+            sf::Vertex(sf::Vector2f(start_x, start_y), vector_color),
+            sf::Vertex(sf::Vector2f(end_x, end_y), vector_color)
         };
         window.draw(line, 2, sf::Lines);
     }
     else
     {
-        const sf::Vertex point[1] = sf::Vertex(sf::Vector2f(scaled_x_start, scaled_y_start), vector_color);
+        const sf::Vertex point[1] = sf::Vertex(sf::Vector2f(start_x, start_y), vector_color);
         window.draw(point, 1, sf::Points);
     }
 }
