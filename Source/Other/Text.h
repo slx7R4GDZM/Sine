@@ -173,11 +173,6 @@ Inactive-Mode 0
 # Graphics Settings
 #==============================================================================
 
-## Simulate Digital-to-Analog Converter
-# 0 = Use the 12-bit internal resolution positions
-# 1 = Simulate the 10-bit DAC, thus having shaky graphics (default)
-Simulate-DAC 1
-
 ## The x:y ratio to crop the image to
 # < 1 = Crops the image starting with the left and right sides
 # 1.0 = Scales the image to the lower resolution axis

@@ -23,7 +23,6 @@ private:
     float line_thickness;
 
     sf::Vector2u resolution;
-    bool simulate_DAC;
     float crop_ratio;
     u8 gamma_table[16];
 
@@ -31,7 +30,7 @@ private:
     void load_absolute(const u16 vector_object[], u8& iteration);
     void draw_short_vector(const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, const bool brighten, sf::RenderWindow& window);
 
-    u16 apply_global_scale(const u16 delta) const;
+    s16 apply_global_scale(const s16 delta) const;
 
     void draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window);
     void draw_wide_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const;

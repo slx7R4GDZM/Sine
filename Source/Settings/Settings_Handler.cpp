@@ -17,25 +17,27 @@ Settings_Handler::Settings_Handler()
     , fallback_res(1024, 790)
     , fallback_win_pos(-1, -1)
     , inactive_mode(PAUSE)
-    , simulate_DAC(true)
     , crop_ratio(1024.0f / 790)
     , samples_MSAA(3)
     , gamma_correction(1.0f)
     , enable_v_sync(false)
     , frame_limiter_mode(SLEEPING)
 {
-    std::ifstream in_file("Sine_Settings.cfg");
+    std::ifstream in_file(SETTINGS_FILENAME);
     if (in_file.good())
         parse_file_settings(in_file);
     else
     {
-        cerr << "Error reading file Sine_Settings.cfg: " << strerror(errno) << "\n\n";
-        std::ofstream out_file("Sine_Settings.cfg");
+        cerr << "Error reading file " << SETTINGS_FILENAME << ": " << strerror(errno) << '\n';
+        std::ofstream out_file(SETTINGS_FILENAME);
 
         if (out_file.good())
+        {
+            clog << "Created file " << SETTINGS_FILENAME << '\n';
             out_file << DEFAULT_SETTINGS;
+        }
         else
-            cerr << "Error writing file Sine_Settings.cfg: " << strerror(errno) << "\n\n";
+            cerr << "Error writing file " << SETTINGS_FILENAME << ": " << strerror(errno) << '\n';
     }
 }
 
@@ -99,11 +101,11 @@ void Settings_Handler::parse_buttons(const string& setting, const string& value)
         {
             cerr << "Invalid key \"" << value << "\" used for button " << setting << '\n';
             cerr << "Button " << setting
-                 << " defaulting to key " << KEY_TABLE[button_key[current_button]] << "\n\n";
+                 << " defaulting to key " << KEY_TABLE[button_key[current_button]] << '\n';
         }
     }
     else
-        cerr << "\nInvalid button \"" << setting << "\"\n\n";
+        cerr << "Invalid button \"" << setting << "\"\n";
 }
 
 void Settings_Handler::parse_settings(const string& setting, const string& value)
@@ -130,8 +132,6 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
         fallback_win_pos.y = clamp_string_value(setting, value, INT32_MIN, INT32_MAX);
     else if (setting == "Inactive-Mode")
         inactive_mode = clamp_string_value(setting, value, PAUSE, RUN_WITH_INPUT);
-    else if (setting == "Simulate-DAC")
-        simulate_DAC = clamp_string_value(setting, value, false, true);
     else if (setting == "Crop-Ratio")
         crop_ratio = clamp_string_value(setting, value, FLT_MIN, FLT_MAX);
     else if (setting == "MSAA-Quality")
@@ -146,7 +146,7 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
     else if (setting == "Frame-Limit-Mode")
         frame_limiter_mode = clamp_string_value(setting, value, SLEEPING, BUSY_WAITING);
     else
-        cerr << "Invalid setting \"" << setting << "\"\n\n";
+        cerr << "Invalid setting \"" << setting << "\"\n";
 }
 
 template <typename T>
@@ -157,12 +157,12 @@ T Settings_Handler::clamp_string_value(const string& setting, const string& valu
         return var_v;
     else if (var_v < min_v)
     {
-        cerr << "Value for setting " << setting << " is too low, limiting it to " << min_v << "\n\n";
+        cerr << "Value for setting " << setting << " is too low, limiting it to " << min_v << '\n';
         return min_v;
     }
     else
     {
-        cerr << "Value for setting " << setting << " is too high, limiting it to " << max_v << "\n\n";
+        cerr << "Value for setting " << setting << " is too high, limiting it to " << max_v << '\n';
         return max_v;
     }
 }
@@ -249,11 +249,11 @@ void Settings_Handler::create_window(const bool toggle_fullscreen, const bool re
 
 void Settings_Handler::output_settings() const
 {
-    clog << '\n';
-    for (u8 i = 0; i < TOTAL_BUTTONS; i++)
-        clog << std::setw(19) << BUTTON_TABLE[i] << " = " << KEY_TABLE[button_key[i]] << '\n';
-
     clog << "----------------------------------------";
+    for (u8 i = 0; i < TOTAL_BUTTONS; i++)
+        clog << '\n' << std::setw(19) << BUTTON_TABLE[i] << " = " << KEY_TABLE[button_key[i]];
+
+    clog << "\n----------------------------------------";
     clog << "\nLanguage = " << static_cast<u16>(option_switch.language);
     clog << "\nStarting-Lives = " << static_cast<u16>(option_switch.starting_lives);
     clog << "\nCenter-Coin-Multiplier = " << static_cast<u16>(option_switch.center_coin_multiplier);
@@ -269,7 +269,6 @@ void Settings_Handler::output_settings() const
     clog << "\nInactive-Mode = " << static_cast<u16>(inactive_mode);
 
     clog << "\n----------------------------------------";
-    clog << "\nSimulate-DAC = " << simulate_DAC;
     clog << "\nCrop-Ratio = " << crop_ratio;
     clog << "\nMSAA-Quality = " << static_cast<u16>(samples_MSAA);
     clog << "\nGamma-Correction = " << gamma_correction;
@@ -302,9 +301,8 @@ Frame_Limiter_Mode Settings_Handler::get_frame_limiter_mode() const
     return frame_limiter_mode;
 }
 
-void Settings_Handler::get_settings(bool& simulate_DAC, float& crop_ratio, u8 gamma_table[]) const
+void Settings_Handler::get_settings(float& crop_ratio, u8 gamma_table[]) const
 {
-    simulate_DAC = this->simulate_DAC;
     crop_ratio = this->crop_ratio;
     for (u8 i = 0; i < 16; i++)
         gamma_table[i] = 255 * std::pow(static_cast<float>(i) * 17 / 255, 1 / gamma_correction) + 0.5f;

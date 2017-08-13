@@ -23,7 +23,6 @@ private:
     sf::Vector2u current_res;
     sf::Vector2i fallback_win_pos;
     Inactive_Mode inactive_mode;
-    bool simulate_DAC;
     float crop_ratio;
     u8 samples_MSAA;
     sf::ContextSettings context_settings;
@@ -46,5 +45,5 @@ public:
     sf::Vector2u get_resolution() const;
     Inactive_Mode get_inactive_mode() const;
     Frame_Limiter_Mode get_frame_limiter_mode() const;
-    void get_settings(bool& simulate_DAC, float& crop_ratio, u8 gamma_table[]) const;
+    void get_settings(float& crop_ratio, u8 gamma_table[]) const;
 };

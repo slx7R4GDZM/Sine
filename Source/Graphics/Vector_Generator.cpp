@@ -9,13 +9,11 @@
 const float PI = std::atan(1) * 4;
 const float DESIRED_LINE_WIDTH = 0.75f;
 const float MINIMUM_LINE_WIDTH = 0.5f;
-const u16 INTERNAL_RES = 4096; // the internal resolution axes are 12-bit due to the
-                               // two connected 6-bit Binary Rate Multipliers that
-                               // supplied the clocks to the X and Y position counters
+const u16 INTERNAL_RES = 1024;
 
 Vector_Generator::Vector_Generator(const Settings_Handler settings_handler)
 {
-    settings_handler.get_settings(simulate_DAC, crop_ratio, gamma_table);
+    settings_handler.get_settings(crop_ratio, gamma_table);
     set_resolution_scale(settings_handler.get_resolution());
 }
 
@@ -40,7 +38,7 @@ void Vector_Generator::set_resolution_scale(const sf::Vector2u resolution)
         x_offset = (resolution.x - resolution.y * crop_ratio) * res_scale / 2;
         y_offset = (resolution.y - resolution.y * crop_ratio) * res_scale / 2;
     }
-    line_thickness = DESIRED_LINE_WIDTH / (res_scale / 4);
+    line_thickness = DESIRED_LINE_WIDTH / res_scale;
 }
 
 void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& window, u8 iteration, const bool flip_x, const bool flip_y, const bool brighten)
@@ -76,49 +74,53 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
 
 void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
 {
-    u16 delta_y = vector_object[iteration] & 0x03FF;
-    u16 delta_x = vector_object[iteration + 1] & 0x03FF;
+    s16 delta_y = vector_object[iteration] & 0x03FF;
+    s16 delta_x = vector_object[iteration + 1] & 0x03FF;
 
-    delta_y = apply_global_scale((delta_y << 2) >> (9 - opcode));
-    delta_x = apply_global_scale((delta_x << 2) >> (9 - opcode));
+    delta_y = apply_global_scale(delta_y >> (9 - opcode));
+    delta_x = apply_global_scale(delta_x >> (9 - opcode));
 
-    const s16 final_delta_y = (vector_object[iteration++] & 0x0400 ? -delta_y : delta_y);
-    const s16 final_delta_x = (vector_object[iteration] & 0x0400 ? -delta_x : delta_x);
+    if (vector_object[iteration++] & 0x0400)
+        delta_y = -delta_y;
+    if (vector_object[iteration] & 0x0400)
+        delta_x = -delta_x;
 
     const u8 brightness = vector_object[iteration] >> 12;
 
-    draw_vector(final_delta_x, final_delta_y, brightness, flip_x, flip_y, window);
+    draw_vector(delta_x, delta_y, brightness, flip_x, flip_y, window);
 }
 
 void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration)
 {
-    current_y = (vector_object[iteration++] & 0x03FF) << 2;
-    current_x = (vector_object[iteration] & 0x03FF) << 2;
+    current_y = vector_object[iteration++] & 0x03FF;
+    current_x = vector_object[iteration] & 0x03FF;
     global_scale = static_cast<Global_Scale>(vector_object[iteration] >> 12);
 }
 
 void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, const bool brighten, sf::RenderWindow& window)
 {
-    u16 delta_x = (vector_object[iteration] & 0x0003) << 8;
-    u16 delta_y = vector_object[iteration] & 0x0300;
+    s16 delta_x = (vector_object[iteration] & 0x0003) << 8;
+    s16 delta_y = vector_object[iteration] & 0x0300;
 
     const u8 local_scale = ((vector_object[iteration] & 0x0008) >> 2)
                          + ((vector_object[iteration] & 0x0800) >> 11);
 
-    delta_x = apply_global_scale((delta_x << 2) >> (7 - local_scale));
-    delta_y = apply_global_scale((delta_y << 2) >> (7 - local_scale));
+    delta_x = apply_global_scale(delta_x >> (7 - local_scale));
+    delta_y = apply_global_scale(delta_y >> (7 - local_scale));
 
-    const s16 final_delta_x = (vector_object[iteration] & 0x0004 ? -delta_x : delta_x);
-    const s16 final_delta_y = (vector_object[iteration] & 0x0400 ? -delta_y : delta_y);
+    if (vector_object[iteration] & 0x0004)
+        delta_x = -delta_x;
+    if (vector_object[iteration] & 0x0400)
+        delta_y = -delta_y;
 
     u8 brightness = (vector_object[iteration] & 0x00F0) >> 4;
     if (brighten)
         brightness += 2;
 
-    draw_vector(final_delta_x, final_delta_y, brightness, flip_x, flip_y, window);
+    draw_vector(delta_x, delta_y, brightness, flip_x, flip_y, window);
 }
 
-u16 Vector_Generator::apply_global_scale(const u16 delta) const
+s16 Vector_Generator::apply_global_scale(const s16 delta) const
 {
     if (global_scale <= MUL_128)
         return delta << global_scale;
@@ -134,20 +136,8 @@ void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y,
     const s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y);
     if (brightness)
     {
-        float adjusted_x;
-        float adjusted_y;
-        if (simulate_DAC)
-        {
-            // mask off the lower 2 bits of the 12-bit internal resolution
-            // thus simulating the 10-bit DAC resolution
-            adjusted_x = static_cast<s16>(current_x & 0xFFFC) + x_offset;
-            adjusted_y = static_cast<s16>(current_y & 0xFFFC) + y_offset;
-        }
-        else
-        {
-            adjusted_x = current_x + x_offset;
-            adjusted_y = current_y + y_offset;
-        }
+        float adjusted_x = current_x + x_offset;
+        float adjusted_y = current_y + y_offset;
 
         const float scaled_x_start = adjusted_x / res_scale;
         const float scaled_y_start = resolution.y - adjusted_y / res_scale;
@@ -165,18 +155,31 @@ void Vector_Generator::draw_wide_line_segment(const float start_x, const float s
 {
     if (delta_x || delta_y)
     {
-        const float length = std::sqrt(std::pow(delta_x, 2) + std::pow(delta_y, 2)) / res_scale;
+        const float length = std::sqrt(std::pow(delta_x, 2) + std::pow(delta_y, 2)) / res_scale
+                           + line_thickness * 2;
         sf::RectangleShape line(sf::Vector2f(length, 0.0f));
-        line.setOutlineThickness(line_thickness);
-        line.setRotation(std::atan2(-delta_y, delta_x) * 180 / PI);
+        const float rotation = std::atan2(-delta_y, delta_x) * 180 / PI;
 
-        line.setPosition(start_x, start_y);
+        line.setRotation(rotation);
+        line.setOutlineThickness(line_thickness);
         line.setOutlineColor(vector_color);
+
+        // fix offset of line position caused by extra length from "+ line_thickness * 2"
+        const float line_x_offset = (fabs(1.0f / 90 * rotation) - 1) * line_thickness;
+        float line_y_offset;
+        if (rotation < -90)
+            line_y_offset = (1.0f / 90 * rotation + 2) * line_thickness;
+        else if (rotation < 90)
+            line_y_offset = -1.0f / 90 * rotation * line_thickness;
+        else
+            line_y_offset = (1.0f / 90 * rotation - 2) * line_thickness;
+
+        line.setPosition(start_x + line_x_offset, start_y + line_y_offset);
         window.draw(line);
     }
     else
     {
-        const float dot_radius = PI / res_scale;
+        const float dot_radius = PI / res_scale / 4;
         sf::CircleShape dot(dot_radius);
         dot.setOrigin(dot_radius, dot_radius);
 
