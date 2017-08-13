@@ -92,8 +92,14 @@ void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_ob
 
 void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration)
 {
-    current_y = vector_object[iteration++] & 0x03FF;
+    current_y = vector_object[iteration] & 0x03FF;
+    if (vector_object[iteration++] & 0x0400)
+        current_y = -current_y;
+
     current_x = vector_object[iteration] & 0x03FF;
+    if (vector_object[iteration] & 0x0400)
+        current_x = -current_x;
+
     global_scale = static_cast<Global_Scale>(vector_object[iteration] >> 12);
 }
 
