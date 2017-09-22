@@ -4,6 +4,8 @@
 
 #include "Photon.h"
 
+#include "../../Graphics/Vector-Generator.h"
+#include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
 void Photon::spawn(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos)
@@ -19,7 +21,7 @@ void Photon::spawn(const u8 direction, const s8 vel_x, const s8 vel_y, const Pos
     status = 17;
 }
 
-void Photon::update(Vector_Generator& vector_generator, sf::RenderWindow& window)
+void Photon::update(Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (status && status < TRUE_EXPLOSION_START)
     {
@@ -59,7 +61,7 @@ void Photon::solve_position(const s8 base_offset, u8& pos_major, u8& pos_minor)
         pos_major++;
 }
 
-void Photon::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
+void Photon::draw(Vector_Generator& vector_generator, RenderWindow& window) const
 {
     set_position_and_size(MUL_1, vector_generator, window);
     vector_generator.process(PHOTON, window);

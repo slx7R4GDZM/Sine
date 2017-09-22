@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include "../Other/Common_Things.h"
 #include "../Other/Constants.h"
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <fstream>
+
+class fstream;
 
 class Settings_Handler
 {
 private:
-    kb::Key button_key[TOTAL_BUTTONS];
+    Kb::Key button_key[TOTAL_BUTTONS];
     Option_Switch option_switch;
 
     // some of these can probably be made to be temporary
@@ -37,10 +36,10 @@ private:
     static T clamp_string_value(const string& setting, const string& value, const T min_v, const T max_v);
 public:
     Settings_Handler();
-    void create_window(sf::RenderWindow& win);
-    void create_window(const bool toggle_fullscreen, const bool reuse_pos, const sf::Vector2u new_res, sf::RenderWindow& win);
+    void create_window(RenderWindow& win);
+    void create_window(const bool toggle_fullscreen, const bool reuse_pos, const sf::Vector2u new_res, RenderWindow& win);
     void output_settings() const;
-    kb::Key get_button_key(const Button button_key) const;
+    Kb::Key get_button_key(const Button button) const;
     Option_Switch get_option_switch() const;
     sf::Vector2u get_resolution() const;
     Inactive_Mode get_inactive_mode() const;

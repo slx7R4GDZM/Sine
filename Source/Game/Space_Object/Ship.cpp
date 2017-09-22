@@ -4,6 +4,8 @@
 
 #include "Ship.h"
 
+#include "../../Graphics/Vector-Generator.h"
+#include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
 void Ship::spawn()
@@ -20,7 +22,7 @@ void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
     ship_spawn_timer = 129;
 }
 
-void Ship::update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Vector_Generator& vector_generator, sf::RenderWindow& window)
+void Ship::update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (status == ALIVE)
     {
@@ -96,7 +98,7 @@ void Ship::dampen_velocity_axis(s8& vel_major, u8& vel_minor)
     }
 }
 
-void Ship::draw(bool& draw_thrust, const u8 direction, Vector_Generator& vector_generator, sf::RenderWindow& window) const
+void Ship::draw(bool& draw_thrust, const u8 direction, Vector_Generator& vector_generator, RenderWindow& window) const
 {
     bool flip_x = false;
     bool flip_y = false;

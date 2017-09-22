@@ -4,33 +4,34 @@
 
 #pragma once
 
-#include <SFML/Window/Keyboard.hpp>
 #include <chrono>
 #include <cstdint>
-#include <cstdlib>
 #include <iostream>
 #include <string>
-
-using kb = sf::Keyboard;
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Keyboard.hpp>
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-using u8 = uint_fast8_t;
-using u16 = uint_fast16_t;
-using u32 = uint_fast32_t;
-using u64 = uint_fast64_t;
+using u8 = std::uint_fast8_t;
+using u16 = std::uint_fast16_t;
+using u32 = std::uint_fast32_t;
+using u64 = std::uint_fast64_t;
 
-using s8 = int_fast8_t;
-using s16 = int_fast16_t;
-using s32 = int_fast32_t;
-using s64 = int_fast64_t;
+using s8 = std::int_fast8_t;
+using s16 = std::int_fast16_t;
+using s32 = std::int_fast32_t;
+using s64 = std::int_fast64_t;
 
 using std::cerr;
 using std::clog;
 using std::string;
 
-enum Button : u8
+using sf::RenderWindow;
+using Kb = sf::Keyboard;
+
+enum Button
 {
     HYPERSPACE,
     FIRE,
@@ -46,7 +47,7 @@ enum Button : u8
     EXIT
 };
 
-enum Text : u8
+enum Text
 {
     HIGH_SCORES,
     PLAYER_,
@@ -61,7 +62,7 @@ enum Text : u8
     TWO_COINS_1_PLAY
 };
 
-enum Global_Scale : u8
+enum Global_Scale
 {
     MUL_1,
     MUL_2,
@@ -81,7 +82,7 @@ enum Global_Scale : u8
     DIV_2
 };
 
-enum Opcode : u8
+enum Opcode
 {
     VCTR_0,
     VCTR_1,
@@ -101,7 +102,7 @@ enum Opcode : u8
     SVEC
 };
 
-enum Language : u8
+enum Language
 {
     ENGLISH,
     GERMAN,
@@ -109,21 +110,21 @@ enum Language : u8
     SPANISH
 };
 
-enum Window_Mode : u8
+enum Window_Mode
 {
     WIN_NORMAL,
     WIN_BORDERLESS,
     WIN_FULLSCREEN
 };
 
-enum Inactive_Mode : u8
+enum Inactive_Mode
 {
     PAUSE,
     RUN_WITHOUT_INPUT,
     RUN_WITH_INPUT
 };
 
-enum Frame_Limiter_Mode : u8
+enum Frame_Limiter_Mode
 {
     SLEEPING,
     BUSY_WAITING
@@ -157,36 +158,8 @@ struct Option_Switch
     u8 coinage                : 2;
 };
 
-static bool overflowed_u8(const u8 var_current, const u8 var_previous)
-{
-    return var_current < var_previous ? 1 : 0;
-}
-
-// underflow is not the right term for this, better name would be negative_overflowed
-static bool underflowed_u8(const u8 var_current, const u8 var_previous)
-{
-    return var_current > var_previous ? 1 : 0;
-}
-
-static u8 random_byte()
-{
-    return rand() % 256;
-}
-
-static s8 clamp_s8(const s8 value, const s8 min_value, const s8 max_value)
-{
-    if (value < min_value)
-        return min_value;
-    else if (value > max_value)
-        return max_value;
-    else
-        return value;
-}
-
-static Coordinate get_total_pos(const Position& pos)
-{
-    Coordinate totalPos;
-    totalPos.position_x = pos.x_major * 256 + pos.x_minor;
-    totalPos.position_y = pos.y_major * 256 + pos.y_minor;
-    return totalPos;
-}
+bool overflowed_u8(const u8 var_current, const u8 var_previous);
+bool underflowed_u8(const u8 var_current, const u8 var_previous);
+u8 random_byte();
+s8 clamp_s8(const s8 value, const s8 min_value, const s8 max_value);
+Coordinate get_total_pos(const Position& pos);

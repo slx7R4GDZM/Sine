@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Other/Common_Things.h"
+#include "Common-Things.h"
 
 const u8 ENGLISH_OFFSET_TABLE[] = {0x00, 0x04, 0x07, 0x12, 0x1B, 0x25, 0x32, 0x36, 0x39, 0x3E, 0x43};
 const u8  GERMAN_OFFSET_TABLE[] = {0x00, 0x05, 0x08, 0x15, 0x21, 0x2D, 0x3A, 0x41, 0x44, 0x4A, 0x50};
@@ -96,18 +96,18 @@ R"(# Lines starting with # are ignored by the program
 # Button Settings
 #==============================================================================
 
- B_One-Player-Start Num1
- B_Two-Player-Start Num2
-      B_Rotate-Left A
-     B_Rotate-Right D
-           B_Thrust W
-             B_Fire E
-       B_Hyperspace Space
-        B_Left-Coin Left
-      B_Center-Coin Down
-       B_Right-Coin Right
-B_Toggle-Fullscreen F11
-             B_Exit Escape
+ B-One-Player-Start Num1
+ B-Two-Player-Start Num2
+      B-Rotate-Left A
+     B-Rotate-Right D
+           B-Thrust W
+             B-Fire E
+       B-Hyperspace Space
+        B-Left-Coin Left
+      B-Center-Coin Down
+       B-Right-Coin Right
+B-Toggle-Fullscreen F11
+             B-Exit Escape
 
 #==============================================================================
 # 8-Toggle Switch

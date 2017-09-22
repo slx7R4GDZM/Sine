@@ -2,9 +2,11 @@
 // Distributed under the terms of the MIT License.
 // Refer to the License.txt file for details.
 
-#include "Vector_Generator.h"
+#include "Vector-Generator.h"
 
 #include <cmath>
+#include <SFML/Graphics.hpp>
+#include "../Settings/Settings-Handler.h"
 
 const float PI = std::atan(1) * 4;
 const float DESIRED_LINE_WIDTH = 0.75f;
@@ -41,12 +43,12 @@ void Vector_Generator::set_resolution_scale(const sf::Vector2u resolution)
     line_thickness = DESIRED_LINE_WIDTH / res_scale;
 }
 
-void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& window, u8 iteration, const bool flip_x, const bool flip_y, const bool brighten)
+void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, u16 iteration, const bool flip_x, const bool flip_y, const bool brighten)
 {
     bool done = false;
     while (!done)
     {
-        Opcode opcode = static_cast<Opcode>(vector_object[iteration] >> 12);
+        const Opcode opcode = static_cast<Opcode>(vector_object[iteration] >> 12);
         switch (opcode) // case ranges are not an official C++ standard
         {
         case VCTR_0 ... VCTR_9:
@@ -72,7 +74,7 @@ void Vector_Generator::process(const u16 vector_object[], sf::RenderWindow& wind
 
 // opcodes
 
-void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
+void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_object[], u16& iteration, const bool flip_x, const bool flip_y, RenderWindow& window)
 {
     s16 delta_y = vector_object[iteration] & 0x03FF;
     s16 delta_x = vector_object[iteration + 1] & 0x03FF;
@@ -90,7 +92,7 @@ void Vector_Generator::draw_long_vector(const Opcode opcode, const u16 vector_ob
     draw_vector(delta_x, delta_y, brightness, flip_x, flip_y, window);
 }
 
-void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration)
+void Vector_Generator::load_absolute(const u16 vector_object[], u16& iteration)
 {
     current_y = vector_object[iteration] & 0x03FF;
     if (vector_object[iteration++] & 0x0400)
@@ -103,13 +105,13 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u8& iteration)
     global_scale = static_cast<Global_Scale>(vector_object[iteration] >> 12);
 }
 
-void Vector_Generator::draw_short_vector(const u16 vector_object[], u8& iteration, const bool flip_x, const bool flip_y, const bool brighten, sf::RenderWindow& window)
+void Vector_Generator::draw_short_vector(const u16 vector_object[], u16& iteration, const bool flip_x, const bool flip_y, const bool brighten, RenderWindow& window)
 {
     s16 delta_x = (vector_object[iteration] & 0x0003) << 8;
     s16 delta_y = vector_object[iteration] & 0x0300;
 
     const u8 local_scale = ((vector_object[iteration] & 0x0008) >> 2)
-                         + ((vector_object[iteration] & 0x0800) >> 11);
+                         | ((vector_object[iteration] & 0x0800) >> 11);
 
     delta_x = apply_global_scale(delta_x >> (7 - local_scale));
     delta_y = apply_global_scale(delta_y >> (7 - local_scale));
@@ -136,18 +138,18 @@ s16 Vector_Generator::apply_global_scale(const s16 delta) const
 
 // drawing stuff
 
-void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 brightness, const bool flip_x, const bool flip_y, sf::RenderWindow& window)
+void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y, const u8 brightness, const bool flip_x, const bool flip_y, RenderWindow& window)
 {
     const s16 delta_x = (flip_x ? -raw_delta_x : raw_delta_x);
     const s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y);
     if (brightness)
     {
-        float adjusted_x = current_x + x_offset;
-        float adjusted_y = current_y + y_offset;
+        const float adjusted_x = current_x + x_offset;
+        const float adjusted_y = current_y + y_offset;
 
         const float scaled_x_start = adjusted_x / res_scale;
         const float scaled_y_start = resolution.y - adjusted_y / res_scale;
-        sf::Color vector_color = sf::Color(255, 255, 255, gamma_table[brightness]);
+        const sf::Color vector_color = sf::Color(255, 255, 255, gamma_table[brightness]);
         if (line_thickness >= MINIMUM_LINE_WIDTH)
             draw_wide_line_segment(scaled_x_start, scaled_y_start, delta_x, delta_y, vector_color, window);
         else
@@ -157,30 +159,24 @@ void Vector_Generator::draw_vector(const s16 raw_delta_x, const s16 raw_delta_y,
     current_y += delta_y;
 }
 
-void Vector_Generator::draw_wide_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const
+void Vector_Generator::draw_wide_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, RenderWindow& window) const
 {
     if (delta_x || delta_y)
     {
         const float length = std::sqrt(std::pow(delta_x, 2) + std::pow(delta_y, 2)) / res_scale
                            + line_thickness * 2;
         sf::RectangleShape line(sf::Vector2f(length, 0.0f));
-        const float rotation = std::atan2(-delta_y, delta_x) * 180 / PI;
+        const float rotation_degrees = std::atan2(-delta_y, delta_x) * 180 / PI;
 
-        line.setRotation(rotation);
+        line.setRotation(rotation_degrees);
         line.setOutlineThickness(line_thickness);
         line.setOutlineColor(vector_color);
 
-        // fix offset of line position caused by extra length from "+ line_thickness * 2"
-        const float line_x_offset = (fabs(1.0f / 90 * rotation) - 1) * line_thickness;
-        float line_y_offset;
-        if (rotation < -90)
-            line_y_offset = (1.0f / 90 * rotation + 2) * line_thickness;
-        else if (rotation < 90)
-            line_y_offset = -1.0f / 90 * rotation * line_thickness;
-        else
-            line_y_offset = (1.0f / 90 * rotation - 2) * line_thickness;
+        const float rotation_pi_radians = rotation_degrees * PI / 180;
+        const float line_x_offset = std::cos(rotation_pi_radians) * line_thickness;
+        const float line_y_offset = std::sin(rotation_pi_radians) * line_thickness;
 
-        line.setPosition(start_x + line_x_offset, start_y + line_y_offset);
+        line.setPosition(start_x - line_x_offset, start_y - line_y_offset);
         window.draw(line);
     }
     else
@@ -195,13 +191,13 @@ void Vector_Generator::draw_wide_line_segment(const float start_x, const float s
     }
 }
 
-void Vector_Generator::draw_thin_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, sf::RenderWindow& window) const
+void Vector_Generator::draw_thin_line_segment(const float start_x, const float start_y, const s16 delta_x, const s16 delta_y, const sf::Color vector_color, RenderWindow& window) const
 {
     if (delta_x || delta_y)
     {
         const float end_x = start_x + delta_x / res_scale;
         const float end_y = start_y - delta_y / res_scale;
-        const sf::Vertex line[2] =
+        const sf::Vertex line[] =
         {
             sf::Vertex(sf::Vector2f(start_x, start_y), vector_color),
             sf::Vertex(sf::Vector2f(end_x, end_y), vector_color)
@@ -210,7 +206,10 @@ void Vector_Generator::draw_thin_line_segment(const float start_x, const float s
     }
     else
     {
-        const sf::Vertex point[1] = sf::Vertex(sf::Vector2f(start_x, start_y), vector_color);
+        const sf::Vertex point[] =
+        {
+            sf::Vertex(sf::Vector2f(start_x, start_y), vector_color)
+        };
         window.draw(point, 1, sf::Points);
     }
 }

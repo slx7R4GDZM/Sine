@@ -4,17 +4,17 @@
 
 #pragma once
 
-#include "Common_Things.h"
+#include "Common-Things.h"
 
 const nanoseconds MAX_FRAME_TIME = 16666666ns;
 
-const string SETTINGS_FILENAME = "Sine_Settings.cfg";
+const string SETTINGS_FILENAME = "Sine-Settings.cfg";
 
 const u8 TOTAL_KEYS = 101;
 const string KEY_TABLE[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "Num0", "Num1", "Num2", "Num3", "Num4", "Num5", "Num6", "Num7", "Num8", "Num9", "Escape", "LControl", "LShift", "LAlt", "LSystem", "RControl", "RShift", "RAlt", "RSystem", "Menu", "LBracket", "RBracket", "SemiColon", "Comma", "Period", "Quote", "Slash", "BackSlash", "Tilde", "Equal", "Dash", "Space", "Return", "BackSpace", "Tab", "PageUp", "PageDown", "End", "Home", "Insert", "Delete", "Add", "Subtract", "Multiply", "Divide", "Left", "Right", "Up", "Down", "Numpad0", "Numpad1", "Numpad2", "Numpad3", "Numpad4", "Numpad5", "Numpad6", "Numpad7", "Numpad8", "Numpad9", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13", "F14", "F15", "Pause"};
 
 const u8 TOTAL_BUTTONS = 12;
-const string BUTTON_TABLE[] = {"B_Hyperspace", "B_Fire", "B_Left-Coin", "B_Center-Coin", "B_Right-Coin", "B_One-Player-Start", "B_Two-Player-Start", "B_Thrust", "B_Rotate-Right", "B_Rotate-Left", "B_Toggle-Fullscreen", "B_Exit"};
+const string BUTTON_TABLE[] = {"B-Hyperspace", "B-Fire", "B-Left-Coin", "B-Center-Coin", "B-Right-Coin", "B-One-Player-Start", "B-Two-Player-Start", "B-Thrust", "B-Rotate-Right", "B-Rotate-Left", "B-Toggle-Fullscreen", "B-Exit"};
 
 const u16 MAX_SCORE = 10000;
 const u8 MAX_HS_COUNT = 10;

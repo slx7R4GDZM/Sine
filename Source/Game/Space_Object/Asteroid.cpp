@@ -4,6 +4,8 @@
 
 #include "Asteroid.h"
 
+#include "../../Graphics/Vector-Generator.h"
+#include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
 void Asteroid::spawn_wave_asteroid()
@@ -60,7 +62,7 @@ s8 Asteroid::get_starting_velocity() const
     }
 }
 
-void Asteroid::update(u8& asteroid_count, u8& asteroid_wave_spawn_time, Vector_Generator& vector_generator, sf::RenderWindow& window)
+void Asteroid::update(u8& asteroid_count, u8& asteroid_wave_spawn_time, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (status && status <= 0x1C)
     {
@@ -112,7 +114,7 @@ u8 Asteroid::get_points() const
     }
 }
 
-void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
+void Asteroid::draw(Vector_Generator& vector_generator, RenderWindow& window) const
 {
     Global_Scale scale;
     switch (status & 0x07)
@@ -127,6 +129,7 @@ void Asteroid::draw(Vector_Generator& vector_generator, sf::RenderWindow& window
         scale = DIV_4;
         break;
     }
+
     set_position_and_size(scale, vector_generator, window);
     switch (status >> 3)
     {

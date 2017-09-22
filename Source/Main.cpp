@@ -2,12 +2,12 @@
 // Distributed under the terms of the MIT License.
 // Refer to the License.txt file for details.
 
-#include "Game/Game.h"
 #include <cstdlib>
 #include <ctime>
+#include "Game/Game.h"
 
 int main()
 {
-    srand(time(nullptr));
+    std::srand(std::time(nullptr));
     Game game;
 }

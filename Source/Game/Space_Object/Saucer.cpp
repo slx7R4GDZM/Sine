@@ -4,6 +4,8 @@
 
 #include "Saucer.h"
 
+#include "../../Graphics/Vector-Generator.h"
+#include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
 void Saucer::spawn(const u16 player_score, const u8 saucer_spawn_time_start)
@@ -52,7 +54,7 @@ void Saucer::crash(u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_st
     saucer_spawn_and_shot_time = saucer_spawn_time_start;
 }
 
-void Saucer::update(const u8 fast_timer, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start, Vector_Generator& vector_generator, sf::RenderWindow& window)
+void Saucer::update(const u8 fast_timer, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (status == LARGE_SAUCER || status == SMALL_SAUCER)
     {
@@ -119,7 +121,7 @@ u8 Saucer::get_points() const
         return SMALL_SAUCER_POINTS;
 }
 
-void Saucer::draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const
+void Saucer::draw(Vector_Generator& vector_generator, RenderWindow& window) const
 {
     if (status == LARGE_SAUCER)
         set_position_and_size(DIV_2, vector_generator, window);

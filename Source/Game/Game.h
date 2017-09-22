@@ -8,11 +8,9 @@
 #include "Space_Object/Ship.h"
 #include "Space_Object/Saucer.h"
 #include "Space_Object/Photon.h"
-#include "../Graphics/Vector_Generator.h"
-#include "../Input/Input_Handler.h"
-#include "../Other/Common_Things.h"
+#include "../Input/Input-Handler.h"
 #include "../Other/Constants.h"
-#include <SFML/Graphics.hpp>
+#include "../Settings/Settings-Handler.h"
 
 class Game
 {
@@ -33,7 +31,7 @@ private:
     };
 
     Settings_Handler settings;
-    sf::RenderWindow window;
+    RenderWindow window;
     Input_Handler input;
     Inactive_Mode game_activity;
     bool draw_thrust; // this is a kinda hacky variable to deal with how the dvg is simulated super inaccurately
@@ -61,8 +59,8 @@ private:
     Option_Switch option_switch;
     Player player[MAX_PLAYERS];
 
-    void process_events(Vector_Generator& vector_generator, sf::RenderWindow& window);
-    void limit_FPS(const high_resolution_clock::time_point start_time) const;
+    void process_events(Vector_Generator& vector_generator, RenderWindow& window);
+    void limit_FPS(const steady_clock::time_point start_time) const;
 
     void draw_multiplayer_scores(Vector_Generator& vector_generator);
     void draw_copyright(Vector_Generator& vector_generator);

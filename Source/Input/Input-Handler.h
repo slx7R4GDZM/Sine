@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "../Other/Common_Things.h"
-#include "../Settings/Settings_Handler.h"
+#include "../Other/Constants.h"
+
+class Settings_Handler;
 
 class Input_Handler
 {

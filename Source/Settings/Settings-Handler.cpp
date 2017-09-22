@@ -2,16 +2,17 @@
 // Distributed under the terms of the MIT License.
 // Refer to the License.txt file for details.
 
-#include "Settings_Handler.h"
+#include "Settings-Handler.h"
 
-#include "../Other/Text.h"
 #include <cfloat>
 #include <cmath>
 #include <cstring>
+#include <fstream>
 #include <iomanip>
+#include "../Other/Text.h"
 
 Settings_Handler::Settings_Handler()
-    : button_key{kb::Space, kb::E, kb::Left, kb::Down, kb::Right, kb::Num1, kb::Num2, kb::W, kb::D, kb::A, kb::F11, kb::Escape}
+    : button_key{Kb::Space, Kb::E, Kb::Left, Kb::Down, Kb::Right, Kb::Num1, Kb::Num2, Kb::W, Kb::D, Kb::A, Kb::F11, Kb::Escape}
     , option_switch{ENGLISH, 1, 0, 0, 2}
     , window_mode(WIN_NORMAL)
     , fallback_res(1024, 790)
@@ -28,7 +29,7 @@ Settings_Handler::Settings_Handler()
         parse_file_settings(in_file);
     else
     {
-        cerr << "Error reading file " << SETTINGS_FILENAME << ": " << strerror(errno) << '\n';
+        cerr << "Error reading file " << SETTINGS_FILENAME << ": " << std::strerror(errno) << '\n';
         std::ofstream out_file(SETTINGS_FILENAME);
 
         if (out_file.good())
@@ -37,7 +38,7 @@ Settings_Handler::Settings_Handler()
             out_file << DEFAULT_SETTINGS;
         }
         else
-            cerr << "Error writing file " << SETTINGS_FILENAME << ": " << strerror(errno) << '\n';
+            cerr << "Error writing file " << SETTINGS_FILENAME << ": " << std::strerror(errno) << '\n';
     }
 }
 
@@ -88,16 +89,16 @@ void Settings_Handler::parse_buttons(const string& setting, const string& value)
     // determine if the key choice exists
     if (current_button != INVALID_BUTTON)
     {
-        kb::Key key = kb::Unknown;
-        for (u8 i = 0; i < TOTAL_KEYS && key == kb::Unknown; i++)
+        Kb::Key key = Kb::Unknown;
+        for (u8 i = 0; i < TOTAL_KEYS && key == Kb::Unknown; i++)
         {
             if (value == KEY_TABLE[i])
             {
-                key = kb::Key(i);
-                button_key[current_button] = kb::Key(i);
+                key = Kb::Key(i);
+                button_key[current_button] = Kb::Key(i);
             }
         }
-        if (key == kb::Unknown)
+        if (key == Kb::Unknown)
         {
             cerr << "Invalid key \"" << value << "\" used for button " << setting << '\n';
             cerr << "Button " << setting
@@ -167,7 +168,7 @@ T Settings_Handler::clamp_string_value(const string& setting, const string& valu
     }
 }
 
-void Settings_Handler::create_window(sf::RenderWindow& win)
+void Settings_Handler::create_window(RenderWindow& win)
 {
     if (!samples_MSAA)
         context_settings.antialiasingLevel = 0;
@@ -177,7 +178,7 @@ void Settings_Handler::create_window(sf::RenderWindow& win)
     create_window(false, false, fallback_res, win);
 }
 
-void Settings_Handler::create_window(const bool toggle_fullscreen, const bool reuse_pos, const sf::Vector2u new_res, sf::RenderWindow& win)
+void Settings_Handler::create_window(const bool toggle_fullscreen, const bool reuse_pos, const sf::Vector2u new_res, RenderWindow& win)
 {
     if (toggle_fullscreen)
     {
@@ -273,10 +274,11 @@ void Settings_Handler::output_settings() const
     clog << "\nMSAA-Quality = " << static_cast<u16>(samples_MSAA);
     clog << "\nGamma-Correction = " << gamma_correction;
     clog << "\nV-Sync-Enabled = " << enable_v_sync;
-    clog << "\nFrame-Limit-Mode = " << frame_limiter_mode << '\n';
+    clog << "\nFrame-Limit-Mode = " << frame_limiter_mode;
+    clog << "\n----------------------------------------\n";
 }
 
-kb::Key Settings_Handler::get_button_key(const Button button) const
+Kb::Key Settings_Handler::get_button_key(const Button button) const
 {
     return button_key[button];
 }
@@ -305,5 +307,5 @@ void Settings_Handler::get_settings(float& crop_ratio, u8 gamma_table[]) const
 {
     crop_ratio = this->crop_ratio;
     for (u8 i = 0; i < 16; i++)
-        gamma_table[i] = 255 * std::pow(static_cast<float>(i) * 17 / 255, 1 / gamma_correction) + 0.5f;
+        gamma_table[i] = std::round(std::pow(i * 17 / 255.0f, 1 / gamma_correction) * 255);
 }

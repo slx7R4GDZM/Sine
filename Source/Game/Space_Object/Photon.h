@@ -4,10 +4,7 @@
 
 #pragma once
 
-#include "../Space_Object.h"
-#include "../../Graphics/Vector_Generator.h"
-#include "../../Other/Common_Things.h"
-#include <SFML/Graphics/RenderWindow.hpp>
+#include "../Space-Object.h"
 
 class Photon : public Space_Object
 {
@@ -15,10 +12,10 @@ private:
     u8 photon_timer;
 
     static void solve_position(const s8 base_offset, u8& pos_major, u8& pos_minor);
-    void draw(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
+    void draw(Vector_Generator& vector_generator, RenderWindow& window) const;
 public:
     void spawn(const u8 direction, const s8 vel_x, const s8 vel_y, const Position base_pos);
-    void update(Vector_Generator& vector_generator, sf::RenderWindow& window);
+    void update(Vector_Generator& vector_generator, RenderWindow& window);
     static void fire_photon(Photon photon[], const u8 max_photons, const u8 direction, const Space_Object space_object);
     static bool any(const Photon photon[], const u8 max_photons);
 };

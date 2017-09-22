@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../Graphics/Vector_Generator.h"
-#include "../Other/Common_Things.h"
-#include <SFML/Graphics/RenderWindow.hpp>
+#include "../Other/Common-Things.h"
+
+class Vector_Generator;
 
 class Space_Object
 {
@@ -24,8 +24,8 @@ protected:
     static s8 lookup_sine(const u8 direction);
     static s8 lookup_cosine(const u8 direction);
     void update_position();
-    void draw_explosion(Vector_Generator& vector_generator, sf::RenderWindow& window) const;
-    void set_position_and_size(const Global_Scale scale, Vector_Generator& vector_generator, sf::RenderWindow& window) const;
+    void draw_explosion(Vector_Generator& vector_generator, RenderWindow& window) const;
+    void set_position_and_size(const Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window) const;
 public:
     static u8 limit_position(const u8 pos_major, const u8 max_pos_major);
     bool collide(const Space_Object& object, const u8 minimum_space) const;
