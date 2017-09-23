@@ -39,6 +39,5 @@ The vector and text constants were made with [Sine Toolkit](https://github.com/s
 
 ## License information
 
-This project is licensed under the terms of the [MIT License](License.txt).
-
+This project is licensed under the terms of the [MIT License](License.txt).\
 SFML is licensed under the terms of the [zlib/png license](https://www.sfml-dev.org/license.php).
