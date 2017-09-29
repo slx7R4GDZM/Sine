@@ -166,15 +166,15 @@ void Vector_Generator::draw_wide_line_segment(const float start_x, const float s
         const float length = std::sqrt(std::pow(delta_x, 2) + std::pow(delta_y, 2)) / res_scale
                            + line_thickness * 2;
         sf::RectangleShape line(sf::Vector2f(length, 0.0f));
-        const float rotation_degrees = std::atan2(-delta_y, delta_x) * 180 / PI;
+        const float rotation_radians = std::atan2(-delta_y, delta_x);
+        const float rotation_degrees = rotation_radians * 180 / PI;
 
         line.setRotation(rotation_degrees);
         line.setOutlineThickness(line_thickness);
         line.setOutlineColor(vector_color);
 
-        const float rotation_pi_radians = rotation_degrees * PI / 180;
-        const float line_x_offset = std::cos(rotation_pi_radians) * line_thickness;
-        const float line_y_offset = std::sin(rotation_pi_radians) * line_thickness;
+        const float line_x_offset = std::cos(rotation_radians) * line_thickness;
+        const float line_y_offset = std::sin(rotation_radians) * line_thickness;
 
         line.setPosition(start_x - line_x_offset, start_y - line_y_offset);
         window.draw(line);
