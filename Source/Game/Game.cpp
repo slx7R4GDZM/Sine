@@ -33,7 +33,7 @@ Game::Game()
     , pre_credit_coins(0)
 {
     // window
-    settings.create_window(window);
+    settings.create_startup_window(window);
     settings.output_settings();
     Vector_Generator vector_generator(settings);
 
@@ -65,8 +65,8 @@ Game::Game()
                 input.update(settings);
                 if (input.on_press(TOGGLE_FULLSCREEN))
                 {
-                    settings.create_window(true, true, settings.get_resolution(), window);
-                    vector_generator.set_resolution_scale(settings.get_resolution());
+                    settings.toggle_fullscreen(window);
+                    vector_generator.set_resolution_scale(settings);
                 }
                 else if (input.on_press(EXIT))
                     window.close();
@@ -124,8 +124,8 @@ void Game::process_events(Vector_Generator& vector_generator, RenderWindow& wind
     {
         if (event.type == sf::Event::Resized)
         {
-            settings.create_window(false, true, sf::Vector2u(event.size.width, event.size.height), window);
-            vector_generator.set_resolution_scale(sf::Vector2u(event.size.width, event.size.height));
+            settings.resize_window({event.size.width, event.size.height}, window);
+            vector_generator.set_resolution_scale(settings);
         }
         else if (event.type == sf::Event::Closed)
             window.close();

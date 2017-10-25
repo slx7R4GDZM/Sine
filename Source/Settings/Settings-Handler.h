@@ -16,7 +16,7 @@ private:
 
     // some of these can probably be made to be temporary
     // and done with after the window is created
-    Window_Mode window_mode;
+    Window_Mode starting_window_mode;
     u32 window_style;
     sf::Vector2u fallback_res;
     sf::Vector2u current_res;
@@ -34,10 +34,17 @@ private:
     void parse_settings(const string& setting, const string& value);
     template <typename T>
     static T clamp_string_value(const string& setting, const string& value, const T min_v, const T max_v);
+
+    void handle_window_creation(RenderWindow& win);
+    void handle_fullscreen_creation(RenderWindow& win);
+    void create_window(RenderWindow& win);
 public:
     Settings_Handler();
-    void create_window(RenderWindow& win);
-    void create_window(const bool toggle_fullscreen, const bool reuse_pos, const sf::Vector2u new_res, RenderWindow& win);
+
+    void create_startup_window(RenderWindow& win);
+    void resize_window(const sf::Vector2u new_res, RenderWindow& win);
+    void toggle_fullscreen(RenderWindow& win);
+
     void output_settings() const;
     Kb::Key get_button_key(const Button button) const;
     Option_Switch get_option_switch() const;

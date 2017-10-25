@@ -55,8 +55,8 @@ private:
     u8 ship_vel_y_minor;
     // sound stuff will go here
     u8 credits;
-    u8 pre_credit_coins;
     Option_Switch option_switch;
+    u8 pre_credit_coins;
     Player player[MAX_PLAYERS];
 
     void process_events(Vector_Generator& vector_generator, RenderWindow& window);

@@ -14,7 +14,7 @@
 Settings_Handler::Settings_Handler()
     : button_key{Kb::Space, Kb::E, Kb::Left, Kb::Down, Kb::Right, Kb::Num1, Kb::Num2, Kb::W, Kb::D, Kb::A, Kb::F11, Kb::Escape}
     , option_switch{ENGLISH, 1, 0, 0, 2}
-    , window_mode(WIN_NORMAL)
+    , starting_window_mode(WIN_NORMAL)
     , fallback_res(1024, 790)
     , fallback_win_pos(-1, -1)
     , inactive_mode(PAUSE)
@@ -121,11 +121,11 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
         option_switch.right_coin_multiplier = clamp_string_value(setting, value, 0, 3);
     else if (setting == "Coinage")
         option_switch.coinage = clamp_string_value(setting, value, 0, 3);
-    else if (setting == "Window-Mode")
-        window_mode = clamp_string_value(setting, value, WIN_NORMAL, WIN_FULLSCREEN);
-    else if (setting == "X-Resolution")
+    else if (setting == "Starting-Window-Mode")
+        starting_window_mode = clamp_string_value(setting, value, WIN_NORMAL, WIN_FULLSCREEN);
+    else if (setting == "Starting-X-Resolution")
         fallback_res.x = clamp_string_value(setting, value, 1u, UINT32_MAX);
-    else if (setting == "Y-Resolution")
+    else if (setting == "Starting-Y-Resolution")
         fallback_res.y = clamp_string_value(setting, value, 1u, UINT32_MAX);
     else if (setting == "Start-Window-Position-X")
         fallback_win_pos.x = clamp_string_value(setting, value, INT32_MIN, INT32_MAX);
@@ -168,64 +168,56 @@ T Settings_Handler::clamp_string_value(const string& setting, const string& valu
     }
 }
 
-void Settings_Handler::create_window(RenderWindow& win)
+void Settings_Handler::create_startup_window(RenderWindow& win)
 {
     if (!samples_MSAA)
         context_settings.antialiasingLevel = 0;
     else
         context_settings.antialiasingLevel = std::pow(2, samples_MSAA);
 
-    create_window(false, false, fallback_res, win);
-}
-
-void Settings_Handler::create_window(const bool toggle_fullscreen, const bool reuse_pos, const sf::Vector2u new_res, RenderWindow& win)
-{
-    if (toggle_fullscreen)
-    {
-        if (window_style != sf::Style::Fullscreen)
-        {
-            fallback_res = current_res;
-            current_res = new_res;
-            fallback_win_pos = win.getPosition();
-            window_style = sf::Style::Fullscreen;
-        }
-        else
-        {
-            current_res = fallback_res;
-            switch (window_mode)
-            {
-            case WIN_NORMAL:
-            case WIN_FULLSCREEN:
-                window_style = sf::Style::Default;
-                break;
-            case WIN_BORDERLESS:
-                window_style = sf::Style::None;
-                break;
-            }
-        }
-    }
+    if (starting_window_mode != WIN_FULLSCREEN)
+        handle_window_creation(win);
     else
     {
-        // if creating the window for the first time or resizing it
-        current_res = new_res;
-        if (reuse_pos)
-            fallback_win_pos = win.getPosition();
-        switch (window_mode)
-        {
-        case WIN_NORMAL:
-            window_style = sf::Style::Default;
-            break;
-        case WIN_BORDERLESS:
-            window_style = sf::Style::None;
-            break;
-        case WIN_FULLSCREEN:
-            if (reuse_pos)
-                window_style = sf::Style::Default;
-            else
-                window_style = sf::Style::Fullscreen;
-            break;
-        }
+        current_res = fallback_res;
+        handle_fullscreen_creation(win);
     }
+}
+
+void Settings_Handler::handle_window_creation(RenderWindow& win)
+{
+    if (starting_window_mode != WIN_BORDERLESS)
+        window_style = sf::Style::Default;
+    else
+        window_style = sf::Style::None;
+
+    current_res = fallback_res;
+    create_window(win);
+}
+
+void Settings_Handler::handle_fullscreen_creation(RenderWindow& win)
+{
+    window_style = sf::Style::Fullscreen;
+    fallback_res = current_res;
+    fallback_win_pos = win.getPosition();
+
+    if (starting_window_mode != WIN_FULLSCREEN)
+        current_res = {sf::VideoMode::getDesktopMode().width,
+                       sf::VideoMode::getDesktopMode().height};
+    else if (win.isOpen())
+        // if the game started out in fullscreen then re-entering fullscreen
+        // will use the config resolution rather than the desktop resolution
+        current_res = static_cast<sf::Vector2u>(win.getDefaultView().getSize());
+
+    create_window(win);
+}
+
+void Settings_Handler::create_window(RenderWindow& win)
+{
+    if (current_res.x == 0)
+        current_res.x = 1;
+    if (current_res.y == 0)
+        current_res.y = 1;
 
     win.create(sf::VideoMode(current_res.x, current_res.y), "Sine", window_style, context_settings);
 
@@ -234,18 +226,39 @@ void Settings_Handler::create_window(const bool toggle_fullscreen, const bool re
 
     if (window_style == sf::Style::Fullscreen)
         win.setMouseCursorVisible(false);
-    else if (reuse_pos)
-        win.setPosition(fallback_win_pos);
+    else if (fallback_win_pos.x != -1 && fallback_win_pos.y != -1)
+        win.setPosition(sf::Vector2i(fallback_win_pos.x, fallback_win_pos.y));
+    else if (fallback_win_pos.x != -1)
+        win.setPosition(sf::Vector2i(fallback_win_pos.x, win.getPosition().y));
+    else if (fallback_win_pos.y != -1)
+        win.setPosition(sf::Vector2i(win.getPosition().x, fallback_win_pos.y));
+
+    win.setVerticalSyncEnabled(enable_v_sync);
+}
+
+void Settings_Handler::resize_window(const sf::Vector2u new_res, RenderWindow& win)
+{
+    current_res = new_res;
+    if (current_res.x == 0 || current_res.y == 0)
+    {
+        // recreate the window if the new resolution is invalid
+        fallback_win_pos = win.getPosition();
+        create_window(win);
+    }
     else
     {
-        if (fallback_win_pos.x != -1 && fallback_win_pos.y != -1)
-            win.setPosition(sf::Vector2i(fallback_win_pos.x, fallback_win_pos.y));
-        else if (fallback_win_pos.x != -1)
-            win.setPosition(sf::Vector2i(fallback_win_pos.x, win.getPosition().y));
-        else if (fallback_win_pos.y != -1)
-            win.setPosition(sf::Vector2i(win.getPosition().x, fallback_win_pos.y));
+        // adjust the view if the window was resized with a valid resolution
+        const sf::View new_view({0, 0, static_cast<float>(current_res.x), static_cast<float>(current_res.y)});
+        win.setView(new_view);
     }
-    win.setVerticalSyncEnabled(enable_v_sync);
+}
+
+void Settings_Handler::toggle_fullscreen(RenderWindow& win)
+{
+    if (window_style == sf::Style::Fullscreen)
+        handle_window_creation(win);
+    else
+        handle_fullscreen_creation(win);
 }
 
 void Settings_Handler::output_settings() const
@@ -262,9 +275,9 @@ void Settings_Handler::output_settings() const
     clog << "\nCoinage = " << static_cast<u16>(option_switch.coinage);
 
     clog << "\n----------------------------------------";
-    clog << "\nWindow-Mode = " << static_cast<u16>(window_mode);
-    clog << "\nX-Resolution = " << fallback_res.x;
-    clog << "\nY-Resolution = " << fallback_res.y;
+    clog << "\nStarting-Window-Mode = " << static_cast<u16>(starting_window_mode);
+    clog << "\nStarting-X-Resolution = " << fallback_res.x;
+    clog << "\nStarting-Y-Resolution = " << fallback_res.y;
     clog << "\nStart-Window-Position-X = " << fallback_win_pos.x;
     clog << "\nStart-Window-Position-Y = " << fallback_win_pos.y;
     clog << "\nInactive-Mode = " << static_cast<u16>(inactive_mode);

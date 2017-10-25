@@ -13,34 +13,45 @@ const float DESIRED_LINE_WIDTH = 0.75f;
 const float MINIMUM_LINE_WIDTH = 0.5f;
 const u16 INTERNAL_RES = 1024;
 
-Vector_Generator::Vector_Generator(const Settings_Handler settings_handler)
+Vector_Generator::Vector_Generator(const Settings_Handler settings)
 {
-    settings_handler.get_settings(crop_ratio, gamma_table);
-    set_resolution_scale(settings_handler.get_resolution());
+    settings.get_settings(crop_ratio, gamma_table);
+    set_resolution_scale(settings);
 }
 
-void Vector_Generator::set_resolution_scale(const sf::Vector2u resolution)
+void Vector_Generator::set_resolution_scale(const Settings_Handler settings)
 {
-    this->resolution = resolution;
-    if (resolution.x <= resolution.y && crop_ratio >= 1.0f)
+    this->resolution = settings.get_resolution();
+    if (crop_ratio < 1.0f)
     {
-        res_scale = static_cast<float>(INTERNAL_RES) / resolution.x;
-        x_offset = 0;
-        y_offset = (resolution.y - resolution.x) * res_scale / 2;
-    }
-    else if (resolution.x >= resolution.y && crop_ratio <= 1.0f)
-    {
-        res_scale = static_cast<float>(INTERNAL_RES) / resolution.y;
-        x_offset = (resolution.x - resolution.y) * res_scale / 2;
-        y_offset = 0;
+        if (resolution.x > resolution.y * crop_ratio)
+            crop_with_extra_space(resolution.x, x_offset, resolution.y, y_offset);
+        else
+        {
+            res_scale = INTERNAL_RES / (resolution.x / crop_ratio);
+            x_offset = (resolution.x - resolution.x / crop_ratio) * res_scale / 2;
+            y_offset = (resolution.y - resolution.x / crop_ratio) * res_scale / 2;
+        }
     }
     else
     {
-        res_scale = INTERNAL_RES / (resolution.y * crop_ratio);
-        x_offset = (resolution.x - resolution.y * crop_ratio) * res_scale / 2;
-        y_offset = (resolution.y - resolution.y * crop_ratio) * res_scale / 2;
+        if (resolution.x < resolution.y * crop_ratio)
+            crop_with_extra_space(resolution.y, y_offset, resolution.x, x_offset);
+        else
+        {
+            res_scale = INTERNAL_RES / (resolution.y * crop_ratio);
+            x_offset = (resolution.x - resolution.y * crop_ratio) * res_scale / 2;
+            y_offset = (resolution.y - resolution.y * crop_ratio) * res_scale / 2;
+        }
     }
     line_thickness = DESIRED_LINE_WIDTH / res_scale;
+}
+
+void Vector_Generator::crop_with_extra_space(const u32 axis_to_crop, float& crop_offset, const u32 scale_axis, float& scale_offset)
+{
+    res_scale = static_cast<float>(INTERNAL_RES) / scale_axis;
+    crop_offset = static_cast<s32>(axis_to_crop - scale_axis) * res_scale / 2;
+    scale_offset = 0;
 }
 
 void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, u16 iteration, const bool flip_x, const bool flip_y, const bool brighten)
