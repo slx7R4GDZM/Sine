@@ -22,7 +22,7 @@ void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
     ship_spawn_timer = 129;
 }
 
-void Ship::update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Vector_Generator& vector_generator, RenderWindow& window)
+void Ship::update(const u8 fast_timer, const u8 direction, Offset explosion_x[], Offset explosion_y[], bool& draw_thrust, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (status == ALIVE)
     {
@@ -31,7 +31,7 @@ void Ship::update(const u8 fast_timer, const u8 direction, bool& draw_thrust, Ve
     }
     else if (status >= TRUE_EXPLOSION_START)
     {
-        draw_explosion(vector_generator, window);
+        handle_explosion(explosion_x, explosion_y, vector_generator, window);
         if (fast_timer % 2)
         {
             status++;
@@ -130,4 +130,60 @@ void Ship::draw(bool& draw_thrust, const u8 direction, Vector_Generator& vector_
         vector_generator.process(SHIP_THRUST_TABLE, window, SHIP_THRUST_OFFSET_TABLE[vector_offset], flip_x, flip_y);
         draw_thrust = false;
     }
+}
+
+void Ship::handle_explosion(Offset explosion_x[], Offset explosion_y[], Vector_Generator& vector_generator, RenderWindow& window) const
+{
+    u16 vector_object[6 * 6 + 1];
+    u8 final_index;
+    bool done = false;
+    for (u8 i = 0; i < 6 && !done; i++)
+    {
+        const u16 delta_x = update_explosion_offset(explosion_x[i], EXPLOSION_VELOCITY[i].x);
+        const u16 delta_y = update_explosion_offset(explosion_y[i], EXPLOSION_VELOCITY[i].y);
+
+        const u16 word_0 = (VCTR_9 << 12) | delta_y;
+        const u16 word_1 =                  delta_x;
+
+        const u16 explosion_part[] =
+        {
+            // move to the explosion
+            word_0,
+            word_1,
+
+            // explosion
+            SHIP_EXPLOSION[i],
+
+            // back to start of explosion
+            static_cast<u16>((SHIP_EXPLOSION[i] & 0xFF0F) ^ 0x0404),
+
+            // back to ship position
+            static_cast<u16>(word_0 ^ 0x0400),
+            static_cast<u16>(word_1 ^ 0x0400)
+        };
+        for (u8 x = 0; x < 6; x++)
+            vector_object[i * 6 + x] = explosion_part[x];
+
+        final_index = (i + 1) * 6;
+        if (status > 255 - (i + 1) * 16)
+            done = true;
+    }
+    vector_object[final_index] = RTSL << 12;
+    set_position_and_size(MUL_1, vector_generator, window);
+    vector_generator.process(vector_object, window);
+}
+
+u16 Ship::update_explosion_offset(Offset& offset, const s8 velocity) const
+{
+    if (status < 162)
+        offset.major = velocity >> 4;
+
+    update_position_axis(offset.major, offset.minor, velocity);
+
+    s16 long_vector_delta = offset.major;
+    if (velocity < 0)
+        long_vector_delta -= 256;
+
+    // return VCTR delta equivalent to explosion offset
+    return ((velocity < 0) << 10) | std::abs(long_vector_delta);
 }

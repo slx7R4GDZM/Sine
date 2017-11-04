@@ -130,10 +130,17 @@ enum Frame_Limiter_Mode
     BUSY_WAITING
 };
 
-/*struct Velocity {
-    s8 x_major;
-    s8 y_major;
-};*/
+struct Velocity
+{
+    s8 x;
+    s8 y;
+};
+
+struct Offset
+{
+    u8 minor;
+    u8 major;
+};
 
 struct Position
 {

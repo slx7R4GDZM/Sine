@@ -57,6 +57,8 @@ private:
     u8 credits;
     Option_Switch option_switch;
     u8 pre_credit_coins;
+    Offset ship_explosion_x[6];
+    Offset ship_explosion_y[6];
     Player player[MAX_PLAYERS];
 
     void process_events(Vector_Generator& vector_generator, RenderWindow& window);

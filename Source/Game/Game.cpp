@@ -31,6 +31,8 @@ Game::Game()
     , ship_vel_y_minor(0)
     , credits(0)
     , pre_credit_coins(0)
+    , ship_explosion_x{}
+    , ship_explosion_y{}
 {
     // window
     settings.create_startup_window(window);
@@ -640,7 +642,7 @@ void Game::update_space_objects(Player& player, Vector_Generator& vector_generat
     for (u8 i = 0; i < MAX_ASTEROIDS; i++)
         player.asteroid[i].update(player.asteroid_count, player.asteroid_wave_spawn_time, vector_generator, window);
 
-    player.ship.update(fast_timer, ship_direction, draw_thrust, vector_generator, window);
+    player.ship.update(fast_timer, ship_direction, ship_explosion_x, ship_explosion_y, draw_thrust, vector_generator, window);
     player.saucer.update(fast_timer, player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start, vector_generator, window);
 
     for (u8 i = 0; i < MAX_SAUCER_PHOTONS; i++)

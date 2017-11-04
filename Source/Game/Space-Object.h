@@ -11,7 +11,6 @@ class Vector_Generator;
 class Space_Object
 {
 private:
-    static void update_position_axis(u8& pos_major, u8& pos_minor, const s8 vel_major);
     static void wrap_position(u8& pos_major, const u8 max_pos_major);
     static bool hit(const u16 pos1, const u16 pos2, const u8 minimum_space);
 protected:
@@ -24,6 +23,7 @@ protected:
     static s8 lookup_sine(const u8 direction);
     static s8 lookup_cosine(const u8 direction);
     void update_position();
+    static void update_position_axis(u8& pos_major, u8& pos_minor, const s8 vel_major);
     void draw_explosion(Vector_Generator& vector_generator, RenderWindow& window) const;
     void set_position_and_size(const Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window) const;
 public:

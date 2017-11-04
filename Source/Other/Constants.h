@@ -68,6 +68,15 @@ const u8 INDISCERNIBLE = 0;
 const u8 ALIVE = 1;
 const s8 MIN_VEL = -64;
 const u8 MAX_VEL = 63;
+const Velocity EXPLOSION_VELOCITY[] =
+{
+    {-40,  30},
+    { 50, -20},
+    {  0, -60},
+    { 60,  20},
+    { 10,  70},
+    {-40, -40}
+};
 
 // photon
 const u8 MAX_SAUCER_PHOTONS = 2;
