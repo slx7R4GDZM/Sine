@@ -164,6 +164,7 @@ void Ship::handle_explosion(Offset explosion_x[], Offset explosion_y[], Vector_G
         for (u8 x = 0; x < 6; x++)
             vector_object[i * 6 + x] = explosion_part[x];
 
+        // make pieces disappear as the ship status gets higher
         final_index = (i + 1) * 6;
         if (status > 255 - (i + 1) * 16)
             done = true;
