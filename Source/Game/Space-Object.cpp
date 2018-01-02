@@ -78,8 +78,8 @@ bool Space_Object::collide(const Space_Object& object, const u8 minimum_space) c
     if (status && status < TRUE_EXPLOSION_START
      && object.status && object.status < TRUE_EXPLOSION_START)
     {
-        Coordinate pos_1 = get_total_pos(pos);
-        Coordinate pos_2 = get_total_pos(object.pos);
+        const Coordinate pos_1 = get_total_pos(pos);
+        const Coordinate pos_2 = get_total_pos(object.pos);
         if (hit(pos_1.position_x, pos_2.position_x, minimum_space)
          && hit(pos_1.position_y, pos_2.position_y, minimum_space))
             return true;
@@ -134,6 +134,16 @@ void Space_Object::set_position_and_size(const Global_Scale scale, Vector_Genera
                           (RTSL << 12)
     };
     vector_generator.process(vector_object, window);
+}
+
+Coordinate Space_Object::get_total_pos(const Position& pos)
+{
+    const Coordinate total_pos =
+    {
+        static_cast<u16>(pos.x_major * 256 + pos.x_minor),
+        static_cast<u16>(pos.y_major * 256 + pos.y_minor)
+    };
+    return total_pos;
 }
 
 u8 Space_Object::get_status() const

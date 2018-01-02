@@ -8,11 +8,26 @@
 
 class Vector_Generator;
 
+struct Position
+{
+    u8 x_major;
+    u8 y_major;
+    u8 x_minor;
+    u8 y_minor;
+};
+
+struct Coordinate
+{
+    u16 position_x;
+    u16 position_y;
+};
+
 class Space_Object
 {
 private:
     static void wrap_position(u8& pos_major, const u8 max_pos_major);
     static bool hit(const u16 pos1, const u16 pos2, const u8 minimum_space);
+    static Coordinate get_total_pos(const Position& pos);
 protected:
     u8 status;
     s8 vel_x_major;

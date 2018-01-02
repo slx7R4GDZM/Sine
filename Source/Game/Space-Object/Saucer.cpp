@@ -8,13 +8,13 @@
 #include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
-void Saucer::spawn(const u16 player_score, const u8 saucer_spawn_time_start)
+void Saucer::spawn(const Score player_score, const u8 saucer_spawn_time_start)
 {
     if (saucer_spawn_time_start >= 128)
         status = LARGE_SAUCER;
     else
     {
-        if (player_score >= 3000)
+        if (player_score.points[1] >= 0x30)
             status = SMALL_SAUCER;
         else
         {

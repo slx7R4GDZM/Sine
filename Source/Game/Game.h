@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "Space_Object/Asteroid.h"
-#include "Space_Object/Ship.h"
-#include "Space_Object/Saucer.h"
-#include "Space_Object/Photon.h"
+#include "Space-Object/Asteroid.h"
+#include "Space-Object/Ship.h"
+#include "Space-Object/Saucer.h"
+#include "Space-Object/Photon.h"
 #include "../Input/Input-Handler.h"
 #include "../Other/Constants.h"
 #include "../Settings/Settings-Handler.h"
@@ -15,21 +15,6 @@
 class Game
 {
 private:
-    struct Player
-    {
-        Asteroid asteroid[MAX_ASTEROIDS];
-        Ship ship;
-        Saucer saucer;
-        Photon saucer_photon[MAX_SAUCER_PHOTONS];
-        Photon ship_photon[MAX_SHIP_PHOTONS];
-        u8 asteroids_per_wave;
-        u8 asteroid_count;
-        u8 saucer_spawn_and_shot_time;
-        u8 saucer_spawn_time_start;
-        u8 ship_spawn_timer;
-        u8 asteroid_wave_spawn_time;
-    };
-
     Settings_Handler settings;
     RenderWindow window;
     Input_Handler input;
@@ -39,11 +24,11 @@ private:
     u8 current_player;
     u8 last_game_player_count;
     u8 player_count;
-    u16 high_score_table[MAX_HS_COUNT];
+    Score high_score_table[MAX_HS_COUNT];
     u8 name_entry_letter_pos;
     u8 player_HS_place[MAX_PLAYERS];
     u8 names_HS[MAX_HS_COUNT * HS_NAME_LENGTH];
-    u16 player_score[MAX_PLAYERS];
+    Score player_score[MAX_PLAYERS];
     u8 starting_lives;
     u8 player_lives[MAX_PLAYERS];
     u8 hyperspace_flag;
@@ -59,7 +44,20 @@ private:
     u8 pre_credit_coins;
     Offset ship_explosion_x[6];
     Offset ship_explosion_y[6];
-    Player player[MAX_PLAYERS];
+    struct Player
+    {
+        Asteroid asteroid[MAX_ASTEROIDS];
+        Ship ship;
+        Saucer saucer;
+        Photon saucer_photon[MAX_SAUCER_PHOTONS];
+        Photon ship_photon[MAX_SHIP_PHOTONS];
+        u8 asteroids_per_wave;
+        u8 asteroid_count;
+        u8 saucer_spawn_and_shot_time;
+        u8 saucer_spawn_time_start;
+        u8 ship_spawn_timer;
+        u8 asteroid_wave_spawn_time;
+    } player[MAX_PLAYERS];
 
     void process_events(Vector_Generator& vector_generator, RenderWindow& window);
     void limit_FPS(const steady_clock::time_point start_time) const;
@@ -76,7 +74,10 @@ private:
 
     void attract_mode(Vector_Generator& vector_generator);
     void update_player(Vector_Generator& vector_generator);
-    void add_points(const u8 points);
+
+    void add_points(const u8 points, const bool bonus);
+    static void add_to_number(u8 number[], const u8 num_size, const u8 to_add, const bool bonus);
+    static bool add_BCD(u8& number, const u8 to_add, const bool overflow);
 
     void insert_any_new_high_scores();
     void handle_HS_entry(Vector_Generator& vector_generator);

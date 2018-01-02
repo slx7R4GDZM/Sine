@@ -32,12 +32,16 @@ s8 clamp_s8(const s8 value, const s8 min_value, const s8 max_value)
         return value;
 }
 
-Coordinate get_total_pos(const Position& pos)
+bool operator>(const Score& score_1, const Score& score_2)
 {
-    const Coordinate total_pos =
+    for (u8 i = 1; i != UINT8_MAX; i--)
     {
-        static_cast<u16>(pos.x_major * 256 + pos.x_minor),
-        static_cast<u16>(pos.y_major * 256 + pos.y_minor)
-    };
-    return total_pos;
+        if (score_1.points[i] > score_2.points[i])
+            return true;
+        else if (score_1.points[i] < score_2.points[i])
+            return false;
+    }
+
+    // scores are the same
+    return false;
 }

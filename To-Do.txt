@@ -9,7 +9,6 @@ add
 	cmake file
 
 re-do correctly
-	score
 	asteroid spawn velocity
 	ship thrust graphics
 	photon spawn position

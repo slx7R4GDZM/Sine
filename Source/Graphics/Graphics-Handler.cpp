@@ -4,10 +4,28 @@
 
 #include "Graphics-Handler.h"
 
-#include <cmath>
 #include "Vector-Generator.h"
 #include "../Other/Text.h"
 #include "../Other/Vectors.h"
+
+void draw_text(const Text text, const Language language, Vector_Generator& vector_generator, RenderWindow& window)
+{
+    switch (language)
+    {
+    case ENGLISH:
+        draw_message(ENGLISH_TEXT_TABLE, ENGLISH_OFFSET_TABLE[text], vector_generator, window);
+        break;
+    case GERMAN:
+        draw_message(GERMAN_TEXT_TABLE, GERMAN_OFFSET_TABLE[text], vector_generator, window);
+        break;
+    case FRENCH:
+        draw_message(FRENCH_TEXT_TABLE, FRENCH_OFFSET_TABLE[text], vector_generator, window);
+        break;
+    case SPANISH:
+        draw_message(SPANISH_TEXT_TABLE, SPANISH_OFFSET_TABLE[text], vector_generator, window);
+        break;
+    }
+}
 
 void draw_message(const u16 message[], const u8 iteration, Vector_Generator& vector_generator, RenderWindow& window)
 {
@@ -34,50 +52,40 @@ void draw_character(const u8 character, Vector_Generator& vector_generator, Rend
     vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[character]);
 }
 
-void draw_digit(const u8 digit, Vector_Generator& vector_generator, RenderWindow& window, const bool brighten)
+void draw_player_score(const u8 player, const Score score[], Vector_Generator& vector_generator, RenderWindow& window, const bool brighten)
 {
-    vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[digit + 1], false, false, brighten);
+    const u8 x = (player == 0 ? 25 : 192);
+    set_position_and_size(x, 219, MUL_2, vector_generator, window);
+    draw_number(score[player].points, 2, vector_generator, window, true, brighten);
 }
 
-void draw_number(const u16 number, const u8 rightmost_x, const u8 y, const Global_Scale num_scale, Vector_Generator& vector_generator, RenderWindow& window, const bool add_zero, const bool brighten)
+void draw_number(const u8 number[], const u8 num_size, Vector_Generator& vector_generator, RenderWindow& window, const bool add_zero, const bool brighten)
 {
-    const string num_string = std::to_string(number);
-    const u8 digits = num_string.length();
-
-    set_position_and_size(rightmost_x - (digits * 3 * std::pow(2, static_cast<u8>(num_scale))), y, num_scale, vector_generator, window);
-    for (u8 i = 0; i < digits; i++)
-        draw_digit(num_string[i] - '0', vector_generator, window, brighten);
-
+    bool drawn_digit = false;
+    for (u8 i = num_size - 1; i != UINT8_MAX; i--)
+    {
+        draw_digit(number[i] >> 4, drawn_digit, false, brighten, vector_generator, window);
+        draw_digit(number[i] & 0xF, drawn_digit, i == 0, brighten, vector_generator, window);
+    }
     if (add_zero)
         draw_digit(0, vector_generator, window, brighten);
 }
 
-// used for drawing the player 1 and player 2 scores
-void draw_score(const u8 player, const u16 score, Vector_Generator& vector_generator, RenderWindow& window, const bool brighten)
+void draw_digit(const u8 digit, bool& drawn_digit, const bool last_digit, const bool brighten, Vector_Generator& vector_generator, RenderWindow& window)
 {
-    if (player == 0)
-        draw_number(score, 49, 219, MUL_2, vector_generator, window, true, brighten);
+    if (drawn_digit || digit || last_digit)
+    {
+        draw_digit(digit, vector_generator, window, brighten);
+        drawn_digit = true;
+    }
     else
-        draw_number(score, 216, 219, MUL_2, vector_generator, window, true, brighten);
+        // space
+        draw_character(0, vector_generator, window);
 }
 
-void draw_text(const Text text, const Language language, Vector_Generator& vector_generator, RenderWindow& window)
+void draw_digit(const u8 digit, Vector_Generator& vector_generator, RenderWindow& window, const bool brighten)
 {
-    switch (language)
-    {
-    case ENGLISH:
-        draw_message(ENGLISH_TEXT_TABLE, ENGLISH_OFFSET_TABLE[text], vector_generator, window);
-        break;
-    case GERMAN:
-        draw_message(GERMAN_TEXT_TABLE, GERMAN_OFFSET_TABLE[text], vector_generator, window);
-        break;
-    case FRENCH:
-        draw_message(FRENCH_TEXT_TABLE, FRENCH_OFFSET_TABLE[text], vector_generator, window);
-        break;
-    case SPANISH:
-        draw_message(SPANISH_TEXT_TABLE, SPANISH_OFFSET_TABLE[text], vector_generator, window);
-        break;
-    }
+    vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[digit + 1], false, false, brighten);
 }
 
 void set_position_and_size(const u8 cur_x, const u8 cur_y, const Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window)

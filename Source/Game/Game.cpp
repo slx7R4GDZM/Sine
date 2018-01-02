@@ -49,7 +49,7 @@ Game::Game()
     // startup
     player[0].asteroids_per_wave = 2;
     player[0].asteroid_count = 0;
-    player[0].saucer_spawn_and_shot_time = 127; // maybe don't do this because it's done in asteroid spawn?
+    player[0].saucer_spawn_and_shot_time = 0;
     player[0].saucer_spawn_time_start = 0;
     player[0].asteroid_wave_spawn_time = 0;
 
@@ -78,8 +78,8 @@ Game::Game()
             coin_input_to_credit();
             if (player_count == 0)
             {
-                draw_score(0, player_score[0], vector_generator, window);
-                draw_score(1, player_score[1], vector_generator, window);
+                draw_player_score(0, player_score, vector_generator, window);
+                draw_player_score(1, player_score, vector_generator, window);
 
                 if (option_switch.coinage == 0)
                     credits = 2;
@@ -94,7 +94,7 @@ Game::Game()
             else if (player_count == 1)
             {
                 update_player(vector_generator);
-                draw_score(0, player_score[0], vector_generator, window);
+                draw_player_score(0, player_score, vector_generator, window);
             }
             else // two-player mode
             {
@@ -106,7 +106,8 @@ Game::Game()
                 for (u8 i = 0; i < player_lives[1] && i < 13; i++)
                     vector_generator.process(LIVES_REMAINING_SHIP, window);
             }
-            draw_number(high_score_table[0], 132, 219, MUL_1, vector_generator, window, true);
+            set_position_and_size(120, 219, MUL_1, vector_generator, window);
+            draw_number(high_score_table[0].points, 2, vector_generator, window, true);
             draw_copyright(vector_generator);
 
             if (fast_timer == 255)
@@ -172,29 +173,29 @@ void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
         if (current_player == 0)
         {
             if (fast_timer % 32 >= 16)
-                draw_score(0, player_score[0], vector_generator, window, true);
+                draw_player_score(0, player_score, vector_generator, window, true);
 
-            draw_score(1, player_score[1], vector_generator, window);
+            draw_player_score(1, player_score, vector_generator, window);
         }
         else
         {
             if (fast_timer % 32 >= 16)
-                draw_score(1, player_score[1], vector_generator, window, true);
+                draw_player_score(1, player_score, vector_generator, window, true);
 
-            draw_score(0, player_score[0], vector_generator, window);
+            draw_player_score(0, player_score, vector_generator, window);
         }
     }
     else
     {
         if (current_player == 0)
         {
-            draw_score(0, player_score[0], vector_generator, window, true);
-            draw_score(1, player_score[1], vector_generator, window);
+            draw_player_score(0, player_score, vector_generator, window, true);
+            draw_player_score(1, player_score, vector_generator, window);
         }
         else
         {
-            draw_score(0, player_score[0], vector_generator, window);
-            draw_score(1, player_score[1], vector_generator, window, true);
+            draw_player_score(0, player_score, vector_generator, window);
+            draw_player_score(1, player_score, vector_generator, window, true);
         }
     }
 }
@@ -311,23 +312,20 @@ void Game::attempt_game_start()
 
 void Game::handle_game_start()
 {
-    clear_space_objects(player[0]);
-    clear_space_objects(player[1]); // maybe? untested
-    current_player = 0; // maybe? untested
+    current_player = 0;
     // names_HS[MAX_HS_COUNT * HS_NAME_LENGTH - 1] = 0; // bug that sets the final initial of the 10th high score to space
-    player_score[0] = 0;
-    player_score[1] = 0;
-    player_HS_place[0] = 255;
-    player_HS_place[1] = 255;
     player_text_timer = 128;
     for (u8 i = 0; i < player_count; i++)
     {
+        player_HS_place[i] = 255;
+        player_score[i] = NO_SCORE;
         player_lives[i] = starting_lives;
+        clear_space_objects(player[i]);
         player[i].ship.spawn();
-        player[i].saucer_spawn_and_shot_time = 146;
-        player[i].saucer_spawn_time_start = player[i].saucer_spawn_and_shot_time;
         player[i].asteroids_per_wave = 2;
         player[i].asteroid_count = 0;
+        player[i].saucer_spawn_and_shot_time = 146;
+        player[i].saucer_spawn_time_start = 146;
         player[i].ship_spawn_timer = 1;
     }
     player[0].asteroid_wave_spawn_time = 127;
@@ -400,28 +398,29 @@ void Game::attract_mode(Vector_Generator& vector_generator)
         draw_text(PUSH_START, option_switch.language, vector_generator, window);
     }
 
-    if (high_score_table[0] > 0 && slow_timer % 8 < 4)
+    if (high_score_table[0] > NO_SCORE && slow_timer % 8 < 4)
     {
         set_position_and_size(100, 182, MUL_2, vector_generator, window);
         draw_text(HIGH_SCORES, option_switch.language, vector_generator, window);
 
         // draw highscore table
-        for (u8 i = 0; i < MAX_HS_COUNT; i++)
+        u8 score_position[1] = {0};
+        for (u8 i = 0; i < MAX_HS_COUNT && high_score_table[i] > NO_SCORE; i++)
         {
-            if (high_score_table[i] > 0) // verify this
-            {
-                // draw score position
-                draw_number(i + 1, 107, 167 - i * 8, MUL_2, vector_generator, window);
-                vector_generator.process(DOT, window);
+            // draw score position
+            add_to_number(score_position, 1, 1, false);
+            set_position_and_size(95, 167 - i * 8, MUL_2, vector_generator, window);
+            draw_number(score_position, 1, vector_generator, window);
+            vector_generator.process(DOT, window);
+            draw_character(0, vector_generator, window);
 
-                // draw score
-                draw_number(high_score_table[i], 137, 167 - i * 8, MUL_2, vector_generator, window, true);
+            // draw score
+            draw_number(high_score_table[i].points, 2, vector_generator, window, true);
+            draw_character(0, vector_generator, window);
 
-                // draw score initials
-                set_position_and_size(149, 167 - i * 8, MUL_2, vector_generator, window);
-                for (u8 c = 0; c < HS_NAME_LENGTH; c++)
-                    draw_character(names_HS[i * 3 + c], vector_generator, window);
-            }
+            // draw score initials
+            for (u8 c = 0; c < HS_NAME_LENGTH; c++)
+                draw_character(names_HS[i * HS_NAME_LENGTH + c], vector_generator, window);
         }
     }
     else
@@ -499,16 +498,37 @@ void Game::update_player(Vector_Generator& vector_generator)
         vector_generator.process(LIVES_REMAINING_SHIP, window);
 }
 
-void Game::add_points(const u8 points)
+void Game::add_points(const u8 points, const bool bonus)
 {
-    const u16 old_thousandth = player_score[current_player] / 1000;
-    player_score[current_player] += points;
+    const u8 old_ten_thousandth = player_score[current_player].points[1] & 0xF0;
+    add_to_number(player_score[current_player].points, 2, points, bonus);
 
-    if (player_score[current_player] / 1000 != old_thousandth)
+    const u8 new_ten_thousandth = player_score[current_player].points[1] & 0xF0;
+    if (new_ten_thousandth != old_ten_thousandth)
         player_lives[current_player]++;
+}
 
-    if (player_score[current_player] >= MAX_SCORE)
-        player_score[current_player] -= MAX_SCORE;
+void Game::add_to_number(u8 number[], const u8 num_size, const u8 to_add, const bool bonus)
+{
+    bool add_to_next = add_BCD(number[0], to_add, bonus);
+    for (u8 i = 1; i < num_size && add_to_next; i++)
+        add_to_next = add_BCD(number[i], 0, add_to_next);
+}
+
+// this uses binary-coded decimal
+bool Game::add_BCD(u8& number, const u8 to_add, const bool overflow)
+{
+    u16 new_number = number + to_add + overflow;
+    if ((number & 0xF) + (to_add & 0xF) + overflow > 9)
+        new_number += 6;
+
+    if (new_number > 0x99)
+        new_number += 0x60;
+
+    number = new_number;
+
+    // overflow
+    return new_number > 0x99;
 }
 
 void Game::insert_any_new_high_scores()
@@ -661,7 +681,7 @@ void Game::handle_collision(Player& player)
     {
         if (player.ship.collide(player.asteroid[i], BONUS_SIZE_1 + player.asteroid[i].get_size()))
         {
-            add_points(player.asteroid[i].get_points());
+            add_points(player.asteroid[i].get_points(), false);
             spawn_asteroids_from_wreckage(player, i);
             player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
         }
@@ -678,7 +698,7 @@ void Game::handle_collision(Player& player)
     }
     if (player.saucer.collide(player.ship, player.saucer.get_size(true)))
     {
-        add_points(player.saucer.get_points());
+        add_points(player.saucer.get_points(), player.saucer.get_status() == SMALL_SAUCER);
         player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
         player.saucer.crash(player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start);
     }
@@ -711,7 +731,7 @@ void Game::handle_collision(Player& player)
         {
             if (player.ship_photon[i].collide(player.asteroid[x], PHOTON_SIZE + player.asteroid[x].get_size()))
             {
-                add_points(player.asteroid[x].get_points());
+                add_points(player.asteroid[x].get_points(), false);
                 spawn_asteroids_from_wreckage(player, x);
                 player.ship_photon[i].set_status(INDISCERNIBLE);
                 crashed = true;
@@ -719,7 +739,7 @@ void Game::handle_collision(Player& player)
         }
         if (player.ship_photon[i].collide(player.saucer, PHOTON_SIZE + player.saucer.get_size(false)))
         {
-            add_points(player.saucer.get_points());
+            add_points(player.saucer.get_points(), player.saucer.get_status() == SMALL_SAUCER);
             player.saucer.crash(player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start);
             player.ship_photon[i].set_status(INDISCERNIBLE);
         }
@@ -885,7 +905,7 @@ void Game::handle_saucer_stuff(Player& player) const
             u8 saucer_direction;
             //if (player.saucer.get_status() == LARGE_SAUCER)
                 saucer_direction = random_byte();
-            //else if (player_score[current_player] < 3500)
+            //else if (player_score[current_player].points[1] < 0x35)
                 // accuracy of +- 16;
             //else
                 // accuracy of +- 8;

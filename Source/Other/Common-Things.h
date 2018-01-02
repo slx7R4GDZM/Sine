@@ -130,30 +130,9 @@ enum Frame_Limiter_Mode
     BUSY_WAITING
 };
 
-struct Velocity
+struct Score
 {
-    s8 x;
-    s8 y;
-};
-
-struct Offset
-{
-    u8 minor;
-    u8 major;
-};
-
-struct Position
-{
-    u8 x_major;
-    u8 y_major;
-    u8 x_minor;
-    u8 y_minor;
-};
-
-struct Coordinate
-{
-    u16 position_x;
-    u16 position_y;
+    u8 points[2];
 };
 
 struct Option_Switch
@@ -165,8 +144,20 @@ struct Option_Switch
     u8 coinage                : 2;
 };
 
+struct Offset
+{
+    u8 minor;
+    u8 major;
+};
+
+struct Velocity
+{
+    s8 x;
+    s8 y;
+};
+
 bool overflowed_u8(const u8 var_current, const u8 var_previous);
 bool underflowed_u8(const u8 var_current, const u8 var_previous);
 u8 random_byte();
 s8 clamp_s8(const s8 value, const s8 min_value, const s8 max_value);
-Coordinate get_total_pos(const Position& pos);
+bool operator>(const Score& score_1, const Score& score_2);

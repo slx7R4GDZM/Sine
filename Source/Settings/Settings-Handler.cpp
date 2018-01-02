@@ -227,7 +227,7 @@ void Settings_Handler::create_window(RenderWindow& win)
     if (window_style == sf::Style::Fullscreen)
         win.setMouseCursorVisible(false);
     else if (fallback_win_pos.x != -1 && fallback_win_pos.y != -1)
-        win.setPosition(sf::Vector2i(fallback_win_pos.x, fallback_win_pos.y));
+        win.setPosition(fallback_win_pos);
     else if (fallback_win_pos.x != -1)
         win.setPosition(sf::Vector2i(fallback_win_pos.x, win.getPosition().y));
     else if (fallback_win_pos.y != -1)
