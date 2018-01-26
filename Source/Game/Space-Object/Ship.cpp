@@ -4,6 +4,7 @@
 
 #include "Ship.h"
 
+#include <cstring>
 #include "../../Graphics/Vector-Generator.h"
 #include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
@@ -22,12 +23,13 @@ void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
     ship_spawn_timer = 129;
 }
 
-void Ship::update(const u8 fast_timer, const u8 direction, Offset explosion_x[], Offset explosion_y[], bool& draw_thrust, Vector_Generator& vector_generator, RenderWindow& window)
+void Ship::update(const u8 fast_timer, const u8 direction, Offset explosion_x[], Offset explosion_y[], const bool thrusting, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (status == ALIVE)
     {
         update_position();
-        draw(draw_thrust, direction, vector_generator, window);
+        const bool draw_thrust = thrusting && fast_timer % 8 >= 4;
+        draw(direction, draw_thrust, vector_generator, window);
     }
     else if (status >= TRUE_EXPLOSION_START)
     {
@@ -98,7 +100,7 @@ void Ship::dampen_velocity_axis(s8& vel_major, u8& vel_minor)
     }
 }
 
-void Ship::draw(bool& draw_thrust, const u8 direction, Vector_Generator& vector_generator, RenderWindow& window) const
+void Ship::draw(const u8 direction, const bool draw_thrust, Vector_Generator& vector_generator, RenderWindow& window) const
 {
     bool flip_x = false;
     bool flip_y = false;
@@ -126,10 +128,7 @@ void Ship::draw(bool& draw_thrust, const u8 direction, Vector_Generator& vector_
     vector_generator.process(SHIP_TABLE, window, SHIP_OFFSET_TABLE[vector_offset], flip_x, flip_y);
 
     if (draw_thrust)
-    {
         vector_generator.process(SHIP_THRUST_TABLE, window, SHIP_THRUST_OFFSET_TABLE[vector_offset], flip_x, flip_y);
-        draw_thrust = false;
-    }
 }
 
 void Ship::handle_explosion(Offset explosion_x[], Offset explosion_y[], Vector_Generator& vector_generator, RenderWindow& window) const
@@ -161,8 +160,7 @@ void Ship::handle_explosion(Offset explosion_x[], Offset explosion_y[], Vector_G
             static_cast<u16>(word_0 ^ 0x0400),
             static_cast<u16>(word_1 ^ 0x0400)
         };
-        for (u8 x = 0; x < 6; x++)
-            vector_object[i * 6 + x] = explosion_part[x];
+        std::memcpy(&vector_object[i * 6], explosion_part, sizeof(explosion_part));
 
         // make pieces disappear as the ship status gets higher
         final_index = (i + 1) * 6;

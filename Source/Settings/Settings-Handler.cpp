@@ -45,33 +45,39 @@ Settings_Handler::Settings_Handler()
 void Settings_Handler::parse_file_settings(std::ifstream& input)
 {
     string line;
-    string setting;
-    string value;
-    while (getline(input, line))
+    string settings[2]; // setting, value
+    while (std::getline(input, line))
     {
-        if (!line.empty() && line[0] != '#')
+        unsigned int x = 0;
+        int start = 0;
+        for (int i = 0; i < 2 && x <= line.length(); i++)
         {
-            while (line[0] == ' ')
-                line.erase(0, 1);
-
-            for (u8 i = 0, option = 0; i < line.length(); i++)
+            bool started = false;
+            bool finished = false;
+            for (x = start; x <= line.length() && !finished; x++)
             {
-                if (line[i] == ' ') // setting
+                if (!started && isgraph(line[x]))
                 {
-                    setting = line.substr(0, i);
-                    option = 1;
+                    start = x;
+                    started = true;
                 }
-                else if (option == 1) // value
+                else if (started && !isgraph(line[x]))
                 {
-                    value = line.substr(i, line.length() - i);
-                    i = line.length();
+                    finished = true;
+                    settings[i] = line.substr(start, x - start);
+                    start = x;
                 }
             }
-            if (setting[0] == 'B')
-                parse_buttons(setting, value);
-            else
-                parse_settings(setting, value);
         }
+        if (settings[0][0] != '#' && !settings[1].empty())
+        {
+            if (settings[0][0] == 'B')
+                parse_buttons(settings[0], settings[1]);
+            else
+                parse_settings(settings[0], settings[1]);
+        }
+        settings[0].clear();
+        settings[1].clear();
     }
 }
 

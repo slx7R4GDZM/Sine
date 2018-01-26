@@ -12,7 +12,6 @@
 
 Game::Game()
     : game_activity(RUN_WITH_INPUT)
-    , draw_thrust(false) // hacky, don't use this var
     , current_player(0)
     , last_game_player_count(0)
     , player_count(0)
@@ -662,7 +661,7 @@ void Game::update_space_objects(Player& player, Vector_Generator& vector_generat
     for (u8 i = 0; i < MAX_ASTEROIDS; i++)
         player.asteroid[i].update(player.asteroid_count, player.asteroid_wave_spawn_time, vector_generator, window);
 
-    player.ship.update(fast_timer, ship_direction, ship_explosion_x, ship_explosion_y, draw_thrust, vector_generator, window);
+    player.ship.update(fast_timer, ship_direction, ship_explosion_x, ship_explosion_y, input.is_pressed(THRUST), vector_generator, window);
     player.saucer.update(fast_timer, player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start, vector_generator, window);
 
     for (u8 i = 0; i < MAX_SAUCER_PHOTONS; i++)
@@ -803,9 +802,6 @@ void Game::spawn_asteroids_from_wreckage(Player& player, const u8 iteration)
 
 void Game::handle_ship_stuff(Player& player)
 {
-    if (input.is_pressed(THRUST) && player.ship.get_status() == ALIVE && fast_timer % 8 >= 4)
-        draw_thrust = true;
-
     // on_press should be handled slightly differently, also need a limit on the photon shooting speed?
     if (input.on_press(FIRE) && !player_text_timer && !player.ship_spawn_timer)
         Photon::fire_photon(player.ship_photon, MAX_SHIP_PHOTONS, ship_direction, player.ship);

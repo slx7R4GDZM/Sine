@@ -73,8 +73,6 @@ const u16 SPANISH_TEXT_TABLE[] =
 
 const string DEFAULT_SETTINGS =
 R"(# Lines starting with # are ignored by the program
-# Do not add more than one space between a setting and the corresponding value
-# Do not add a space after a value
 
 #==============================================================================
 # List of Available Keys

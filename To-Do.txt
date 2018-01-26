@@ -10,7 +10,6 @@ add
 
 re-do correctly
 	asteroid spawn velocity
-	ship thrust graphics
 	photon spawn position
 	photon timer
 	vector generator
