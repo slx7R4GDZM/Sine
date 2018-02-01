@@ -10,7 +10,7 @@ Sine is an unfinished remake of Asteroids that I've made using C++ and [SFML](ht
 
 ## Download
 
-The compressed source and a prebuilt Windows binary can be found [here](https://github.com/slx7R4GDZM/Sine/releases).
+Prebuilt binaries for Windows can be found [here](https://github.com/slx7R4GDZM/Sine/releases).
 
 ## Default controls
 

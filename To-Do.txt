@@ -23,4 +23,3 @@ re-do correctly
 confirm
 	asteroid spawn velocity
 	saucer photon spawn velocity
-	see if a ship can shoot itself via hyperspace

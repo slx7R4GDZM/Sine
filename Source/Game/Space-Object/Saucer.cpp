@@ -101,7 +101,7 @@ void Saucer::attempt_remove(const u8 old_pos_x_major, u8& saucer_spawn_and_shot_
     }
 }
 
-u8 Saucer::get_size(bool bonus) const
+u8 Saucer::get_size(const bool bonus) const
 {
     if (status == SMALL_SAUCER && bonus)
         return BONUS_SIZE_3;

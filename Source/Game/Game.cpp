@@ -736,6 +736,11 @@ void Game::handle_collision(Player& player)
                 crashed = true;
             }
         }
+        if (player.ship_photon[i].collide(player.ship, PHOTON_SIZE))
+        {
+            player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
+            player.ship_photon[i].set_status(INDISCERNIBLE);
+        }
         if (player.ship_photon[i].collide(player.saucer, PHOTON_SIZE + player.saucer.get_size(false)))
         {
             add_points(player.saucer.get_points(), player.saucer.get_status() == SMALL_SAUCER);

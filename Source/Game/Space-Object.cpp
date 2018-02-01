@@ -96,7 +96,7 @@ bool Space_Object::hit(const u16 pos_1, const u16 pos_2, const u8 minimum_space)
     }
     else
     {
-        if (pos_1 - pos_2 < minimum_space * 2 + 1)
+        if (pos_1 - pos_2 <= minimum_space * 2)
             return true;
     }
     return false;
