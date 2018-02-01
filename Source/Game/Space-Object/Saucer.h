@@ -10,7 +10,7 @@ class Saucer : public Space_Object
 {
 private:
     void determine_vertical_velocity();
-    void attempt_remove(const s8 wrap_vel, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start);
+    void attempt_remove(const u8 old_pos_x_major, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start);
     void draw(Vector_Generator& vector_generator, RenderWindow& window) const;
 public:
     void spawn(const Score player_score, const u8 saucer_spawn_time_start);

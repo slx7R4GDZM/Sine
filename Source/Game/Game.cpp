@@ -665,10 +665,10 @@ void Game::update_space_objects(Player& player, Vector_Generator& vector_generat
     player.saucer.update(fast_timer, player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start, vector_generator, window);
 
     for (u8 i = 0; i < MAX_SAUCER_PHOTONS; i++)
-        player.saucer_photon[i].update(vector_generator, window);
+        player.saucer_photon[i].update(fast_timer, vector_generator, window);
 
     for (u8 i = 0; i < MAX_SHIP_PHOTONS; i++)
-        player.ship_photon[i].update(vector_generator, window);
+        player.ship_photon[i].update(fast_timer, vector_generator, window);
 
     handle_collision(player);
 }

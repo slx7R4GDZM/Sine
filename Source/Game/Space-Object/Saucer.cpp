@@ -61,12 +61,9 @@ void Saucer::update(const u8 fast_timer, u8& saucer_spawn_and_shot_time, const u
         if (fast_timer == 0 || fast_timer == 128)
             determine_vertical_velocity();
 
+        const u8 old_pos_x_major = pos.x_major;
         update_position();
-
-        if (pos.x_major == 0 && pos.x_minor == 0)
-            attempt_remove(16, saucer_spawn_and_shot_time, saucer_spawn_time_start);
-        else if (pos.x_major == 31 && pos.x_minor == 255)
-            attempt_remove(-16, saucer_spawn_and_shot_time, saucer_spawn_time_start);
+        attempt_remove(old_pos_x_major, saucer_spawn_and_shot_time, saucer_spawn_time_start);
 
         if (status != INDISCERNIBLE)
             draw(vector_generator, window);
@@ -94,9 +91,10 @@ void Saucer::determine_vertical_velocity()
     }
 }
 
-void Saucer::attempt_remove(const s8 wrap_vel, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start)
+void Saucer::attempt_remove(const u8 old_pos_x_major, u8& saucer_spawn_and_shot_time, const u8 saucer_spawn_time_start)
 {
-    if (vel_x_major == wrap_vel)
+    if ((vel_x_major < 0 && pos.x_major > old_pos_x_major)
+     || (vel_x_major > 0 && pos.x_major < old_pos_x_major))
     {
         status = INDISCERNIBLE;
         saucer_spawn_and_shot_time = saucer_spawn_time_start;

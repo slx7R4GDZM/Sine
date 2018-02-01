@@ -10,8 +10,6 @@ add
 
 re-do correctly
 	asteroid spawn velocity
-	photon spawn position
-	photon timer
 	vector generator
 	denightmarify spaceobject deletion?
 	make explosion graphics less ugly
@@ -25,3 +23,4 @@ re-do correctly
 confirm
 	asteroid spawn velocity
 	saucer photon spawn velocity
+	see if a ship can shoot itself via hyperspace
