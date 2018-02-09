@@ -1,0 +1,31 @@
+super need to add
+	input
+	settings configuration
+	readme
+	pictures
+
+add
+	spawn safety for saucer
+	small saucer aiming
+	some way to simulate analog sound
+	sounds
+	configuration gui
+	support for non kb input
+	vector monitor shader
+	cmake file
+
+re-do correctly
+	asteroid spawn velocity
+	vector generator
+	denightmarify spaceobject deletion?
+	make explosion graphics less ugly
+	input limiter for photons, coins, etc
+	fix fps limiter being slightly off from 60
+	replace pragma onces with include guards and get rid of other non-standard stuff like case ranges
+	replace more magic numbers with constants
+	shorten some super long lines
+	get rid of passing window and vectorgenerator to everything
+
+confirm
+	asteroid spawn velocity
+	saucer photon spawn velocity
