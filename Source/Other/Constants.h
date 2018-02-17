@@ -6,7 +6,7 @@
 
 #include "Common-Things.h"
 
-const nanoseconds MAX_FRAME_TIME = 16666666ns;
+const nanoseconds TARGET_FRAME_TIME = 16666666ns;
 
 const string SETTINGS_FILENAME = "Sine-Settings.cfg";
 

@@ -155,12 +155,12 @@ void Game::limit_FPS(const steady_clock::time_point start_time) const
 {
     if (settings.get_frame_limiter_mode() == SLEEPING)
     {
-        const nanoseconds frame_time = steady_clock::now() - start_time;
-        if (frame_time < MAX_FRAME_TIME)
-            std::this_thread::sleep_for(MAX_FRAME_TIME - frame_time);
+        const nanoseconds time_elapsed = steady_clock::now() - start_time;
+        if (time_elapsed < TARGET_FRAME_TIME)
+            std::this_thread::sleep_for(TARGET_FRAME_TIME - time_elapsed);
     }
     else
-        while (steady_clock::now() - start_time < MAX_FRAME_TIME);
+        while (steady_clock::now() - start_time < TARGET_FRAME_TIME);
 }
 
 void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
@@ -633,7 +633,7 @@ void Game::handle_HS_entry_input()
             slow_timer = 244;
         }
     }
-    if (fast_timer % 8 == 0) // i wonder if this is off by 1 because I didn't freeze the value of fast timer when I checked it
+    if (fast_timer % 8 == 0)
     {
         if (input.is_pressed(ROTATE_LEFT))
         {
