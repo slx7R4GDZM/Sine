@@ -381,7 +381,7 @@ U0 handle_HS_entry_input()
             slow_timer = 244;
         }
     }
-    if (fast_timer % 8 == 0) // i wonder if this is off by 1 because I didn't freeze the value of fast timer when I checked it
+    if (fast_timer % 8 == 0)
     {
         if (is_pressed(&input, ROTATE_LEFT))
         {
