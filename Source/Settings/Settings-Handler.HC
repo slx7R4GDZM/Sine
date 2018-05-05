@@ -10,6 +10,7 @@
 
 class Settings_Handler
 {
+    U8 button_scan_code[TOTAL_BUTTONS];
     U8 option_switch;
 
     // some of these can probably be made to be temporary
@@ -27,6 +28,7 @@ class Settings_Handler
 
 U0 init_settings_handler(Settings_Handler* settings_handler)
 {
+    MemCpy(&settings_handler->button_scan_code, &DEFAULT_BUTTON_SCAN_CODES, TOTAL_BUTTONS);
     settings_handler->option_switch = (ENGLISH << 6)
                                     | (1 << 5)
                                     | (0 << 4)

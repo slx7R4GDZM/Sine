@@ -21,7 +21,7 @@ U0 spawn_ship(Space_Object* ship)
     ship->pos.y_minor = 96;
 }
 
-U0 crash(Space_Object* ship, U8* player_lives, U8* ship_spawn_timer)
+U0 crash_ship(Space_Object* ship, U8* player_lives, U8* ship_spawn_timer)
 {
     (*player_lives)--;
     ship->status = EXPLOSION_START;
@@ -114,7 +114,7 @@ U0 draw_ship(Space_Object* ship, U8 direction, Bool draw_thrust, Vector_Generato
     set_position_and_size(ship, DIV_4, vector_generator, dc);
     process(vector_generator, SHIP_TABLE, dc, SHIP_OFFSET_TABLE[vector_offset], flip_x, flip_y);
 
-    if (*draw_thrust)
+    if (draw_thrust)
         process(vector_generator, SHIP_THRUST_TABLE, dc, SHIP_THRUST_OFFSET_TABLE[vector_offset], flip_x, flip_y);
 }
 

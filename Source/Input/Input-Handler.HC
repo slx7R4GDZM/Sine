@@ -20,9 +20,9 @@ U0 update(Input_Handler* input_handler, Settings_Handler* settings_handler)
     for (i = 0; i < TOTAL_BUTTONS; i++)
     {
         Bool was_button_pushed = input_handler->button_held[i];
-        //if (Kb::isKeyPressed(get_button_key(settings_handler, i)))
-        //    input_handler->button_held[i] = TRUE;
-        //else
+        if (Bt(kbd.down_bitmap, settings_handler->button_scan_code[i]))
+            input_handler->button_held[i] = TRUE;
+        else
             input_handler->button_held[i] = FALSE;
 
         input_handler->button_pushed[i] = !was_button_pushed && input_handler->button_held[i];

@@ -17,6 +17,7 @@ U0 main()
 
     init_game();
     SettingsPop();
+    DCFill();
 }
 
 main();

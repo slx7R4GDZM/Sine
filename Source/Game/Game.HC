@@ -146,7 +146,7 @@ U0 handle_ship_stuff(Player* player)
             // hyperspace failure
             else
             {
-                crash(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
+                crash_ship(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
                 hyperspace_flag = 0;
             }
         }
@@ -275,7 +275,7 @@ U0 handle_collision(Player* player)
         {
             add_points(get_asteroid_points(&player->asteroid[i]), FALSE);
             spawn_asteroids_from_wreckage(player, i);
-            crash(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
+            crash_ship(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
         }
     }
 
@@ -285,14 +285,14 @@ U0 handle_collision(Player* player)
         if (collide(&player->saucer, &player->asteroid[i], get_saucer_size(&player->saucer, TRUE) + get_asteroid_size(&player->asteroid[i])))
         {
             spawn_asteroids_from_wreckage(player, i);
-            crash(&player->saucer, &player->saucer_spawn_and_shot_time, player->saucer_spawn_time_start);
+            crash_saucer(&player->saucer, &player->saucer_spawn_and_shot_time, player->saucer_spawn_time_start);
         }
     }
     if (collide(&player->saucer, &player->ship, get_saucer_size(&player->saucer, TRUE)))
     {
         add_points(get_saucer_points(&player->saucer), player->saucer.status == SMALL_SAUCER);
-        crash(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
-        crash(&player->saucer, &player->saucer_spawn_and_shot_time, player->saucer_spawn_time_start);
+        crash_ship(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
+        crash_saucer(&player->saucer, &player->saucer_spawn_and_shot_time, player->saucer_spawn_time_start);
     }
 
     // saucer photon
@@ -311,7 +311,7 @@ U0 handle_collision(Player* player)
         }
         if (collide(&player->saucer_photon[i], &player->ship, PHOTON_SIZE))
         {
-            crash(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
+            crash_ship(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
             player->saucer_photon[i].status = INDISCERNIBLE;
         }
     }
@@ -331,13 +331,13 @@ U0 handle_collision(Player* player)
         }
         if (collide(&player->ship_photon[i], &player->ship, PHOTON_SIZE))
         {
-            crash(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
+            crash_ship(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
             player->ship_photon[i].status = INDISCERNIBLE;
         }
         if (collide(&player->ship_photon[i], &player->saucer, PHOTON_SIZE + get_saucer_size(&player->saucer, FALSE)))
         {
             add_points(get_saucer_points(&player->saucer), player->saucer.status == SMALL_SAUCER);
-            crash(&player->saucer, &player->saucer_spawn_and_shot_time, player->saucer_spawn_time_start);
+            crash_saucer(&player->saucer, &player->saucer_spawn_and_shot_time, player->saucer_spawn_time_start);
             player->ship_photon[i].status = INDISCERNIBLE;
         }
     }
@@ -464,7 +464,7 @@ U0 insert_any_new_high_scores()
             U64 s;
             for (s = 0; s < MAX_HS_COUNT; s++)
             {
-                if (player_score[p] > high_score_table[s])
+                if (score_more_than(player_score[p], high_score_table[s]))
                 {
                     // move the high score list down by one from where the new score is added
                     U64 i;
@@ -506,7 +506,7 @@ U0 end_game()
         U64 s;
         for (s = 0; s < MAX_HS_COUNT; s++)
         {
-            if (player_score[p] > high_score_table[s])
+            if (score_more_than(player_score[p], high_score_table[s]))
             {
                 player_HS_place[p] = s * HS_NAME_LENGTH;
                 s = MAX_HS_COUNT; // cheeky loop escape
@@ -526,7 +526,7 @@ U0 end_game()
         // deal with both players getting high scores
         if (player_HS_place[0] != 255 && player_HS_place[1] != 255)
         {
-            if (player_score[0] > player_score[1])
+            if (score_more_than(player_score[0], player_score[1]))
                 player_HS_place[1] += HS_NAME_LENGTH;
             else
                 player_HS_place[0] += HS_NAME_LENGTH;
@@ -888,8 +888,8 @@ U0 init_game()
     player[0].asteroid_wave_spawn_time = 0;
 
     // main loop
-    //while (open)
-    while (TRUE)
+    Bool running = TRUE;
+    while (running)
     {
         I64 start_time = cnts.jiffies;
         //process_events(&vector_generator, dc);
@@ -905,8 +905,8 @@ U0 init_game()
                     //toggle_fullscreen(&settings, dc);
                     set_resolution_scale(&vector_generator, &settings);
                 }
-                //else if (on_press(&input, EXIT))
-                    //close
+                else if (on_press(&input, EXIT))
+                    running = FALSE;
             }
 
             // do game stuff

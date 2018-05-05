@@ -50,7 +50,7 @@ U0 spawn_saucer(Space_Object* saucer, Score player_score, U8 saucer_spawn_time_s
     saucer->pos.y_minor = y_random * 32 % 256;
 }
 
-U0 crash(Space_Object* saucer, U8* saucer_spawn_and_shot_time, U8 saucer_spawn_time_start)
+U0 crash_saucer(Space_Object* saucer, U8* saucer_spawn_and_shot_time, U8 saucer_spawn_time_start)
 {
     saucer->status = EXPLOSION_START;
     *saucer_spawn_and_shot_time = saucer_spawn_time_start;
