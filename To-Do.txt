@@ -19,8 +19,7 @@ re-do correctly
 	denightmarify spaceobject deletion?
 	make explosion graphics less ugly
 	input limiter for photons, coins, etc
-	fix fps limiter being way off from 60 (half speed? is refresh blocking?)
-    ^maybe call refresh every 2 frames by using fast_timer?
+	fix fps limiter slightly off from 60
 	replace more magic numbers with constants
 	shorten some super long lines
 	get rid of passing window and vectorgenerator to everything

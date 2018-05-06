@@ -948,8 +948,6 @@ U0 init_game()
             if (fast_timer == 255)
                 slow_timer++;
             fast_timer++;
-
-            Refresh(0, TRUE);
         }
         limit_FPS(&settings, start_time);
     }
