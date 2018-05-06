@@ -1,0 +1,40 @@
+# Sine
+
+Sine is an unfinished remake of Asteroids that I've made using HolyC.
+
+## Download
+
+An ISO image for TempleOS can be found [here](https://github.com/slx7R4GDZM/Sine/releases).
+
+## Default controls
+
+| Action         | Key              |
+|----------------|------------------|
+| 1 Player Start | <kbd>1</kbd>     |
+| 2 Player Start | <kbd>2</kbd>     |
+| Rotate Left    | <kbd>A</kbd>     |
+| Rotate Right   | <kbd>D</kbd>     |
+| Thrust         | <kbd>W</kbd>     |
+| Fire Photon    | <kbd>E</kbd>     |
+| Hyperspace     | <kbd>Space</kbd> |
+| Left Coin      | <kbd>🡨</kbd>     |
+| Center Coin    | <kbd>🡫</kbd>     |
+| Right Coin     | <kbd>🡪</kbd>     |
+| Fullscreen     | <kbd>F11</kbd>   |
+| Exit           | <kbd>Esc</kbd>   |
+
+## Running
+
+After inserting the ISO image run the following in the command line:
+
+	CopyTree("T:", '.');
+	Cd("Sine");
+	#include "Main";
+
+## What's with the strange constants?
+
+The vector and text constants were made with [Sine Toolkit](https://github.com/slx7R4GDZM/Sine-Toolkit).
+
+## License information
+
+This project is licensed under the terms of the [MIT License](License.TXT).
