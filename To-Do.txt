@@ -1,7 +1,5 @@
 super need to add
 	settings configuration
-	readme
-	pictures
 
 add
 	create window for the game so term doesn't need to be cleared

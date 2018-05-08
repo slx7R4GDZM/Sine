@@ -2,6 +2,12 @@
 
 Sine is an unfinished remake of Asteroids that I've made using HolyC.
 
+## Screenshots
+
+| In-game                                                | High score entry                                                                                |
+|--------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| ![Firing at some Asteroids in Sine](Media/In-game.png) | ![Entering initials on the high score screen after beating a score](Media/High-score-entry.png) |
+
 ## Download
 
 An ISO image for TempleOS can be found [here](https://github.com/slx7R4GDZM/Sine/releases).
@@ -25,11 +31,16 @@ An ISO image for TempleOS can be found [here](https://github.com/slx7R4GDZM/Sine
 
 ## Running
 
-After inserting the ISO image run the following in the command line:
+After inserting the ISO image, you can run it from the disc:
 
-	CopyTree("T:", '.');
-	Cd("Sine");
-	#include "Main";
+    Cd("T:/Sine");
+    #include "Main";
+
+Or you can copy the directory to disk to run it:
+
+    CopyTree("T:", '.');
+    Cd("Sine");
+    #include "Main";
 
 ## What's with the strange constants?
 

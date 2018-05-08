@@ -1,6 +1,6 @@
 // Copyright slx7R4GDZM
 // Distributed under the terms of the MIT License.
-// Refer to the License.txt file for details.
+// Refer to the License.TXT file for details.
 
 #ifndef SINE_CONSTANTS_HC
 #define SINE_CONSTANTS_HC
