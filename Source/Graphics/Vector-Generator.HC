@@ -24,7 +24,7 @@ class Vector_Generator
     F64 crop_ratio;
 };
 
-static U16 INTERNAL_RES = 1024;
+#define INTERNAL_RES 1024
 
 U0 crop_with_extra_space(Vector_Generator* vector_generator, U32 axis_to_crop, F64* crop_offset, U32 scale_axis, F64* scale_offset)
 {
@@ -33,29 +33,30 @@ U0 crop_with_extra_space(Vector_Generator* vector_generator, U32 axis_to_crop, F
     *scale_offset = 0;
 }
 
-U0 set_resolution_scale(Vector_Generator* vector_generator, Settings_Handler* settings)
+U0 set_resolution_scale(Vector_Generator* vg)
 {
-    MemCpy(&vector_generator->resolution, &settings->current_res, sizeof(Vector2U16));
-    if (vector_generator->crop_ratio < 1.0)
+    vg->resolution.x = (Fs->win_right - Fs->win_left + 1) * 8;
+    vg->resolution.y = (Fs->win_bottom - Fs->win_top + 1) * 8;
+    if (vg->crop_ratio < 1.0)
     {
-        if (settings->current_res.x > settings->current_res.y * vector_generator->crop_ratio)
-            crop_with_extra_space(vector_generator, settings->current_res.x, &vector_generator->x_offset, settings->current_res.y, &vector_generator->y_offset);
+        if (vg->resolution.x > vg->resolution.y * vg->crop_ratio)
+            crop_with_extra_space(vg, vg->resolution.x, &vg->x_offset, vg->resolution.y, &vg->y_offset);
         else
         {
-            vector_generator->res_scale = INTERNAL_RES / (settings->current_res.x / vector_generator->crop_ratio);
-            vector_generator->x_offset = (settings->current_res.x - settings->current_res.x / vector_generator->crop_ratio) * vector_generator->res_scale / 2;
-            vector_generator->y_offset = (settings->current_res.y - settings->current_res.x / vector_generator->crop_ratio) * vector_generator->res_scale / 2;
+            vg->res_scale = INTERNAL_RES / (vg->resolution.x / vg->crop_ratio);
+            vg->x_offset = (vg->resolution.x - vg->resolution.x / vg->crop_ratio) * vg->res_scale / 2;
+            vg->y_offset = (vg->resolution.y - vg->resolution.x / vg->crop_ratio) * vg->res_scale / 2;
         }
     }
     else
     {
-        if (settings->current_res.x < settings->current_res.y * vector_generator->crop_ratio)
-            crop_with_extra_space(vector_generator, settings->current_res.y, &vector_generator->y_offset, settings->current_res.x, &vector_generator->x_offset);
+        if (vg->resolution.x < vg->resolution.y * vg->crop_ratio)
+            crop_with_extra_space(vg, vg->resolution.y, &vg->y_offset, vg->resolution.x, &vg->x_offset);
         else
         {
-            vector_generator->res_scale = INTERNAL_RES / (settings->current_res.y * vector_generator->crop_ratio);
-            vector_generator->x_offset = (settings->current_res.x - settings->current_res.y * vector_generator->crop_ratio) * vector_generator->res_scale / 2;
-            vector_generator->y_offset = (settings->current_res.y - settings->current_res.y * vector_generator->crop_ratio) * vector_generator->res_scale / 2;
+            vg->res_scale = INTERNAL_RES / (vg->resolution.y * vg->crop_ratio);
+            vg->x_offset = (vg->resolution.x - vg->resolution.y * vg->crop_ratio) * vg->res_scale / 2;
+            vg->y_offset = (vg->resolution.y - vg->resolution.y * vg->crop_ratio) * vg->res_scale / 2;
         }
     }
 }
@@ -63,7 +64,7 @@ U0 set_resolution_scale(Vector_Generator* vector_generator, Settings_Handler* se
 U0 init_vector_generator(Vector_Generator* vector_generator, Settings_Handler* settings)
 {
     vector_generator->crop_ratio = settings->crop_ratio;
-    set_resolution_scale(vector_generator, settings);
+    set_resolution_scale(vector_generator);
 
     U64 i;
     for (i = 0; i < 16; i++)

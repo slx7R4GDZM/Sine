@@ -50,10 +50,10 @@ U0 spawn_saucer(Space_Object* saucer, Score player_score, U8 saucer_spawn_time_s
     saucer->pos.y_minor = y_random * 32 % 256;
 }
 
-U0 crash_saucer(Space_Object* saucer, U8* saucer_spawn_and_shot_time, U8 saucer_spawn_time_start)
+U0 crash_saucer(Space_Object* saucer, U8* saucer_spawn_time, U8 saucer_spawn_time_start)
 {
     saucer->status = EXPLOSION_START;
-    *saucer_spawn_and_shot_time = saucer_spawn_time_start;
+    *saucer_spawn_time = saucer_spawn_time_start;
 }
 
 U0 draw_saucer(Space_Object* saucer, Vector_Generator* vector_generator, CDC* dc)
@@ -66,13 +66,13 @@ U0 draw_saucer(Space_Object* saucer, Vector_Generator* vector_generator, CDC* dc
     process(vector_generator, SAUCER, dc);
 }
 
-U0 attempt_remove(Space_Object* saucer, U8 old_pos_x_major, U8* saucer_spawn_and_shot_time, U8 saucer_spawn_time_start)
+U0 attempt_remove(Space_Object* saucer, U8 old_pos_x_major, U8* saucer_spawn_time, U8 saucer_spawn_time_start)
 {
     if ((saucer->vel_x_major < 0 && saucer->pos.x_major > old_pos_x_major)
      || (saucer->vel_x_major > 0 && saucer->pos.x_major < old_pos_x_major))
     {
         saucer->status = INDISCERNIBLE;
-        *saucer_spawn_and_shot_time = saucer_spawn_time_start;
+        *saucer_spawn_time = saucer_spawn_time_start;
     }
 }
 
@@ -92,7 +92,7 @@ U0 determine_vertical_velocity(Space_Object* saucer)
     }
 }
 
-U0 update_saucer(Space_Object* saucer, U8 fast_timer, U8* saucer_spawn_and_shot_time, U8 saucer_spawn_time_start, Vector_Generator* vector_generator, CDC* dc)
+U0 update_saucer(Space_Object* saucer, U8 fast_timer, U8* saucer_spawn_time, U8 saucer_spawn_time_start, Vector_Generator* vector_generator, CDC* dc)
 {
     if (saucer->status == LARGE_SAUCER || saucer->status == SMALL_SAUCER)
     {
@@ -102,7 +102,7 @@ U0 update_saucer(Space_Object* saucer, U8 fast_timer, U8* saucer_spawn_and_shot_
         U8 old_pos_x_major = saucer->pos.x_major;
         update_position(saucer);
 
-        attempt_remove(saucer, old_pos_x_major, saucer_spawn_and_shot_time, saucer_spawn_time_start);
+        attempt_remove(saucer, old_pos_x_major, saucer_spawn_time, saucer_spawn_time_start);
 
         if (saucer->status != INDISCERNIBLE)
             draw_saucer(saucer, vector_generator, dc);

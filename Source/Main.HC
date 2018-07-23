@@ -10,20 +10,17 @@ U0 main()
     DocClear();
     DocCursor(OFF);
     Bool keep_auto_complete_on = AutoComplete(OFF);
-
     StrCpy(Fs->task_title, "Sine");
-    // since settings aren't implemented just make the window cover the screen
-    Fs->win_left   = 0x00;
-    Fs->win_right  = 0x4F;
-    Fs->win_top    = 0x00;
-    Fs->win_bottom = 0x3B;
-    TaskDerivedValsUpdate();
+    CDoc* print_later = DocNew();
 
-    init_game();
+    init_game(print_later);
+
     DCFill();
     FlushMsgs();
     SettingsPop();
     AutoComplete(keep_auto_complete_on);
+    DocInsDoc(DocPut(), print_later);
+    DocDel(print_later);
 }
 
 main();

@@ -7,10 +7,18 @@
 
 #include "Other/Common-Things.HC"
 
-#define TARGET_FRAME_TIME 16
+#define FLT_MIN 0x0000000000000001
+
+static U8 SETTINGS_FILENAME[18] = "Sine-Settings.TXT";
+
+#define TARGET_FRAME_TIME_JIFFY (JIFFY_FREQ / 60)
+#define TARGET_FRAME_TIME_SYSTEM (SYS_TIMER_FREQ / 60)
 
 #define TOTAL_BUTTONS 12
-static U8 DEFAULT_BUTTON_SCAN_CODES[TOTAL_BUTTONS] = {0x39, 0x12, 0x4B, 0x50, 0x4D, 0x02, 0x03, 0x11, 0x20, 0x1E, 0x57, 0x01};
+#define INVALID_BUTTON U8_MAX
+static U8* BUTTON_TABLE[TOTAL_BUTTONS] = {"B-Hyperspace", "B-Fire", "B-Left-Coin", "B-Center-Coin", "B-Right-Coin", "B-One-Player-Start", "B-Two-Player-Start", "B-Thrust", "B-Rotate-Right", "B-Rotate-Left", "B-Update-Win-Size", "B-Exit"};
+
+static I64 DEFAULT_BUTTON_SCAN_CODES[TOTAL_BUTTONS] = {0x39, 0x12, 0x4B, 0x50, 0x4D, 0x02, 0x03, 0x11, 0x20, 0x1E, 0x3F, 0x01};
 
 #define MAX_HS_COUNT 10
 #define HS_NAME_LENGTH 3

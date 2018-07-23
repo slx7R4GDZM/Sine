@@ -14,7 +14,7 @@ class Input_Handler
     Bool button_pushed[TOTAL_BUTTONS];
 };
 
-U0 update(Input_Handler* input_handler, Settings_Handler* settings_handler)
+U0 update_input(Input_Handler* input_handler, Settings_Handler* settings_handler)
 {
     U64 i;
     for (i = 0; i < TOTAL_BUTTONS; i++)

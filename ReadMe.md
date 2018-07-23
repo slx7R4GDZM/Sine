@@ -38,7 +38,7 @@ After inserting the ISO image, you can run it from the disc:
 
 Or you can copy the directory to disk to run it:
 
-    CopyTree("T:", '.');
+    CopyTree("T:", ".");
     Cd("Sine");
     #include "Main";
 

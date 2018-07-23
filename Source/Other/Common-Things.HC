@@ -5,18 +5,18 @@
 #ifndef SINE_COMMON_THINGS_HC
 #define SINE_COMMON_THINGS_HC
 
-#define HYPERSPACE          0
-#define FIRE                1
-#define LEFT_COIN           2
-#define CENTER_COIN         3
-#define RIGHT_COIN          4
-#define ONE_PLAYER_START    5
-#define TWO_PLAYER_START    6
-#define THRUST              7
-#define ROTATE_RIGHT        8
-#define ROTATE_LEFT         9
-#define TOGGLE_FULLSCREEN  10
-#define EXIT               11
+#define HYPERSPACE        0
+#define FIRE              1
+#define LEFT_COIN         2
+#define CENTER_COIN       3
+#define RIGHT_COIN        4
+#define ONE_PLAYER_START  5
+#define TWO_PLAYER_START  6
+#define THRUST            7
+#define ROTATE_RIGHT      8
+#define ROTATE_LEFT       9
+#define UPDATE_WIN_SIZE  10
+#define EXIT             11
 
 #define HIGH_SCORES                             0
 #define PLAYER_                                 1
@@ -71,11 +71,6 @@
 
 #define WIN_NORMAL     0
 #define WIN_BORDERLESS 1
-#define WIN_FULLSCREEN 2
-
-#define PAUSE             0
-#define RUN_WITHOUT_INPUT 1
-#define RUN_WITH_INPUT    2
 
 #define SLEEPING     0
 #define BUSY_WAITING 1

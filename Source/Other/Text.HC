@@ -72,4 +72,94 @@ U16 SPANISH_TEXT_TABLE[74] =
     0x2054, 0x69D8, 0x2DC2, 0x185C, 0xCA56, 0x9800
 };
 
+#define DEFAULT_SETTINGS "# Lines starting with # are ignored by the program\n"    \
+"\n"                                                                               \
+"#==============================================================================\n"\
+"# Button Settings\n"                                                              \
+"#==============================================================================\n"\
+"\n"                                                                               \
+"B-One-Player-Start 0x02\n"                                                        \
+"B-Two-Player-Start 0x03\n"                                                        \
+"     B-Rotate-Left 0x1E\n"                                                        \
+"    B-Rotate-Right 0x20\n"                                                        \
+"          B-Thrust 0x11\n"                                                        \
+"            B-Fire 0x12\n"                                                        \
+"      B-Hyperspace 0x39\n"                                                        \
+"       B-Left-Coin 0x4B\n"                                                        \
+"     B-Center-Coin 0x50\n"                                                        \
+"      B-Right-Coin 0x4D\n"                                                        \
+" B-Update-Win-Size 0x3F\n"                                                        \
+"            B-Exit 0x01\n"                                                        \
+"\n"                                                                               \
+"#==============================================================================\n"\
+"# 8-Toggle Switch\n"                                                              \
+"#==============================================================================\n"\
+"\n"                                                                               \
+"## Language the game should use\n"                                                \
+"# 0 = English (default)\n"                                                        \
+"# 1 = German\n"                                                                   \
+"# 2 = French\n"                                                                   \
+"# 3 = Spanish\n"                                                                  \
+"Language 0\n"                                                                     \
+"\n"                                                                               \
+"## Amount of starting lives\n"                                                    \
+"# 0 = 4-ship game\n"                                                              \
+"# 1 = 3-ship game (default)\n"                                                    \
+"Starting-Lives 1\n"                                                               \
+"\n"                                                                               \
+"## Center coin mechanism multiplier (left mech of a 2-mech door)\n"               \
+"# 0 = Center coin mech x 1 (default)\n"                                           \
+"# 1 = Center coin mech x 2\n"                                                     \
+"Center-Coin-Multiplier 0\n"                                                       \
+"\n"                                                                               \
+"## Right coin mechanism multiplier\n"                                             \
+"# 0 = Right coin mech x 1 (default)\n"                                            \
+"# 1 = Right coin mech x 4\n"                                                      \
+"# 2 = Right coin mech x 5\n"                                                      \
+"# 3 = Right coin mech x 6\n"                                                      \
+"Right-Coin-Multiplier 0\n"                                                        \
+"\n"                                                                               \
+"## Amount of coins required for playing\n"                                        \
+"# 0 = Free play\n"                                                                \
+"# 1 = 1 coin for 2 plays\n"                                                       \
+"# 2 = 1 coin for 1 play (default)\n"                                              \
+"# 3 = 2 coins for 1 play\n"                                                       \
+"Coinage 2\n"                                                                      \
+"\n"                                                                               \
+"#==============================================================================\n"\
+"# Window Settings\n"                                                              \
+"#==============================================================================\n"\
+"\n"                                                                               \
+"## Which border to start the window with\n"                                       \
+"# 0 = Normal window\n"                                                            \
+"# 1 = Borderless window (default)\n"                                              \
+"Starting-Border 1\n"                                                              \
+"\n"                                                                               \
+"## Starting window resolution\n"                                                  \
+"Starting-X-Resolution 640\n"                                                      \
+"Starting-Y-Resolution 480\n"                                                      \
+"\n"                                                                               \
+"## Starting position for the game window\n"                                       \
+"# -1 = Don't set the starting position\n"                                         \
+"Start-Window-Position-X 0\n"                                                      \
+"Start-Window-Position-Y 0\n"                                                      \
+"\n"                                                                               \
+"#==============================================================================\n"\
+"# Graphics Settings\n"                                                            \
+"#==============================================================================\n"\
+"\n"                                                                               \
+"## The x:y ratio to crop the image to\n"                                          \
+"# < 1 = Crops the image starting with the left and right sides\n"                 \
+"# 1.0 = Scales the image to the lower resolution axis\n"                          \
+"# > 1 = Crops the image starting with the top and bottom (default)\n"             \
+"Crop-Ratio 1.29620253164556962\n"                                                 \
+"\n"                                                                               \
+"## Gamma correction\n"                                                            \
+"Gamma-Correction 1.0\n"                                                           \
+"\n"                                                                               \
+"## Whether to use busy waiting or sleeping to limit FPS\n"                        \
+"# 0 = Use sleeping\n"                                                             \
+"# 1 = Use busy waiting; this has high CPU usage, but it's consistent (default)\n" \
+"Frame-Limit-Mode 1\n"
+
 #endif

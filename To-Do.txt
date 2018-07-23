@@ -1,8 +1,6 @@
-super need to add
-	settings configuration
-
 add
-	create window for the game so term doesn't need to be cleared
+    a way of detecting if the current window is active
+    a way to resize windows in realtime?
 	spawn safety for saucer
 	small saucer aiming
 	some way to simulate analog sound
@@ -17,7 +15,6 @@ re-do correctly
 	denightmarify spaceobject deletion?
 	make explosion graphics less ugly
 	input limiter for photons, coins, etc
-	fix fps limiter slightly off from 60
 	replace more magic numbers with constants
 	shorten some super long lines
 	get rid of passing window and vectorgenerator to everything

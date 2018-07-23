@@ -18,31 +18,30 @@
 #include "Settings/Settings-Handler.HC"
 
 Settings_Handler settings;
-CDC* dc = DCAlias();
+CDC* dc;
 Input_Handler input;
-U8 game_activity = RUN_WITH_INPUT;
 
-U8 current_player = 0;
-U8 last_game_player_count = 0;
-U8 player_count = 0;
+U8 current_player;
+U8 last_game_player_count;
+U8 player_count;
 Score high_score_table[MAX_HS_COUNT];
-U8 name_entry_letter_pos = 0;
+U8 name_entry_letter_pos;
 U8 player_HS_place[MAX_PLAYERS];
 U8 names_HS[MAX_HS_COUNT * HS_NAME_LENGTH];
 Score player_score[MAX_PLAYERS];
 U8 starting_lives;
 U8 player_lives[MAX_PLAYERS];
-U8 hyperspace_flag = 0;
-U8 player_text_timer = 0;
-U8 fast_timer = 0;
-U8 slow_timer = 0;
-U8 ship_direction = 0;
-U8 ship_vel_x_minor = 0;
-U8 ship_vel_y_minor = 0;
+U8 hyperspace_flag;
+U8 player_text_timer;
+U8 fast_timer;
+U8 slow_timer;
+U8 ship_direction;
+U8 ship_vel_x_minor;
+U8 ship_vel_y_minor;
 // sound stuff will go here
-U8 credits = 0;
+U8 credits;
 U8 option_switch;
-U8 pre_credit_coins = 0;
+U8 pre_credit_coins;
 Offset ship_explosion_x[6];
 Offset ship_explosion_y[6];
 class Player
@@ -835,33 +834,45 @@ U0 draw_multiplayer_scores(Vector_Generator* vector_generator)
 
 U0 limit_FPS(Settings_Handler* settings, I64 start_time)
 {
-    if (cnts.jiffies - start_time < TARGET_FRAME_TIME)
-        SleepUntil(start_time + TARGET_FRAME_TIME);
+    if (settings->frame_limiter_mode == SLEEPING)
+    {
+        if (cnts.jiffies - start_time < TARGET_FRAME_TIME_JIFFY)
+            SleepUntil(start_time + TARGET_FRAME_TIME_JIFFY);
+    }
+    else
+    {
+        while (SysTimerRead() - start_time < TARGET_FRAME_TIME_SYSTEM)
+            Yield();
+    }
 }
 
-U0 init_game()
+U0 initialize_memory()
 {
-    // dc
-    init_settings_handler(&settings);
-    //create_startup_window(&settings, dc);
-    //output_settings(&settings);
-
-    Vector_Generator vector_generator;
-    init_vector_generator(&vector_generator, &settings);
-
-    // settings
+    dc = DCAlias();
+    current_player = 0;
+    last_game_player_count = 0;
+    player_count = 0;
+    MemSetU8(high_score_table, 0, MAX_HS_COUNT * sizeof(Score));
+    name_entry_letter_pos = 0;
+    MemSetU8(player_HS_place, 176, MAX_PLAYERS);
+    MemSetU8(names_HS, 0, MAX_HS_COUNT * HS_NAME_LENGTH);
+    MemSetU8(player_score, 0, MAX_PLAYERS * sizeof(Score));
+    MemSetU8(player_lives, 0, MAX_PLAYERS);
+    hyperspace_flag = 0;
+    player_text_timer = 0;
+    fast_timer = 0;
+    slow_timer = 0;
+    ship_direction = 0;
+    ship_vel_x_minor = 0;
+    ship_vel_y_minor = 0;
+    credits = 0;
     option_switch = settings.option_switch;
     if ((option_switch & 0x20) == 0)
         starting_lives = 4;
     else
         starting_lives = 3;
 
-    // startup
-    MemSetU8(high_score_table, 0, MAX_HS_COUNT * sizeof(Score));
-    MemSetU8(player_HS_place, 176, MAX_PLAYERS);
-    MemSetU8(names_HS, 0, MAX_HS_COUNT * HS_NAME_LENGTH);
-    MemSetU8(player_score, 0, MAX_PLAYERS * sizeof(Score));
-    MemSetU8(player_lives, 0, MAX_PLAYERS);
+    pre_credit_coins = 0;
     MemSetU8(ship_explosion_x, 0, sizeof(ship_explosion_x));
     MemSetU8(ship_explosion_y, 0, sizeof(ship_explosion_x));
 
@@ -886,69 +897,77 @@ U0 init_game()
     player[0].saucer_spawn_and_shot_time = 0;
     player[0].saucer_spawn_time_start = 0;
     player[0].asteroid_wave_spawn_time = 0;
+}
+
+U0 init_game(CDoc* std_out)
+{
+    init_settings_handler(&settings, std_out);
+    set_up_startup_window(&settings);
+    output_settings(&settings, std_out);
+
+    Vector_Generator vector_generator;
+    init_vector_generator(&vector_generator, &settings);
+
+    initialize_memory();
 
     // main loop
     Bool running = TRUE;
     while (running)
     {
-        I64 start_time = cnts.jiffies;
-        //process_events(&vector_generator, dc);
-        if (game_activity != PAUSE)
+        I64 start_time;
+        if (settings.frame_limiter_mode == SLEEPING)
+            start_time = cnts.jiffies;
+        else
+            start_time = SysTimerRead();
+
+        DCFill();
+        update_input(&input, &settings);
+        if (on_press(&input, UPDATE_WIN_SIZE))
+            set_resolution_scale(&vector_generator);
+        else if (on_press(&input, EXIT))
+            running = FALSE;
+
+        // do game stuff
+        coin_input_to_credit();
+        if (player_count == 0)
         {
-            DCFill();
+            draw_player_score(0, player_score, &vector_generator, dc);
+            draw_player_score(1, player_score, &vector_generator, dc);
 
-            if (game_activity == RUN_WITH_INPUT)
-            {
-                update(&input, &settings);
-                if (on_press(&input, TOGGLE_FULLSCREEN))
-                {
-                    //toggle_fullscreen(&settings, dc);
-                    set_resolution_scale(&vector_generator, &settings);
-                }
-                else if (on_press(&input, EXIT))
-                    running = FALSE;
-            }
+            if ((option_switch & 0x03) == 0)
+                credits = 2;
 
-            // do game stuff
-            coin_input_to_credit();
-            if (player_count == 0)
-            {
-                draw_player_score(0, player_score, &vector_generator, dc);
-                draw_player_score(1, player_score, &vector_generator, dc);
+            if (player_HS_place[0] < 128 || player_HS_place[1] < 128)
+                handle_HS_entry(&vector_generator);
+            else
+                attract_mode(&vector_generator);
 
-                if ((option_switch & 0x03) == 0)
-                    credits = 2;
-
-                if (player_HS_place[0] < 128 || player_HS_place[1] < 128)
-                    handle_HS_entry(&vector_generator);
-                else
-                    attract_mode(&vector_generator);
-
-                attempt_game_start();
-            }
-            else if (player_count == 1)
-            {
-                update_player(&vector_generator);
-                draw_player_score(0, player_score, &vector_generator, dc);
-            }
-            else // two-player mode
-            {
-                update_player(&vector_generator);
-                draw_multiplayer_scores(&vector_generator);
-
-                // draw player 2 lives
-                set_position_and_size(207, 213, DIV_4, &vector_generator, dc);
-                for (i = 0; i < player_lives[1] && i < 13; i++)
-                    process(&vector_generator, LIVES_REMAINING_SHIP, dc);
-            }
-            set_position_and_size(120, 219, MUL_1, &vector_generator, dc);
-            draw_number(high_score_table[0].points, 2, &vector_generator, dc, TRUE);
-            draw_copyright(&vector_generator);
-
-            if (fast_timer == 255)
-                slow_timer++;
-            fast_timer++;
+            attempt_game_start();
         }
+        else if (player_count == 1)
+        {
+            update_player(&vector_generator);
+            draw_player_score(0, player_score, &vector_generator, dc);
+        }
+        else // two-player mode
+        {
+            update_player(&vector_generator);
+            draw_multiplayer_scores(&vector_generator);
+
+            // draw player 2 lives
+            set_position_and_size(207, 213, DIV_4, &vector_generator, dc);
+            U64 i;
+            for (i = 0; i < player_lives[1] && i < 13; i++)
+                process(&vector_generator, LIVES_REMAINING_SHIP, dc);
+        }
+        set_position_and_size(120, 219, MUL_1, &vector_generator, dc);
+        draw_number(high_score_table[0].points, 2, &vector_generator, dc, TRUE);
+        draw_copyright(&vector_generator);
+
+        if (fast_timer == 255)
+            slow_timer++;
+        fast_timer++;
+
         limit_FPS(&settings, start_time);
     }
 }
