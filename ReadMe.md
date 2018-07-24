@@ -6,7 +6,7 @@ Sine is an unfinished remake of Asteroids that I've made using HolyC.
 
 | In-game                                                | High score entry                                                                                |
 |--------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-| ![Firing at some Asteroids in Sine](Media/In-game.png) | ![Entering initials on the high score screen after beating a score](Media/High-score-entry.png) |
+| ![Firing at some asteroids in Sine](Media/In-game.png) | ![Entering initials on the high score screen after beating a score](Media/High-score-entry.png) |
 
 ## Download
 
@@ -26,7 +26,7 @@ An ISO image for TempleOS can be found [here](https://github.com/slx7R4GDZM/Sine
 | Left Coin      | <kbd>🡨</kbd>     |
 | Center Coin    | <kbd>🡫</kbd>     |
 | Right Coin     | <kbd>🡪</kbd>     |
-| Fullscreen     | <kbd>F11</kbd>   |
+| Resize Window  | <kbd>F5</kbd>    |
 | Exit           | <kbd>Esc</kbd>   |
 
 ## Running

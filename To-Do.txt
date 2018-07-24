@@ -1,6 +1,6 @@
 add
-    a way of detecting if the current window is active
-    a way to resize windows in realtime?
+	a way of detecting if the current window is active
+	a way to resize windows in realtime?
 	spawn safety for saucer
 	small saucer aiming
 	some way to simulate analog sound
