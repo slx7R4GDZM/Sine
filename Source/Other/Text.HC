@@ -155,7 +155,7 @@ U16 SPANISH_TEXT_TABLE[74] =
 "Crop-Ratio 1.29620253164556962\n"                                                 \
 "\n"                                                                               \
 "## Gamma correction\n"                                                            \
-"Gamma-Correction 1.0\n"                                                           \
+"Gamma-Correction 1.8\n"                                                           \
 "\n"                                                                               \
 "## Whether to use busy waiting or sleeping to limit FPS\n"                        \
 "# 0 = Use sleeping\n"                                                             \

@@ -69,8 +69,7 @@ U0 init_vector_generator(Vector_Generator* vector_generator, Settings_Handler* s
     U64 i;
     for (i = 0; i < 16; i++)
     {
-        F64 gamma_correction = 1.8;
-        U16 color = Round(Pow((15 - i) * 17 / 255.0, 1 / gamma_correction) * 65535);
+        U16 color = Round(Pow((15 - i) * 17 / 255.0, 1 / settings->gamma_correction) * 65535);
         CBGR48 palette_color;
         palette_color.r = color;
         palette_color.g = color;
