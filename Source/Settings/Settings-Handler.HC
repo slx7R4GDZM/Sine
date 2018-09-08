@@ -18,6 +18,7 @@ class Settings_Handler
     U8 starting_border;
     Vector2U16 start_resolution;
     Vector2I16 starting_win_pos;
+    Bool mouse_cursor_visible;
     F64 crop_ratio;
     F64 gamma_correction;
     Bool frame_limiter_mode;
@@ -54,6 +55,7 @@ U0 set_up_startup_window(Settings_Handler* settings)
     pos.y = get_start_position(settings->starting_win_pos.y, border, Fs->win_top);
 
     set_position_and_resolution(settings->start_resolution, pos, border);
+    ms.show = settings->mouse_cursor_visible;
 }
 
 F64 clamp_F64_string(CDoc* std_out, U8* setting, U8* value, F64 min_value, F64 max_value)
@@ -133,6 +135,8 @@ U0 parse_settings(Settings_Handler* settings, CDoc* std_out, U8* setting, U8* va
         if (settings->starting_win_pos.y != -1)
             settings->starting_win_pos.y = round_to_eights(settings->starting_win_pos.y);
     }
+    else if (StrCmp(setting, "Mouse-Cursor-Visible") == 0)
+        settings->mouse_cursor_visible = clamp_I64_string(std_out, setting, value, FALSE, TRUE);
     else if (StrCmp(setting, "Crop-Ratio") == 0)
         settings->crop_ratio = clamp_F64_string(std_out, setting, value, FLT_MIN, F64_MAX);
     else if (StrCmp(setting, "Gamma-Correction") == 0)
@@ -301,6 +305,7 @@ U0 output_settings(Settings_Handler* settings, CDoc* std_out)
     DocPrint(std_out, "\nStarting-Y-Resolution = %u", settings->start_resolution.y);
     DocPrint(std_out, "\nStart-Window-Position-X = %d", settings->starting_win_pos.x);
     DocPrint(std_out, "\nStart-Window-Position-Y = %d", settings->starting_win_pos.y);
+    DocPrint(std_out, "\nMouse-Cursor-Visible = %u", settings->mouse_cursor_visible);
 
     DocPrint(std_out, "\n----------------------------------------");
     DocPrint(std_out, "\nCrop-Ratio = %n", settings->crop_ratio);

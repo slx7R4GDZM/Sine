@@ -144,6 +144,11 @@ U16 SPANISH_TEXT_TABLE[74] =
 "Start-Window-Position-X 0\n"                                                      \
 "Start-Window-Position-Y 0\n"                                                      \
 "\n"                                                                               \
+"## Mouse cursor visibility\n"                                                     \
+"# 0 = Hidden (default)\n"                                                         \
+"# 1 = Visible\n"                                                                  \
+"Mouse-Cursor-Visible 0\n"                                                         \
+"\n"                                                                               \
 "#==============================================================================\n"\
 "# Graphics Settings\n"                                                            \
 "#==============================================================================\n"\

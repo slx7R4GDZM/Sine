@@ -1,4 +1,5 @@
 add
+	figure out how to get TempleOS running at 60 FPS without a reboot
 	a way of detecting if the current window is active
 	a way to resize windows in realtime?
 	spawn safety for saucer

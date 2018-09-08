@@ -17,6 +17,7 @@ U0 main()
 
     DCFill();
     FlushMsgs();
+    ms.show = TRUE;
     SettingsPop();
     AutoComplete(keep_auto_complete_on);
     DocInsDoc(DocPut(), print_later);
