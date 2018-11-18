@@ -1,5 +1,4 @@
 add
-	spawn safety for saucer
 	small saucer aiming
 	some way to simulate analog sound
 	sounds

@@ -4,9 +4,9 @@ Sine is an unfinished remake of Asteroids that I've made using C++ and [SFML](ht
 
 ## Screenshots
 
-| In-game                                                          | High score entry                                                                                                   |
-|------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| ![Firing at some Asteroids in Sine](Media/In-game.png "In-game") | ![Entering initials on the high score screen after beating a score](Media/High-score-entry.png "High score entry") |
+| In-game                                                | High score entry                                                                                |
+|--------------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| ![Firing at some asteroids in Sine](Media/In-game.png) | ![Entering initials on the high score screen after beating a score](Media/High-score-entry.png) |
 
 ## Download
 

@@ -32,7 +32,7 @@ void draw_message(const u16 message[], const u8 iteration, Vector_Generator& vec
     bool done = false;
     for (u8 i = iteration; !done; i++)
     {
-        for (u8 c = 2; !done && c != UINT8_MAX; c--)
+        for (u8 c = 2; !done && c < 3; c--)
         {
             const u8 character = (message[i] >> (c * 5 + 1)) & 0x1F;
             if (character == 0) // null
@@ -54,7 +54,7 @@ void draw_character(const u8 character, Vector_Generator& vector_generator, Rend
 
 void draw_player_score(const u8 player, const Score score[], Vector_Generator& vector_generator, RenderWindow& window, const bool brighten)
 {
-    const u8 x = (player == 0 ? 25 : 192);
+    const u8 x = player == 0 ? 25 : 192;
     set_position_and_size(x, 219, MUL_2, vector_generator, window);
     draw_number(score[player].points, 2, vector_generator, window, true, brighten);
 }
@@ -62,7 +62,7 @@ void draw_player_score(const u8 player, const Score score[], Vector_Generator& v
 void draw_number(const u8 number[], const u8 num_size, Vector_Generator& vector_generator, RenderWindow& window, const bool add_zero, const bool brighten)
 {
     bool drawn_digit = false;
-    for (u8 i = num_size - 1; i != UINT8_MAX; i--)
+    for (u8 i = num_size - 1; i < num_size; i--)
     {
         draw_digit(number[i] >> 4, drawn_digit, false, brighten, vector_generator, window);
         draw_digit(number[i] & 0xF, drawn_digit, i == 0, brighten, vector_generator, window);

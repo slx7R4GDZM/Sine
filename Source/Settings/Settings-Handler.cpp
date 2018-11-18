@@ -12,7 +12,7 @@
 #include "../Other/Text.h"
 
 Settings_Handler::Settings_Handler()
-    : button_key{Kb::Space, Kb::E, Kb::Left, Kb::Down, Kb::Right, Kb::Num1, Kb::Num2, Kb::W, Kb::D, Kb::A, Kb::F11, Kb::Escape}
+    : button_key_code{Kb::Space, Kb::E, Kb::Left, Kb::Down, Kb::Right, Kb::Num1, Kb::Num2, Kb::W, Kb::D, Kb::A, Kb::F11, Kb::Escape}
     , option_switch{ENGLISH, 1, 0, 0, 2}
     , starting_window_mode(WIN_NORMAL)
     , fallback_res(1024, 790)
@@ -96,19 +96,19 @@ void Settings_Handler::parse_buttons(const string& setting, const string& value)
     if (current_button != INVALID_BUTTON)
     {
         Kb::Key key = Kb::Unknown;
-        for (u8 i = 0; i < TOTAL_KEYS && key == Kb::Unknown; i++)
+        for (u8 i = 0; i < Kb::KeyCount && key == Kb::Unknown; i++)
         {
             if (value == KEY_TABLE[i])
             {
                 key = Kb::Key(i);
-                button_key[current_button] = Kb::Key(i);
+                button_key_code[current_button] = Kb::Key(i);
             }
         }
         if (key == Kb::Unknown)
         {
             cerr << "Invalid key \"" << value << "\" used for button " << setting << '\n';
             cerr << "Button " << setting
-                 << " defaulting to key " << KEY_TABLE[button_key[current_button]] << '\n';
+                 << " defaulting to key " << KEY_TABLE[button_key_code[current_button]] << '\n';
         }
     }
     else
@@ -271,7 +271,7 @@ void Settings_Handler::output_settings() const
 {
     clog << "----------------------------------------";
     for (u8 i = 0; i < TOTAL_BUTTONS; i++)
-        clog << '\n' << std::setw(19) << BUTTON_TABLE[i] << " = " << KEY_TABLE[button_key[i]];
+        clog << '\n' << std::setw(19) << BUTTON_TABLE[i] << " = " << KEY_TABLE[button_key_code[i]];
 
     clog << "\n----------------------------------------";
     clog << "\nLanguage = " << static_cast<u16>(option_switch.language);
@@ -297,9 +297,9 @@ void Settings_Handler::output_settings() const
     clog << "\n----------------------------------------\n";
 }
 
-Kb::Key Settings_Handler::get_button_key(const Button button) const
+Kb::Key Settings_Handler::get_button_key_code(const Button button) const
 {
-    return button_key[button];
+    return button_key_code[button];
 }
 
 Option_Switch Settings_Handler::get_option_switch() const

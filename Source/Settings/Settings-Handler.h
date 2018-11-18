@@ -11,7 +11,7 @@ class fstream;
 class Settings_Handler
 {
 private:
-    Kb::Key button_key[TOTAL_BUTTONS];
+    Kb::Key button_key_code[TOTAL_BUTTONS];
     Option_Switch option_switch;
 
     // some of these can probably be made to be temporary
@@ -46,7 +46,7 @@ public:
     void toggle_fullscreen(RenderWindow& win);
 
     void output_settings() const;
-    Kb::Key get_button_key(const Button button) const;
+    Kb::Key get_button_key_code(const Button button) const;
     Option_Switch get_option_switch() const;
     sf::Vector2u get_resolution() const;
     Inactive_Mode get_inactive_mode() const;

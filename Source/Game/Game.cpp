@@ -50,7 +50,10 @@ Game::Game()
     player[0].asteroid_count = 0;
     player[0].saucer_spawn_and_shot_time = 0;
     player[0].saucer_spawn_time_start = 0;
+    player[0].block_saucer_spawn_time = 0;
+    player[1].block_saucer_spawn_time = 0;
     player[0].asteroid_wave_spawn_time = 0;
+    player[0].asteroids_to_slow_saucer_spawn = 0;
 
     // main loop
     while (window.isOpen())
@@ -326,12 +329,9 @@ void Game::handle_game_start()
         player[i].saucer_spawn_and_shot_time = 146;
         player[i].saucer_spawn_time_start = 146;
         player[i].ship_spawn_timer = 1;
+        player[i].asteroid_wave_spawn_time = 127;
+        player[i].asteroids_to_slow_saucer_spawn = 5;
     }
-    player[0].asteroid_wave_spawn_time = 127;
-    if (last_game_player_count == 1)
-        player[1].asteroid_wave_spawn_time = 127;
-    else
-        player[1].asteroid_wave_spawn_time = 0;
 }
 
 void Game::end_game()
@@ -777,12 +777,15 @@ void Game::attempt_asteroid_wave_spawn(Player& player)
         else if (player.asteroids_per_wave == 10)
             player.asteroids_per_wave++;
 
+        player.saucer_spawn_and_shot_time = 127;
+        if (player.asteroids_to_slow_saucer_spawn < 10)
+            player.asteroids_to_slow_saucer_spawn++;
+
         for (u8 i = 0; i < player.asteroids_per_wave; i++)
         {
             player.asteroid[i].spawn_wave_asteroid();
             player.asteroid_count++;
         }
-        player.saucer_spawn_and_shot_time = 127;
     }
 }
 
@@ -803,6 +806,7 @@ void Game::spawn_asteroids_from_wreckage(Player& player, const u8 iteration)
         }
     }
     player.asteroid[iteration].set_status(EXPLOSION_START);
+    player.block_saucer_spawn_time = 80;
 }
 
 void Game::handle_ship_stuff(Player& player)
@@ -891,14 +895,20 @@ void Game::handle_saucer_stuff(Player& player) const
         player.saucer_spawn_and_shot_time--;
         if (player.saucer.get_status() == INDISCERNIBLE)
         {
+            if (player.block_saucer_spawn_time)
+                player.block_saucer_spawn_time--;
+
             if (player.saucer_spawn_and_shot_time == 0)
             {
+                player.saucer_spawn_and_shot_time = 18;
+                if (player.block_saucer_spawn_time && player.asteroid_count >= player.asteroids_to_slow_saucer_spawn)
+                    return;
+
                 const u8 new_saucer_spawn_time_start = player.saucer_spawn_time_start - 6;
                 if (new_saucer_spawn_time_start >= MINIMUM_SAUCER_SPAWN_TIME)
                     player.saucer_spawn_time_start = new_saucer_spawn_time_start;
 
                 player.saucer.spawn(player_score[current_player], player.saucer_spawn_time_start);
-                player.saucer_spawn_and_shot_time = 18;
             }
         }
         else if (player.saucer_spawn_and_shot_time == 0)

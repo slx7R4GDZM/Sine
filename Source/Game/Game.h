@@ -54,8 +54,10 @@ private:
         u8 asteroid_count;
         u8 saucer_spawn_and_shot_time;
         u8 saucer_spawn_time_start;
+        u8 block_saucer_spawn_time;
         u8 ship_spawn_timer;
         u8 asteroid_wave_spawn_time;
+        u8 asteroids_to_slow_saucer_spawn;
     } player[MAX_PLAYERS];
 
     void process_events(Vector_Generator& vector_generator, RenderWindow& window);
