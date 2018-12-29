@@ -61,7 +61,7 @@ private:
     } player[MAX_PLAYERS];
 
     void process_events(Vector_Generator& vector_generator, RenderWindow& window);
-    void limit_FPS(const steady_clock::time_point start_time) const;
+    void limit_FPS(steady_clock::time_point start_time) const;
 
     void draw_multiplayer_scores(Vector_Generator& vector_generator);
     void draw_copyright(Vector_Generator& vector_generator);
@@ -76,9 +76,7 @@ private:
     void attract_mode(Vector_Generator& vector_generator);
     void update_player(Vector_Generator& vector_generator);
 
-    void add_points(const u8 points, const bool bonus);
-    static void add_to_number(u8 number[], const u8 num_size, const u8 to_add, const bool bonus);
-    static bool add_BCD(u8& number, const u8 to_add, const bool overflow);
+    void add_points(u8 points, bool bonus);
 
     void insert_any_new_high_scores();
     void handle_HS_entry(Vector_Generator& vector_generator);
@@ -90,7 +88,8 @@ private:
     static void clear_space_objects(Player& player);
 
     static void attempt_asteroid_wave_spawn(Player& player);
-    static void spawn_asteroids_from_wreckage(Player& player, const u8 iteration);
+    static void crash_asteroid(Player& player, u8 crashed_ast);
+    static bool spawn_asteroid(Player& player, u8 crashed_ast, u8 ast_size, u8& new_ast);
     void handle_ship_stuff(Player& player);
     void handle_saucer_stuff(Player& player) const;
 public:

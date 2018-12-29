@@ -6,42 +6,75 @@
 
 #include <cstdlib>
 
-bool overflowed_u8(const u8 var_current, const u8 var_previous)
+bool operator>(Score score_1, Score score_2)
+{
+    for (u8 i = 1; i != UINT8_MAX; i--)
+    {
+        if (score_1.points[i] > score_2.points[i])
+            return true;
+        if (score_1.points[i] < score_2.points[i])
+            return false;
+    }
+
+    // scores are the same
+    return false;
+}
+
+bool operator<=(Score score_1, Score score_2)
+{
+    return !(score_1 > score_2);
+}
+
+bool overflowed_u8(u8 var_current, u8 var_previous)
 {
     return var_current < var_previous;
 }
 
 // underflow is not the right term for this, better name would be negative_overflowed
-bool underflowed_u8(const u8 var_current, const u8 var_previous)
+bool underflowed_u8(u8 var_current, u8 var_previous)
 {
     return var_current > var_previous;
 }
 
 u8 random_byte()
 {
-    return std::rand() % 256;
+    return std::rand() & 255;
 }
 
-s8 clamp_s8(const s8 value, const s8 min_value, const s8 max_value)
+s8 clamp_s8(s8 value, s8 min_value, s8 max_value)
 {
     if (value < min_value)
         return min_value;
-    else if (value > max_value)
+    if (value > max_value)
         return max_value;
-    else
-        return value;
+
+    return value;
 }
 
-bool operator>(const Score& score_1, const Score& score_2)
+void add_to_number(u8 number[], u8 num_size, u8 to_add, bool bonus)
 {
-    for (u8 i = 1; i != UINT8_MAX; i--)
-    {
-        if (score_1.points[i] > score_2.points[i])
-            return true;
-        else if (score_1.points[i] < score_2.points[i])
-            return false;
-    }
+    bool add_to_next = add_BCD(number[0], to_add, bonus);
+    for (u8 i = 1; i < num_size && add_to_next; i++)
+        add_to_next = add_BCD(number[i], 0, add_to_next);
+}
 
-    // scores are the same
-    return false;
+// this uses binary-coded decimal
+bool add_BCD(u8& number, u8 to_add, bool overflow)
+{
+    u16 new_number = number + to_add + overflow;
+    if ((number & 0xF) + (to_add & 0xF) + overflow > 9)
+        new_number += 6;
+
+    if (new_number > 0x99)
+        new_number += 0x60;
+
+    number = new_number;
+
+    // overflow
+    return new_number > 0x99;
+}
+
+u8 twos_complement(u8 number)
+{
+    return ~number + 1;
 }

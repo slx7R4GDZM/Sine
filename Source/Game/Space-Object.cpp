@@ -8,12 +8,22 @@
 #include "../Other/Constants.h"
 #include "../Other/Vectors.h"
 
+struct Coordinate
+{
+    u16 position_x;
+    u16 position_y;
+};
+
+static void wrap_position(u8& pos_major, u8 max_pos_major);
+static bool hit(u16 pos_1, u16 pos_2, u8 minimum_space);
+static Coordinate get_total_pos(const Position& pos);
+
 Space_Object::Space_Object()
 {
     status = INDISCERNIBLE;
 }
 
-s8 Space_Object::lookup_sine(const u8 direction)
+s8 Space_Object::lookup_sine(u8 direction)
 {
     if (direction <= 64)
         return SINE_TABLE[direction];
@@ -21,11 +31,11 @@ s8 Space_Object::lookup_sine(const u8 direction)
         return SINE_TABLE[128 - direction];
     if (direction <= 192)
         return -SINE_TABLE[direction - 128];
-    else
-        return -SINE_TABLE[256 - direction];
+
+    return -SINE_TABLE[256 - direction];
 }
 
-s8 Space_Object::lookup_cosine(const u8 direction)
+s8 Space_Object::lookup_cosine(u8 direction)
 {
     return lookup_sine(direction + 64);
 }
@@ -38,7 +48,7 @@ void Space_Object::update_position()
     wrap_position(pos.y_major, MAX_Y_POS_MAJOR);
 }
 
-void Space_Object::update_position_axis(u8& pos_major, u8& pos_minor, const s8 vel_major)
+void Space_Object::update_position_axis(u8& pos_major, u8& pos_minor, s8 vel_major)
 {
     const u8 old_pos_minor = pos_minor;
     pos_minor += vel_major;
@@ -55,7 +65,7 @@ void Space_Object::update_position_axis(u8& pos_major, u8& pos_minor, const s8 v
     }
 }
 
-void Space_Object::wrap_position(u8& pos_major, const u8 max_pos_major)
+void wrap_position(u8& pos_major, u8 max_pos_major)
 {
     if (pos_major == 255) // underflowed
         pos_major = max_pos_major;
@@ -63,17 +73,18 @@ void Space_Object::wrap_position(u8& pos_major, const u8 max_pos_major)
         pos_major = 0;
 }
 
-u8 Space_Object::limit_position(const u8 pos_major, const u8 max_pos_major)
+u8 Space_Object::limit_position(u8 pos_major, u8 max_pos_major)
 {
     if (pos_major < 3)
         return 3;
-    else if (pos_major > max_pos_major)
+
+    if (pos_major > max_pos_major)
         return max_pos_major;
-    else
-        return pos_major;
+
+    return pos_major;
 }
 
-bool Space_Object::collide(const Space_Object& object, const u8 minimum_space) const
+bool Space_Object::collide(Space_Object object, u8 minimum_space) const
 {
     if (status && status < TRUE_EXPLOSION_START
      && object.status && object.status < TRUE_EXPLOSION_START)
@@ -87,7 +98,7 @@ bool Space_Object::collide(const Space_Object& object, const u8 minimum_space) c
     return false;
 }
 
-bool Space_Object::hit(const u16 pos_1, const u16 pos_2, const u8 minimum_space)
+bool hit(u16 pos_1, u16 pos_2, u8 minimum_space)
 {
     if (pos_1 < pos_2)
     {
@@ -104,10 +115,10 @@ bool Space_Object::hit(const u16 pos_1, const u16 pos_2, const u8 minimum_space)
 
 void Space_Object::draw_explosion(Vector_Generator& vector_generator, RenderWindow& window) const
 {
-    const Global_Scale scale = static_cast<Global_Scale>((status + 33) / 17);
+    const Global_Scale scale = static_cast<Global_Scale>(((status & 0xF0) + 0x10) >> 4);
     set_position_and_size(scale, vector_generator, window);
 
-    switch (status / 4 % 4)
+    switch (status >> 2 & 3)
     {
     case 0:
         vector_generator.process(EXPLOSION_4, window);
@@ -124,61 +135,24 @@ void Space_Object::draw_explosion(Vector_Generator& vector_generator, RenderWind
     }
 }
 
-void Space_Object::set_position_and_size(const Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window) const
+void Space_Object::set_position_and_size(Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window) const
 {
     // add 128 to y making the 4:3 Space_Object space centered inside the 1:1 DVG space
     const u16 vector_object[] =
     {
-        static_cast<u16>(((LABS << 12) | (pos.y_major << 5) | (pos.y_minor >> 3)) + 128),
-        static_cast<u16>((scale << 12) | (pos.x_major << 5) | (pos.x_minor >> 3)),
-                          (RTSL << 12)
+        static_cast<u16>((LABS << 12 | pos.y_major << 5 | pos.y_minor >> 3) + 128),
+        static_cast<u16>(scale << 12 | pos.x_major << 5 | pos.x_minor >> 3),
+                          RTSL << 12
     };
     vector_generator.process(vector_object, window);
 }
 
-Coordinate Space_Object::get_total_pos(const Position& pos)
+Coordinate get_total_pos(const Position& pos)
 {
     const Coordinate total_pos =
     {
-        static_cast<u16>(pos.x_major * 256 + pos.x_minor),
-        static_cast<u16>(pos.y_major * 256 + pos.y_minor)
+        static_cast<u16>(pos.x_major << 8 | pos.x_minor),
+        static_cast<u16>(pos.y_major << 8 | pos.y_minor)
     };
     return total_pos;
-}
-
-u8 Space_Object::get_status() const
-{
-    return status;
-}
-
-s8 Space_Object::get_vel_x() const
-{
-    return vel_x_major;
-}
-
-s8 Space_Object::get_vel_y() const
-{
-    return vel_y_major;
-}
-
-Position Space_Object::get_position() const
-{
-    return pos;
-}
-
-void Space_Object::set_status(const u8 status)
-{
-    this->status = status;
-}
-
-void Space_Object::set_velocity(const s8 vel_x_major, const s8 vel_y_major)
-{
-    this->vel_x_major = vel_x_major;
-    this->vel_y_major = vel_y_major;
-}
-
-void Space_Object::set_position_major(const u8 pos_x_major, const u8 pos_y_major)
-{
-    pos.x_major = pos_x_major;
-    pos.y_major = pos_y_major;
 }

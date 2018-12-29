@@ -11,6 +11,8 @@
 #include <iomanip>
 #include "../Other/Text.h"
 
+static string get_next(const string& line, unsigned& position);
+
 Settings_Handler::Settings_Handler()
     : button_key_code{Kb::Space, Kb::E, Kb::Left, Kb::Down, Kb::Right, Kb::Num1, Kb::Num2, Kb::W, Kb::D, Kb::A, Kb::F11, Kb::Escape}
     , option_switch{ENGLISH, 1, 0, 0, 2}
@@ -45,40 +47,42 @@ Settings_Handler::Settings_Handler()
 void Settings_Handler::parse_file_settings(std::ifstream& input)
 {
     string line;
-    string settings[2]; // setting, value
     while (std::getline(input, line))
     {
-        unsigned int x = 0;
-        int start = 0;
-        for (int i = 0; i < 2 && x <= line.length(); i++)
+        unsigned line_pos = 0;
+        const string setting = get_next(line, line_pos);
+        if (setting.size() && setting[0] != '#')
         {
-            bool started = false;
-            bool finished = false;
-            for (x = start; x <= line.length() && !finished; x++)
-            {
-                if (!started && isgraph(line[x]))
-                {
-                    start = x;
-                    started = true;
-                }
-                else if (started && !isgraph(line[x]))
-                {
-                    finished = true;
-                    settings[i] = line.substr(start, x - start);
-                    start = x;
-                }
-            }
-        }
-        if (settings[0][0] != '#' && !settings[1].empty())
-        {
-            if (settings[0][0] == 'B')
-                parse_buttons(settings[0], settings[1]);
+            const string value = get_next(line, line_pos);
+            if (value.empty())
+                continue;
+            if (setting[0] == 'B')
+                parse_buttons(setting, value);
             else
-                parse_settings(settings[0], settings[1]);
+                parse_settings(setting, value);
         }
-        settings[0].clear();
-        settings[1].clear();
     }
+}
+
+string get_next(const string& line, unsigned& position)
+{
+    // move past the whitespace
+    while (position < line.size() && !std::isgraph(line[position]))
+        position++;
+
+    // grab the usable text
+    string output;
+    int i;
+    for (i = 0; position + i <= line.size(); i++)
+    {
+        if (!std::isgraph(line[position + i]))
+        {
+            output = line.substr(position, i);
+            break;
+        }
+    }
+    position += i + 1;
+    return output;
 }
 
 void Settings_Handler::parse_buttons(const string& setting, const string& value)
@@ -93,26 +97,27 @@ void Settings_Handler::parse_buttons(const string& setting, const string& value)
     }
 
     // determine if the key choice exists
-    if (current_button != INVALID_BUTTON)
+    if (current_button == INVALID_BUTTON)
     {
-        Kb::Key key = Kb::Unknown;
-        for (u8 i = 0; i < Kb::KeyCount && key == Kb::Unknown; i++)
+        cerr << "Invalid button \"" << setting << "\"\n";
+        return;
+    }
+
+    Kb::Key key = Kb::Unknown;
+    for (u8 i = 0; i < Kb::KeyCount && key == Kb::Unknown; i++)
+    {
+        if (value == KEY_TABLE[i])
         {
-            if (value == KEY_TABLE[i])
-            {
-                key = Kb::Key(i);
-                button_key_code[current_button] = Kb::Key(i);
-            }
-        }
-        if (key == Kb::Unknown)
-        {
-            cerr << "Invalid key \"" << value << "\" used for button " << setting << '\n';
-            cerr << "Button " << setting
-                 << " defaulting to key " << KEY_TABLE[button_key_code[current_button]] << '\n';
+            key = Kb::Key(i);
+            button_key_code[current_button] = Kb::Key(i);
         }
     }
-    else
-        cerr << "Invalid button \"" << setting << "\"\n";
+    if (key == Kb::Unknown)
+    {
+        cerr << "Invalid key \"" << value << "\" used for button " << setting << '\n';
+        cerr << "Button " << setting
+             << " defaulting to key " << KEY_TABLE[button_key_code[current_button]] << '\n';
+    }
 }
 
 void Settings_Handler::parse_settings(const string& setting, const string& value)
@@ -157,21 +162,20 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
 }
 
 template <typename T>
-T Settings_Handler::clamp_string_value(const string& setting, const string& value, const T min_v, const T max_v)
+T Settings_Handler::clamp_string_value(const string& setting, const string& value, T min_v, T max_v)
 {
     const T var_v = static_cast<T>(std::stod(value));
     if (var_v >= min_v && var_v <= max_v)
         return var_v;
-    else if (var_v < min_v)
+
+    if (var_v < min_v)
     {
         cerr << "Value for setting " << setting << " is too low, limiting it to " << min_v << '\n';
         return min_v;
     }
-    else
-    {
-        cerr << "Value for setting " << setting << " is too high, limiting it to " << max_v << '\n';
-        return max_v;
-    }
+
+    cerr << "Value for setting " << setting << " is too high, limiting it to " << max_v << '\n';
+    return max_v;
 }
 
 void Settings_Handler::create_startup_window(RenderWindow& win)
@@ -242,7 +246,7 @@ void Settings_Handler::create_window(RenderWindow& win)
     win.setVerticalSyncEnabled(enable_v_sync);
 }
 
-void Settings_Handler::resize_window(const sf::Vector2u new_res, RenderWindow& win)
+void Settings_Handler::resize_window(sf::Vector2u new_res, RenderWindow& win)
 {
     current_res = new_res;
     if (current_res.x == 0 || current_res.y == 0)
@@ -297,7 +301,7 @@ void Settings_Handler::output_settings() const
     clog << "\n----------------------------------------\n";
 }
 
-Kb::Key Settings_Handler::get_button_key_code(const Button button) const
+Kb::Key Settings_Handler::get_button_key_code(Button button) const
 {
     return button_key_code[button];
 }

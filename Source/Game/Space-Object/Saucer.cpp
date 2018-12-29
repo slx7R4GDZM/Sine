@@ -8,7 +8,7 @@
 #include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
-void Saucer::spawn(const Score player_score, const u8 saucer_spawn_time_start)
+void Saucer::spawn(Score player_score, u8 saucer_spawn_time_start)
 {
     if (saucer_spawn_time_start >= 128)
         status = LARGE_SAUCER;
@@ -25,18 +25,17 @@ void Saucer::spawn(const Score player_score, const u8 saucer_spawn_time_start)
         }
     }
 
-    const u8 x_random = random_byte();
-    if (x_random < 128)
-    {
-        vel_x_major = -16;
-        pos.x_major = 31;
-        pos.x_minor = 255;
-    }
-    else
+    if (random_byte() & 0x80)
     {
         vel_x_major = 16;
         pos.x_major = 0;
         pos.x_minor = 0;
+    }
+    else
+    {
+        vel_x_major = -16;
+        pos.x_major = 31;
+        pos.x_minor = 255;
     }
 
     const u8 y_random = random_byte();
@@ -45,16 +44,16 @@ void Saucer::spawn(const Score player_score, const u8 saucer_spawn_time_start)
     if (pos.y_major > 23)
         pos.y_major -= 8;
 
-    pos.y_minor = y_random * 32 % 256;
+    pos.y_minor = (y_random & 7) * 32;
 }
 
-void Saucer::crash(u8& saucer_spawn_time, const u8 saucer_spawn_time_start)
+void Saucer::crash(u8& saucer_spawn_time, u8 saucer_spawn_time_start)
 {
     status = EXPLOSION_START;
     saucer_spawn_time = saucer_spawn_time_start;
 }
 
-void Saucer::update(const u8 fast_timer, u8& saucer_spawn_time, const u8 saucer_spawn_time_start, Vector_Generator& vector_generator, RenderWindow& window)
+void Saucer::update(u8 fast_timer, u8& saucer_spawn_time, u8 saucer_spawn_time_start, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (status == LARGE_SAUCER || status == SMALL_SAUCER)
     {
@@ -71,19 +70,19 @@ void Saucer::update(const u8 fast_timer, u8& saucer_spawn_time, const u8 saucer_
     else if (status >= TRUE_EXPLOSION_START)
     {
         draw_explosion(vector_generator, window);
-        status += 16 - (status - 1) / 16;
+        status += (twos_complement(status) >> 4) + 1;
     }
 }
 
 void Saucer::determine_vertical_velocity()
 {
-    switch (random_byte() % 4)
+    switch (random_byte() & 3)
     {
     case 0:
-        vel_y_major = 16;
-        break;
-    case 1:
         vel_y_major = -16;
+        break;
+    case 3:
+        vel_y_major = 16;
         break;
     default:
         vel_y_major = 0;
@@ -91,7 +90,7 @@ void Saucer::determine_vertical_velocity()
     }
 }
 
-void Saucer::attempt_remove(const u8 old_pos_x_major, u8& saucer_spawn_time, const u8 saucer_spawn_time_start)
+void Saucer::attempt_remove(u8 old_pos_x_major, u8& saucer_spawn_time, u8 saucer_spawn_time_start)
 {
     if ((vel_x_major < 0 && pos.x_major > old_pos_x_major)
      || (vel_x_major > 0 && pos.x_major < old_pos_x_major))
@@ -101,22 +100,22 @@ void Saucer::attempt_remove(const u8 old_pos_x_major, u8& saucer_spawn_time, con
     }
 }
 
-u8 Saucer::get_size(const bool bonus) const
+u8 Saucer::get_size(bool bonus) const
 {
     if (status == SMALL_SAUCER && bonus)
         return BONUS_SIZE_3;
-    else if (status == LARGE_SAUCER)
+    if (status == LARGE_SAUCER)
         return LARGE_SAUCER_SIZE + (bonus ? BONUS_SIZE_2 : 0);
-    else
-        return 0;
+
+    return 0;
 }
 
 u8 Saucer::get_points() const
 {
     if (status == LARGE_SAUCER)
         return LARGE_SAUCER_POINTS;
-    else
-        return SMALL_SAUCER_POINTS;
+
+    return SMALL_SAUCER_POINTS;
 }
 
 void Saucer::draw(Vector_Generator& vector_generator, RenderWindow& window) const

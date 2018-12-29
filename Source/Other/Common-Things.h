@@ -150,14 +150,13 @@ struct Offset
     u8 major;
 };
 
-struct Velocity
-{
-    s8 x;
-    s8 y;
-};
+bool operator> (Score score_1, Score score_2);
+bool operator<=(Score score_1, Score score_2);
 
-bool overflowed_u8(const u8 var_current, const u8 var_previous);
-bool underflowed_u8(const u8 var_current, const u8 var_previous);
+bool overflowed_u8(u8 var_current, u8 var_previous);
+bool underflowed_u8(u8 var_current, u8 var_previous);
 u8 random_byte();
-s8 clamp_s8(const s8 value, const s8 min_value, const s8 max_value);
-bool operator>(const Score& score_1, const Score& score_2);
+s8 clamp_s8(s8 value, s8 min_value, s8 max_value);
+void add_to_number(u8 number[], u8 num_size, u8 to_add, bool bonus);
+bool add_BCD(u8& number, u8 to_add, bool overflow);
+u8 twos_complement(u8 number);

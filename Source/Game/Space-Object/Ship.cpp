@@ -9,6 +9,10 @@
 #include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
+static void negative_vel_change(s8& vel_major, u8& vel_minor, u8 old_vel_minor);
+static void positive_vel_change(s8& vel_major, u8& vel_minor, u8 old_vel_minor);
+static void dampen_velocity_axis(s8& vel_major, u8& vel_minor);
+
 void Ship::spawn()
 {
     vel_x_major = 0;
@@ -23,18 +27,18 @@ void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
     ship_spawn_timer = 129;
 }
 
-void Ship::update(const u8 fast_timer, const u8 direction, Offset explosion_x[], Offset explosion_y[], const bool thrusting, Vector_Generator& vector_generator, RenderWindow& window)
+void Ship::update(u8 fast_timer, u8 direction, Offset explosion_x[], Offset explosion_y[], bool thrusting, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (status == ALIVE)
     {
         update_position();
-        const bool draw_thrust = thrusting && fast_timer % 8 >= 4;
+        const bool draw_thrust = thrusting && fast_timer & 4;
         draw(direction, draw_thrust, vector_generator, window);
     }
     else if (status >= TRUE_EXPLOSION_START)
     {
         handle_explosion(explosion_x, explosion_y, vector_generator, window);
-        if (fast_timer % 2)
+        if (fast_timer & 1)
         {
             status++;
             if (status == INDISCERNIBLE)
@@ -43,7 +47,7 @@ void Ship::update(const u8 fast_timer, const u8 direction, Offset explosion_x[],
     }
 }
 
-void Ship::add_thrust(const u8 direction, u8& vel_x_minor, u8& vel_y_minor)
+void Ship::add_thrust(u8 direction, u8& vel_x_minor, u8& vel_y_minor)
 {
     // x
     const u8 old_vel_x_minor = vel_x_minor;
@@ -64,13 +68,13 @@ void Ship::add_thrust(const u8 direction, u8& vel_x_minor, u8& vel_y_minor)
         positive_vel_change(vel_y_major, vel_y_minor, old_vel_y_minor);
 }
 
-void Ship::negative_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_minor)
+void negative_vel_change(s8& vel_major, u8& vel_minor, u8 old_vel_minor)
 {
     if (underflowed_u8(vel_minor, old_vel_minor))
         vel_major == MIN_VEL ? vel_minor = 1 : vel_major--;
 }
 
-void Ship::positive_vel_change(s8& vel_major, u8& vel_minor, const u8 old_vel_minor)
+void positive_vel_change(s8& vel_major, u8& vel_minor, u8 old_vel_minor)
 {
     if (overflowed_u8(vel_minor, old_vel_minor))
         vel_major == MAX_VEL ? vel_minor = 255 : vel_major++;
@@ -82,7 +86,7 @@ void Ship::dampen_velocity(u8& vel_x_minor, u8& vel_y_minor)
     dampen_velocity_axis(vel_y_major, vel_y_minor);
 }
 
-void Ship::dampen_velocity_axis(s8& vel_major, u8& vel_minor)
+void dampen_velocity_axis(s8& vel_major, u8& vel_minor)
 {
     if (vel_major < 0) // reduction of 2 to 128
     {
@@ -100,7 +104,7 @@ void Ship::dampen_velocity_axis(s8& vel_major, u8& vel_minor)
     }
 }
 
-void Ship::draw(const u8 direction, const bool draw_thrust, Vector_Generator& vector_generator, RenderWindow& window) const
+void Ship::draw(u8 direction, bool draw_thrust, Vector_Generator& vector_generator, RenderWindow& window) const
 {
     bool flip_x = false;
     bool flip_y = false;
@@ -141,8 +145,8 @@ void Ship::handle_explosion(Offset explosion_x[], Offset explosion_y[], Vector_G
         const u16 delta_x = update_explosion_offset(explosion_x[i], EXPLOSION_VELOCITY[i].x);
         const u16 delta_y = update_explosion_offset(explosion_y[i], EXPLOSION_VELOCITY[i].y);
 
-        const u16 word_0 = (VCTR_9 << 12) | delta_y;
-        const u16 word_1 =                  delta_x;
+        const u16 word_0 = VCTR_9 << 12 | delta_y;
+        const u16 word_1 =                delta_x;
 
         const u16 explosion_part[] =
         {
@@ -172,7 +176,7 @@ void Ship::handle_explosion(Offset explosion_x[], Offset explosion_y[], Vector_G
     vector_generator.process(vector_object, window);
 }
 
-u16 Ship::update_explosion_offset(Offset& offset, const s8 velocity) const
+u16 Ship::update_explosion_offset(Offset& offset, s8 velocity) const
 {
     if (status < 162)
         offset.major = velocity >> 4;
@@ -184,5 +188,5 @@ u16 Ship::update_explosion_offset(Offset& offset, const s8 velocity) const
         long_vector_delta -= 256;
 
     // return VCTR delta equivalent to explosion offset
-    return ((velocity < 0) << 10) | std::abs(long_vector_delta);
+    return (velocity < 0) << 10 | std::abs(long_vector_delta);
 }

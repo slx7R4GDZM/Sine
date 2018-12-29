@@ -8,58 +8,58 @@
 #include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
+static s8 set_asteroid_velocity(s8 old_velocity);
+
 void Asteroid::spawn_wave_asteroid()
 {
-    status = random_byte() / 8 * 8 % 32 + 4;
-    vel_x_major = get_starting_velocity();
-    vel_y_major = get_starting_velocity();
+    status = (random_byte() & ASTEROID_TYPE) | LARGE_ASTEROID;
+    vel_x_major = set_asteroid_velocity(0);
+    vel_y_major = set_asteroid_velocity(0);
 
     const u8 random = random_byte();
-    if (random % 2)
+    if (random & 1)
     {
         pos.x_major = 0;
-        pos.y_major = random / 2 % 32;
+        pos.y_major = random / 2 & 31;
         if (pos.y_major >= 24)
             pos.y_major -= 8;
     }
     else
     {
-        pos.x_major = random / 2 % 32;
-        pos.y_major = 0;
+        pos.x_major = random / 2 & 31;
         pos.y_major = 0;
     }
     pos.x_minor = 0;
     pos.y_minor = 0;
 }
 
-void Asteroid::spawn_crash_asteroid(const u8 status, const Position pos)
+void Asteroid::spawn_split_asteroid(u8 asteroid_size, s8 vel_x, s8 vel_y, Position pos)
 {
-    this->status = random_byte() / 8 * 8 % 32 + ((status & 0x07) >> 1);
+    status = (random_byte() & ASTEROID_TYPE) | asteroid_size >> 1;
+    vel_x_major = set_asteroid_velocity(vel_x);
+    vel_y_major = set_asteroid_velocity(vel_y);
     this->pos = pos;
-    vel_x_major = get_starting_velocity();
-    vel_y_major = get_starting_velocity();
 }
 
-s8 Asteroid::get_starting_velocity() const
+s8 set_asteroid_velocity(s8 old_velocity)
 {
-    u8 random = random_byte();
-    if (random < 128)
-        random %= 16;
-    else
-        random = random % 16 + 16;
+    // random offset from -16 to 15
+    s8 offset = random_byte() & 0x8F;
+    if (offset < 0)
+        offset |= 0xF0;
 
-    switch (status & 0x07)
-    {
-    case 4:
-        return LARGE_ASTEROID_SPAWN_VELOCITY[random];
-        break;
-    case 2:
-        return MEDIUM_ASTEROID_SPAWN_VELOCITY[random];
-        break;
-    case 1:
-        return SMALL_ASTEROID_SPAWN_VELOCITY[random];
-        break;
-    }
+    s8 velocity = old_velocity + offset;
+    if (velocity < 0)
+        velocity = clamp_s8(velocity, -31, -6);
+    else
+        velocity = clamp_s8(velocity,   6, 31);
+
+    return velocity;
+}
+
+void Asteroid::offset_position(u8& pos_minor, s8 vel_major)
+{
+    pos_minor ^= (vel_major & 31) * 2;
 }
 
 void Asteroid::update(u8& asteroid_count, u8& asteroid_wave_spawn_time, Vector_Generator& vector_generator, RenderWindow& window)
@@ -72,7 +72,7 @@ void Asteroid::update(u8& asteroid_count, u8& asteroid_wave_spawn_time, Vector_G
     else if (status >= TRUE_EXPLOSION_START)
     {
         draw_explosion(vector_generator, window);
-        status += 16 - (status - 1) / 16;
+        status += (twos_complement(status) >> 4) + 1;
         if (status == INDISCERNIBLE)
         {
             asteroid_count--;
@@ -84,15 +84,15 @@ void Asteroid::update(u8& asteroid_count, u8& asteroid_wave_spawn_time, Vector_G
 
 u8 Asteroid::get_size() const
 {
-    switch (status & 0x07)
+    switch (status & ASTEROID_SIZE)
     {
-    case 4:
+    case LARGE_ASTEROID:
         return LARGE_ASTEROID_SIZE;
         break;
-    case 2:
+    case MEDIUM_ASTEROID:
         return MEDIUM_ASTEROID_SIZE;
         break;
-    case 1:
+    case SMALL_ASTEROID:
         return SMALL_ASTEROID_SIZE;
         break;
     }
@@ -100,15 +100,15 @@ u8 Asteroid::get_size() const
 
 u8 Asteroid::get_points() const
 {
-    switch (status & 0x07)
+    switch (status & ASTEROID_SIZE)
     {
-    case 4:
+    case LARGE_ASTEROID:
         return LARGE_ASTEROID_POINTS;
         break;
-    case 2:
+    case MEDIUM_ASTEROID:
         return MEDIUM_ASTEROID_POINTS;
         break;
-    case 1:
+    case SMALL_ASTEROID:
         return SMALL_ASTEROID_POINTS;
         break;
     }
@@ -117,15 +117,15 @@ u8 Asteroid::get_points() const
 void Asteroid::draw(Vector_Generator& vector_generator, RenderWindow& window) const
 {
     Global_Scale scale;
-    switch (status & 0x07)
+    switch (status & ASTEROID_SIZE)
     {
-    case 4:
+    case LARGE_ASTEROID:
         scale = MUL_1;
         break;
-    case 2:
+    case MEDIUM_ASTEROID:
         scale = DIV_2;
         break;
-    case 1:
+    case SMALL_ASTEROID:
         scale = DIV_4;
         break;
     }

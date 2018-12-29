@@ -20,12 +20,12 @@ void Input_Handler::update(const Settings_Handler& settings_handler)
     }
 }
 
-bool Input_Handler::is_pressed(const Button button) const
+bool Input_Handler::is_pressed(Button button) const
 {
     return button_held[button];
 }
 
-bool Input_Handler::on_press(const Button button) const
+bool Input_Handler::on_press(Button button) const
 {
     return button_pushed[button];
 }
