@@ -42,6 +42,15 @@ Or you can copy the directory to disk to run it:
     Cd("Sine");
     #include "Main";
 
+## Running at 60 FPS
+
+This will make TempleOS 60 FPS, but it might break other programs.
+
+1. Open ```C:/Kernel/KernelA.HH```.
+2. Assuming TempleOS 5.03, go to line 1478.
+3. Edit ```WINMGR_FPS``` and ```WINMGR_PERIOD``` to use 60000.0 instead of 30000.0.
+4. Reboot TempleOS.
+
 ## What's with the strange constants?
 
 The vector and text constants were made with [Sine Toolkit](https://github.com/slx7R4GDZM/Sine-Toolkit).

@@ -41,6 +41,7 @@ static U8 SINE_TABLE[65] =
 };
 
 // spaceobjects
+#define INDISCERNIBLE 0
 #define TRUE_EXPLOSION_START 128
 #define EXPLOSION_START 160
 #define BONUS_SIZE_1 71
@@ -70,7 +71,6 @@ static I8 SMALL_ASTEROID_SPAWN_VELOCITY[32] = {0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x1
 #define MINIMUM_SAUCER_SPAWN_TIME 32
 
 // ship
-#define INDISCERNIBLE 0
 #define ALIVE 1
 #define MIN_VEL -64
 #define MAX_VEL 63

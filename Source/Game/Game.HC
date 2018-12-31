@@ -55,8 +55,10 @@ class Player
     U8 asteroid_count;
     U8 saucer_spawn_and_shot_time;
     U8 saucer_spawn_time_start;
+    U8 block_saucer_spawn_time;
     U8 ship_spawn_timer;
     U8 asteroid_wave_spawn_time;
+    U8 asteroids_to_slow_saucer_spawn;
 } player[MAX_PLAYERS];
 
 U0 handle_saucer_stuff(Player* player)
@@ -66,14 +68,21 @@ U0 handle_saucer_stuff(Player* player)
         player->saucer_spawn_and_shot_time--;
         if (player->saucer.status == INDISCERNIBLE)
         {
+            if (player->block_saucer_spawn_time)
+                player->block_saucer_spawn_time--;
+
             if (player->saucer_spawn_and_shot_time == 0)
             {
+                player->saucer_spawn_and_shot_time = 18;
+                if (player->block_saucer_spawn_time
+                 && player->asteroid_count >= player->asteroids_to_slow_saucer_spawn)
+                    return;
+
                 U8 new_saucer_spawn_time_start = player->saucer_spawn_time_start - 6;
                 if (new_saucer_spawn_time_start >= MINIMUM_SAUCER_SPAWN_TIME)
                     player->saucer_spawn_time_start = new_saucer_spawn_time_start;
 
                 spawn_saucer(&player->saucer, player_score[current_player], player->saucer_spawn_time_start);
-                player->saucer_spawn_and_shot_time = 18;
             }
         }
         else if (player->saucer_spawn_and_shot_time == 0)
@@ -190,6 +199,7 @@ U0 spawn_asteroids_from_wreckage(Player* player, U8 iteration)
         }
     }
     player->asteroid[iteration].status = EXPLOSION_START;
+    player->block_saucer_spawn_time = 80;
 }
 
 U0 attempt_asteroid_wave_spawn(Player* player)
@@ -204,13 +214,16 @@ U0 attempt_asteroid_wave_spawn(Player* player)
         else if (player->asteroids_per_wave == 10)
             player->asteroids_per_wave++;
 
+        player->saucer_spawn_and_shot_time = 127;
+        if (player->asteroids_to_slow_saucer_spawn < 10)
+            player->asteroids_to_slow_saucer_spawn++;
+
         U64 i;
         for (i = 0; i < player->asteroids_per_wave; i++)
         {
             spawn_wave_asteroid(&player->asteroid[i]);
             player->asteroid_count++;
         }
-        player->saucer_spawn_and_shot_time = 127;
     }
 }
 
@@ -678,12 +691,9 @@ U0 handle_game_start()
         player[i].saucer_spawn_and_shot_time = 146;
         player[i].saucer_spawn_time_start = 146;
         player[i].ship_spawn_timer = 1;
+        player[i].asteroid_wave_spawn_time = 127;
+        player[i].asteroids_to_slow_saucer_spawn = 5;
     }
-    player[0].asteroid_wave_spawn_time = 127;
-    if (last_game_player_count == 1)
-        player[1].asteroid_wave_spawn_time = 127;
-    else
-        player[1].asteroid_wave_spawn_time = 0;
 }
 
 U0 attempt_game_start()
@@ -896,7 +906,10 @@ U0 initialize_memory()
     player[0].asteroid_count = 0;
     player[0].saucer_spawn_and_shot_time = 0;
     player[0].saucer_spawn_time_start = 0;
+    player[0].block_saucer_spawn_time = 0;
+    player[1].block_saucer_spawn_time = 0;
     player[0].asteroid_wave_spawn_time = 0;
+    player[0].asteroids_to_slow_saucer_spawn = 0;
 }
 
 U0 init_game(CDoc* std_out)
