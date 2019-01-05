@@ -40,7 +40,7 @@ U0 update_explosion_offset(Space_Object* ship, Offset* offset, I8 velocity, U16*
         long_vector_delta -= 256;
 
     // return VCTR delta equivalent to explosion offset
-    *delta = ((velocity < 0) << 10) | AbsI64(long_vector_delta);
+    *delta = (velocity < 0) << 10 | AbsI64(long_vector_delta);
 }
 
 U0 handle_explosion(Space_Object* ship, Offset* explosion_x, Offset* explosion_y, Vector_Generator* vector_generator, CDC* dc)
@@ -56,8 +56,8 @@ U0 handle_explosion(Space_Object* ship, Offset* explosion_x, Offset* explosion_y
         update_explosion_offset(ship, &explosion_x[i], EXPLOSION_VELOCITY[i].x, &delta_x);
         update_explosion_offset(ship, &explosion_y[i], EXPLOSION_VELOCITY[i].y, &delta_y);
 
-        U16 word_0 = (VCTR_9 << 12) | delta_y;
-        U16 word_1 =                  delta_x;
+        U16 word_0 = VCTR_9 << 12 | delta_y;
+        U16 word_1 =                delta_x;
 
         U16 explosion_part[6];
 
@@ -120,16 +120,19 @@ U0 draw_ship(Space_Object* ship, U8 direction, Bool draw_thrust, Vector_Generato
 
 U0 update_ship(Space_Object* ship, U8 fast_timer, U8 direction, Offset* explosion_x, Offset* explosion_y, Bool thrusting, Vector_Generator* vector_generator, CDC* dc)
 {
-    if (ship->status == ALIVE)
+    if (!ship->status)
+        return;
+
+    if (ship->status < TRUE_EXPLOSION_START)
     {
         update_position(ship);
-        Bool draw_thrust = thrusting && fast_timer % 8 >= 4;
+        Bool draw_thrust = thrusting && fast_timer & 4;
         draw_ship(ship, direction, draw_thrust, vector_generator, dc);
     }
-    else if (ship->status >= TRUE_EXPLOSION_START)
+    else
     {
         handle_explosion(ship, explosion_x, explosion_y, vector_generator, dc);
-        if (fast_timer % 2)
+        if (fast_timer & 1)
         {
             ship->status++;
             if (ship->status == INDISCERNIBLE)

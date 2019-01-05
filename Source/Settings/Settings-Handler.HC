@@ -39,10 +39,10 @@ I16 get_start_position(I16 starting_position, Bool border, I16 lower_edge)
 {
     if (starting_position != -1)
         return starting_position;
-    else if (border)
+    if (border)
         return (lower_edge - 1) * 8;
-    else
-        return lower_edge * 8;
+
+    return lower_edge * 8;
 }
 
 U0 set_up_startup_window(Settings_Handler* settings)

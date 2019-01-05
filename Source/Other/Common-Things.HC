@@ -104,6 +104,21 @@ class Velocity
     I8 y;
 };
 
+Bool score_greater(Score score_1, Score score_2)
+{
+    U64 i;
+    for (i = 1; i < 2; i--)
+    {
+        if (score_1.points[i] > score_2.points[i])
+            return TRUE;
+        if (score_1.points[i] < score_2.points[i])
+            return FALSE;
+    }
+
+    // scores are the same
+    return FALSE;
+}
+
 Bool overflowed_U8(U8 var_current, U8 var_previous)
 {
     return var_current < var_previous;
@@ -124,25 +139,49 @@ I8 clamp_I8(I8 value, I8 min_value, I8 max_value)
 {
     if (value < min_value)
         return min_value;
-    else if (value > max_value)
+    if (value > max_value)
         return max_value;
-    else
-        return value;
+
+    return value;
 }
 
-Bool score_more_than(Score score_1, Score score_2)
+// this uses binary-coded decimal
+Bool add_BCD(U8* number, U8 to_add, Bool overflow)
 {
-    U64 i;
-    for (i = 1; i < 2; i--)
-    {
-        if (score_1.points[i] > score_2.points[i])
-            return TRUE;
-        else if (score_1.points[i] < score_2.points[i])
-            return FALSE;
-    }
+    U16 new_number = *number + to_add + overflow;
+    if ((*number & 0xF) + (to_add & 0xF) + overflow > 9)
+        new_number += 6;
 
-    // scores are the same
-    return FALSE;
+    if (new_number > 0x99)
+        new_number += 0x60;
+
+    *number = new_number;
+
+    // overflow
+    return new_number > 0x99;
+}
+
+U0 add_to_number(U8* number, U8 num_size, U8 to_add, Bool bonus)
+{
+    Bool add_to_next = add_BCD(&number[0], to_add, bonus);
+    U64 i;
+    for (i = 1; i < num_size && add_to_next; i++)
+        add_to_next = add_BCD(&number[i], 0, add_to_next);
+}
+
+I8 to_I8(I8 number)
+{
+    return number;
+}
+
+U8 to_U8(U8 number)
+{
+    return number;
+}
+
+U8 twos_complement(U8 number)
+{
+    return to_U8(~number + 1);
 }
 
 #endif

@@ -31,10 +31,10 @@ class Coordinate
     U16 position_y;
 };
 
-U0 get_total_pos(Coordinate* total_pos, Position* pos)
+U0 get_total_pos(Coordinate* total_pos, Position pos)
 {
-    total_pos->position_x = pos->x_major * 256 + pos->x_minor;
-    total_pos->position_y = pos->y_major * 256 + pos->y_minor;
+    total_pos->position_x = pos.x_major << 8 | pos.x_minor;
+    total_pos->position_y = pos.y_major << 8 | pos.y_minor;
 }
 
 I8 lookup_sine(U8 direction)
@@ -45,8 +45,8 @@ I8 lookup_sine(U8 direction)
         return SINE_TABLE[128 - direction];
     if (direction <= 192)
         return -SINE_TABLE[direction - 128];
-    else
-        return -SINE_TABLE[256 - direction];
+
+    return -SINE_TABLE[256 - direction];
 }
 
 I8 lookup_cosine(U8 direction)
@@ -91,44 +91,40 @@ U8 limit_position(U8 pos_major, U8 max_pos_major)
 {
     if (pos_major < 3)
         return 3;
-    else if (pos_major > max_pos_major)
+
+    if (pos_major > max_pos_major)
         return max_pos_major;
-    else
-        return pos_major;
+
+    return pos_major;
 }
 
-U0 hit(U16 pos_1, U16 pos_2, U8 minimum_space, Bool* was_hit)
+Bool hit(U16 pos_1, U16 pos_2, U8 minimum_space)
 {
     if (pos_1 < pos_2)
     {
         if (pos_2 - pos_1 < minimum_space * 2)
-            *was_hit = TRUE;
+            return TRUE;
     }
     else
     {
         if (pos_1 - pos_2 <= minimum_space * 2)
-            *was_hit = TRUE;
+            return TRUE;
     }
+    return FALSE;
 }
 
-Bool collide(Space_Object* o1, Space_Object* o2, U8 minimum_space)
+Bool collide(Space_Object o1, Space_Object o2, U8 minimum_space)
 {
-    if (o1->status && o1->status < TRUE_EXPLOSION_START
-     && o2->status && o2->status < TRUE_EXPLOSION_START)
+    if (o1.status && o1.status < TRUE_EXPLOSION_START
+     && o2.status && o2.status < TRUE_EXPLOSION_START)
     {
         Coordinate pos_1;
         Coordinate pos_2;
-        get_total_pos(&pos_1, &o1->pos);
-        get_total_pos(&pos_2, &o2->pos);
-        Bool hit_x = FALSE;
-        hit(pos_1.position_x, pos_2.position_x, minimum_space, &hit_x);
-        if (hit_x)
-        {
-            Bool hit_y = FALSE;
-            hit(pos_1.position_y, pos_2.position_y, minimum_space, &hit_y);
-            if (hit_y)
-                return TRUE;
-        }
+        get_total_pos(&pos_1, o1.pos);
+        get_total_pos(&pos_2, o2.pos);
+        if (hit(pos_1.position_x, pos_2.position_x, minimum_space)
+         && hit(pos_1.position_y, pos_2.position_y, minimum_space))
+            return TRUE;
     }
     return FALSE;
 }
@@ -137,18 +133,18 @@ U0 set_position_and_size(Space_Object* space_object, U8 scale, Vector_Generator*
 {
     // add 128 to y making the 4:3 Space_Object space centered inside the 1:1 DVG space
     U16 vector_object[3];
-    vector_object[0] = ((LABS << 12) | (space_object->pos.y_major << 5) | (space_object->pos.y_minor >> 3)) + 128;
-    vector_object[1] = (scale << 12) | (space_object->pos.x_major << 5) | (space_object->pos.x_minor >> 3);
-    vector_object[2] =  (RTSL << 12);
+    vector_object[0] = (LABS << 12 | space_object->pos.y_major << 5 | space_object->pos.y_minor >> 3) + 128;
+    vector_object[1] = scale << 12 | space_object->pos.x_major << 5 | space_object->pos.x_minor >> 3;
+    vector_object[2] =  RTSL << 12;
     process(vector_generator, vector_object, dc);
 }
 
 U0 draw_explosion(Space_Object* space_object, Vector_Generator* vector_generator, CDC* dc)
 {
-    U8 scale = (space_object->status + 33) / 17;
+    U8 scale = ((space_object->status & 0xF0) + 0x10) >> 4;
     set_position_and_size(space_object, scale, vector_generator, dc);
 
-    switch (space_object->status / 4 % 4)
+    switch (space_object->status >> 2 & 3)
     {
     case 0:
         process(vector_generator, EXPLOSION_4, dc);

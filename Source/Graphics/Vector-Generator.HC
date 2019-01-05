@@ -107,7 +107,7 @@ U0 draw_vector(Vector_Generator* vector_generator, I16 raw_delta_x, I16 raw_delt
         F64 adjusted_x = vector_generator->current_x + vector_generator->x_offset;
         F64 adjusted_y = vector_generator->current_y + vector_generator->y_offset;
 
-        F64 scaled_x_start = adjusted_x / vector_generator->res_scale;
+        F64 scaled_x_start =                                  adjusted_x / vector_generator->res_scale;
         F64 scaled_y_start = vector_generator->resolution.y - adjusted_y / vector_generator->res_scale;
         dc->color = 15 - brightness;
         draw_line_segment(vector_generator, scaled_x_start, scaled_y_start, delta_x, delta_y, dc);
@@ -120,15 +120,15 @@ I16 apply_global_scale(Vector_Generator* vector_generator, I16 delta)
 {
     if (vector_generator->global_scale <= MUL_128)
         return delta << vector_generator->global_scale;
-    else
-        return delta >> (16 - vector_generator->global_scale);
+
+    return delta >> (16 - vector_generator->global_scale);
 }
 
 // opcodes
 
 U0 draw_long_vector(Vector_Generator* vector_generator, U8 opcode, U16* vector_object, U16* iteration, Bool flip_x, Bool flip_y, CDC* dc)
 {
-    I16 delta_y = vector_object[*iteration] & 0x03FF;
+    I16 delta_y = vector_object[*iteration]     & 0x03FF;
     I16 delta_x = vector_object[*iteration + 1] & 0x03FF;
 
     delta_y = apply_global_scale(vector_generator, delta_y >> (9 - opcode));
@@ -136,7 +136,7 @@ U0 draw_long_vector(Vector_Generator* vector_generator, U8 opcode, U16* vector_o
 
     if (vector_object[(*iteration)++] & 0x0400)
         delta_y = -delta_y;
-    if (vector_object[*iteration] & 0x0400)
+    if (vector_object[*iteration]     & 0x0400)
         delta_x = -delta_x;
 
     U8 brightness = vector_object[*iteration] >> 12;
@@ -151,7 +151,7 @@ U0 load_absolute(Vector_Generator* vector_generator, U16* vector_object, U16* it
         vector_generator->current_y = -vector_generator->current_y;
 
     vector_generator->current_x = vector_object[*iteration] & 0x03FF;
-    if (vector_object[*iteration] & 0x0400)
+    if (vector_object[*iteration]     & 0x0400)
         vector_generator->current_x = -vector_generator->current_x;
 
     vector_generator->global_scale = vector_object[*iteration] >> 12;
@@ -162,8 +162,8 @@ U0 draw_short_vector(Vector_Generator* vector_generator, U16* vector_object, U16
     I16 delta_x = (vector_object[*iteration] & 0x0003) << 8;
     I16 delta_y = vector_object[*iteration] & 0x0300;
 
-    U8 local_scale = ((vector_object[*iteration] & 0x0008) >> 2)
-                   | ((vector_object[*iteration] & 0x0800) >> 11);
+    U8 local_scale = (vector_object[*iteration] & 0x0008) >>  2
+                   | (vector_object[*iteration] & 0x0800) >> 11;
 
     delta_x = apply_global_scale(vector_generator, delta_x >> (7 - local_scale));
     delta_y = apply_global_scale(vector_generator, delta_y >> (7 - local_scale));

@@ -27,18 +27,17 @@ U0 spawn_saucer(Space_Object* saucer, Score player_score, U8 saucer_spawn_time_s
         }
     }
 
-    U8 x_random = random_byte();
-    if (x_random < 128)
-    {
-        saucer->vel_x_major = -16;
-        saucer->pos.x_major = 31;
-        saucer->pos.x_minor = 255;
-    }
-    else
+    if (random_byte() & 0x80)
     {
         saucer->vel_x_major = 16;
         saucer->pos.x_major = 0;
         saucer->pos.x_minor = 0;
+    }
+    else
+    {
+        saucer->vel_x_major = -16;
+        saucer->pos.x_major = 31;
+        saucer->pos.x_minor = 255;
     }
 
     U8 y_random = random_byte();
@@ -47,7 +46,7 @@ U0 spawn_saucer(Space_Object* saucer, Score player_score, U8 saucer_spawn_time_s
     if (saucer->pos.y_major > 23)
         saucer->pos.y_major -= 8;
 
-    saucer->pos.y_minor = y_random * 32 % 256;
+    saucer->pos.y_minor = (y_random & 7) * 32;
 }
 
 U0 crash_saucer(Space_Object* saucer, U8* saucer_spawn_time, U8 saucer_spawn_time_start)
@@ -78,13 +77,13 @@ U0 attempt_remove(Space_Object* saucer, U8 old_pos_x_major, U8* saucer_spawn_tim
 
 U0 determine_vertical_velocity(Space_Object* saucer)
 {
-    switch (random_byte() % 4)
+    switch (random_byte() & 3)
     {
     case 0:
-        saucer->vel_y_major = 16;
-        break;
-    case 1:
         saucer->vel_y_major = -16;
+        break;
+    case 3:
+        saucer->vel_y_major = 16;
         break;
     default:
         saucer->vel_y_major = 0;
@@ -94,7 +93,10 @@ U0 determine_vertical_velocity(Space_Object* saucer)
 
 U0 update_saucer(Space_Object* saucer, U8 fast_timer, U8* saucer_spawn_time, U8 saucer_spawn_time_start, Vector_Generator* vector_generator, CDC* dc)
 {
-    if (saucer->status == LARGE_SAUCER || saucer->status == SMALL_SAUCER)
+    if (!saucer->status)
+        return;
+
+    if (saucer->status < TRUE_EXPLOSION_START)
     {
         if (fast_timer == 0 || fast_timer == 128)
             determine_vertical_velocity(saucer);
@@ -107,34 +109,34 @@ U0 update_saucer(Space_Object* saucer, U8 fast_timer, U8* saucer_spawn_time, U8 
         if (saucer->status != INDISCERNIBLE)
             draw_saucer(saucer, vector_generator, dc);
     }
-    else if (saucer->status >= TRUE_EXPLOSION_START)
+    else
     {
         draw_explosion(saucer, vector_generator, dc);
-        saucer->status += 16 - (saucer->status - 1) / 16;
+        saucer->status += (twos_complement(saucer->status) >> 4) + 1;
     }
 }
 
-U8 get_saucer_size(Space_Object* saucer, Bool bonus)
+U8 get_saucer_size(Space_Object saucer, Bool bonus)
 {
-    if (saucer->status == SMALL_SAUCER && bonus)
-        return BONUS_SIZE_3;
-    else if (saucer->status == LARGE_SAUCER)
+    if (saucer.status == LARGE_SAUCER)
     {
         if (bonus)
             return LARGE_SAUCER_SIZE + BONUS_SIZE_2;
-        else
-            return LARGE_SAUCER_SIZE;
+
+        return LARGE_SAUCER_SIZE;
     }
-    else
-        return 0;
+    if (bonus)
+        return BONUS_SIZE_3;
+
+    return 0;
 }
 
-U8 get_saucer_points(Space_Object* saucer)
+U8 get_saucer_points(Space_Object saucer)
 {
-    if (saucer->status == LARGE_SAUCER)
+    if (saucer.status == LARGE_SAUCER)
         return LARGE_SAUCER_POINTS;
-    else
-        return SMALL_SAUCER_POINTS;
+
+    return SMALL_SAUCER_POINTS;
 }
 
 #endif

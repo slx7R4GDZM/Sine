@@ -47,8 +47,8 @@ Or you can copy the directory to disk to run it:
 This will make TempleOS 60 FPS, but it might break other programs.
 
 1. Open ```C:/Kernel/KernelA.HH```.
-2. Assuming TempleOS 5.03, go to line 1478.
-3. Edit ```WINMGR_FPS``` and ```WINMGR_PERIOD``` to use 60000.0 instead of 30000.0.
+2. Assuming TempleOS 5.030, go to line 1478.
+3. For ```WINMGR_FPS``` and ```WINMGR_PERIOD``` change 30000.0 to 60000.0.
 4. Reboot TempleOS.
 
 ## What's with the strange constants?

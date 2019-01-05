@@ -10,72 +10,70 @@
 #include "Other/Constants.HC"
 #include "Other/Vectors.HC"
 
-U0 set_starting_velocity(U8 status, I8* velocity)
+I8 set_asteroid_velocity(I8 old_velocity)
 {
-    U8 random = random_byte();
-    if (random < 128)
-        random %= 16;
-    else
-        random = random % 16 + 16;
+    // random offset from -16 to 15
+    I8 offset = to_I8(random_byte() & 0x8F);
+    if (offset < 0)
+        offset |= 0xF0;
 
-    switch (status & 0x07)
-    {
-    case 4:
-        *velocity = LARGE_ASTEROID_SPAWN_VELOCITY[random];
-        break;
-    case 2:
-        *velocity = MEDIUM_ASTEROID_SPAWN_VELOCITY[random];
-        break;
-    case 1:
-        *velocity = SMALL_ASTEROID_SPAWN_VELOCITY[random];
-        break;
-    }
+    I8 velocity = old_velocity + offset;
+    if (velocity < 0)
+        velocity = clamp_I8(velocity, -31, -6);
+    else
+        velocity = clamp_I8(velocity,   6, 31);
+
+    return velocity;
+}
+
+U0 offset_position(U8* pos_minor, I8 vel_major)
+{
+    *pos_minor ^= (vel_major & 31) * 2;
 }
 
 U0 spawn_wave_asteroid(Space_Object* asteroid)
 {
-    asteroid->status = random_byte() / 8 * 8 % 32 + 4;
-    set_starting_velocity(asteroid->status, &asteroid->vel_x_major);
-    set_starting_velocity(asteroid->status, &asteroid->vel_y_major);
+    asteroid->status = (random_byte() & ASTEROID_TYPE) | LARGE_ASTEROID;
+    asteroid->vel_x_major = set_asteroid_velocity(0);
+    asteroid->vel_y_major = set_asteroid_velocity(0);
 
     U8 random = random_byte();
-    if (random % 2)
+    if (random & 1)
     {
         asteroid->pos.x_major = 0;
-        asteroid->pos.y_major = random / 2 % 32;
+        asteroid->pos.y_major = random / 2 & 31;
         if (asteroid->pos.y_major >= 24)
             asteroid->pos.y_major -= 8;
     }
     else
     {
-        asteroid->pos.x_major = random / 2 % 32;
-        asteroid->pos.y_major = 0;
+        asteroid->pos.x_major = random / 2 & 31;
         asteroid->pos.y_major = 0;
     }
     asteroid->pos.x_minor = 0;
     asteroid->pos.y_minor = 0;
 }
 
-U0 spawn_crash_asteroid(Space_Object* asteroid, U8 status, Position* pos)
+U0 spawn_split_asteroid(Space_Object* asteroid, U8 asteroid_size, I8 vel_x, I8 vel_y, Position pos)
 {
-    asteroid->status = random_byte() / 8 * 8 % 32 + ((status & 0x07) >> 1);
-    MemCpy(&asteroid->pos, pos, sizeof(Position));
-    set_starting_velocity(asteroid->status, &asteroid->vel_x_major);
-    set_starting_velocity(asteroid->status, &asteroid->vel_y_major);
+    asteroid->status = (random_byte() & ASTEROID_TYPE) | asteroid_size >> 1;
+    asteroid->vel_x_major = set_asteroid_velocity(vel_x);
+    asteroid->vel_y_major = set_asteroid_velocity(vel_y);
+    MemCpy(&asteroid->pos, &pos, sizeof(Position));
 }
 
 U0 draw_asteroid(Space_Object* asteroid, Vector_Generator* vector_generator, CDC* dc)
 {
     U8 scale;
-    switch (asteroid->status & 0x07)
+    switch (asteroid->status & ASTEROID_SIZE)
     {
-    case 4:
+    case LARGE_ASTEROID:
         scale = MUL_1;
         break;
-    case 2:
+    case MEDIUM_ASTEROID:
         scale = DIV_2;
         break;
-    case 1:
+    case SMALL_ASTEROID:
         scale = DIV_4;
         break;
     }
@@ -100,15 +98,18 @@ U0 draw_asteroid(Space_Object* asteroid, Vector_Generator* vector_generator, CDC
 
 U0 update_asteroid(Space_Object* asteroid, U8* asteroid_count, U8* asteroid_wave_spawn_time, Vector_Generator* vector_generator, CDC* dc)
 {
-    if (asteroid->status && asteroid->status <= 0x1C)
+    if (!asteroid->status)
+        return;
+
+    if (asteroid->status < TRUE_EXPLOSION_START)
     {
         update_position(asteroid);
         draw_asteroid(asteroid, vector_generator, dc);
     }
-    else if (asteroid->status >= TRUE_EXPLOSION_START)
+    else
     {
         draw_explosion(asteroid, vector_generator, dc);
-        asteroid->status += 16 - (asteroid->status - 1) / 16;
+        asteroid->status += (twos_complement(asteroid->status) >> 4) + 1;
         if (asteroid->status == INDISCERNIBLE)
         {
             (*asteroid_count)--;
@@ -118,33 +119,33 @@ U0 update_asteroid(Space_Object* asteroid, U8* asteroid_count, U8* asteroid_wave
     }
 }
 
-U8 get_asteroid_size(Space_Object* asteroid)
+U8 get_asteroid_size(Space_Object asteroid)
 {
-    switch (asteroid->status & 0x07)
+    switch (asteroid.status & ASTEROID_SIZE)
     {
-    case 4:
+    case LARGE_ASTEROID:
         return LARGE_ASTEROID_SIZE;
         break;
-    case 2:
+    case MEDIUM_ASTEROID:
         return MEDIUM_ASTEROID_SIZE;
         break;
-    case 1:
+    case SMALL_ASTEROID:
         return SMALL_ASTEROID_SIZE;
         break;
     }
 }
 
-U8 get_asteroid_points(Space_Object* asteroid)
+U8 get_asteroid_points(Space_Object asteroid)
 {
-    switch (asteroid->status & 0x07)
+    switch (asteroid.status & ASTEROID_SIZE)
     {
-    case 4:
+    case LARGE_ASTEROID:
         return LARGE_ASTEROID_POINTS;
         break;
-    case 2:
+    case MEDIUM_ASTEROID:
         return MEDIUM_ASTEROID_POINTS;
         break;
-    case 1:
+    case SMALL_ASTEROID:
         return SMALL_ASTEROID_POINTS;
         break;
     }
