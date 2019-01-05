@@ -14,35 +14,9 @@
 
 class Game
 {
+public:
+    Game();
 private:
-    Settings_Handler settings;
-    RenderWindow window;
-    Input_Handler input;
-    Inactive_Mode game_activity;
-
-    u8 current_player;
-    u8 last_game_player_count;
-    u8 player_count;
-    Score high_score_table[MAX_HS_COUNT];
-    u8 name_entry_letter_pos;
-    u8 player_HS_place[MAX_PLAYERS];
-    u8 names_HS[MAX_HS_COUNT * HS_NAME_LENGTH];
-    Score player_score[MAX_PLAYERS];
-    u8 starting_lives;
-    u8 player_lives[MAX_PLAYERS];
-    u8 hyperspace_flag;
-    u8 player_text_timer;
-    u8 fast_timer;
-    u8 slow_timer;
-    u8 ship_direction;
-    u8 ship_vel_x_minor;
-    u8 ship_vel_y_minor;
-    // sound stuff will go here
-    u8 credits;
-    Option_Switch option_switch;
-    u8 pre_credit_coins;
-    Offset ship_explosion_x[6];
-    Offset ship_explosion_y[6];
     struct Player
     {
         Asteroid asteroid[MAX_ASTEROIDS];
@@ -58,7 +32,7 @@ private:
         u8 ship_spawn_timer;
         u8 asteroid_wave_spawn_time;
         u8 asteroids_to_slow_saucer_spawn;
-    } player[MAX_PLAYERS];
+    };
 
     void process_events(Vector_Generator& vector_generator, RenderWindow& window);
     void limit_FPS(steady_clock::time_point start_time) const;
@@ -92,6 +66,34 @@ private:
     static bool spawn_asteroid(Player& player, u8 crashed_ast, u8 ast_size, u8& new_ast);
     void handle_ship_stuff(Player& player);
     void handle_saucer_stuff(Player& player) const;
-public:
-    Game();
+
+    Settings_Handler settings;
+    RenderWindow window;
+    Input_Handler input;
+    Inactive_Mode game_activity;
+
+    u8 current_player;
+    u8 last_game_player_count;
+    u8 player_count;
+    Score high_score_table[MAX_HS_COUNT];
+    u8 name_entry_letter_pos;
+    u8 player_HS_place[MAX_PLAYERS];
+    u8 names_HS[MAX_HS_COUNT * HS_NAME_LENGTH];
+    Score player_score[MAX_PLAYERS];
+    u8 starting_lives;
+    u8 player_lives[MAX_PLAYERS];
+    u8 hyperspace_flag;
+    u8 player_text_timer;
+    u8 fast_timer;
+    u8 slow_timer;
+    u8 ship_direction;
+    u8 ship_vel_x_minor;
+    u8 ship_vel_y_minor;
+    // sound stuff will go here
+    u8 credits;
+    Option_Switch option_switch;
+    u8 pre_credit_coins;
+    Offset ship_explosion_x[6];
+    Offset ship_explosion_y[6];
+    Player player[MAX_PLAYERS];
 };

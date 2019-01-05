@@ -55,7 +55,10 @@ void Saucer::crash(u8& saucer_spawn_time, u8 saucer_spawn_time_start)
 
 void Saucer::update(u8 fast_timer, u8& saucer_spawn_time, u8 saucer_spawn_time_start, Vector_Generator& vector_generator, RenderWindow& window)
 {
-    if (status == LARGE_SAUCER || status == SMALL_SAUCER)
+    if (!status)
+        return;
+
+    if (status < TRUE_EXPLOSION_START)
     {
         if (fast_timer == 0 || fast_timer == 128)
             determine_vertical_velocity();
@@ -67,7 +70,7 @@ void Saucer::update(u8 fast_timer, u8& saucer_spawn_time, u8 saucer_spawn_time_s
         if (status != INDISCERNIBLE)
             draw(vector_generator, window);
     }
-    else if (status >= TRUE_EXPLOSION_START)
+    else
     {
         draw_explosion(vector_generator, window);
         status += (twos_complement(status) >> 4) + 1;

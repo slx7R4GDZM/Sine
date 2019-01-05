@@ -64,12 +64,15 @@ void Asteroid::offset_position(u8& pos_minor, s8 vel_major)
 
 void Asteroid::update(u8& asteroid_count, u8& asteroid_wave_spawn_time, Vector_Generator& vector_generator, RenderWindow& window)
 {
-    if (status && status <= 0x1C)
+    if (!status)
+        return;
+
+    if (status < TRUE_EXPLOSION_START)
     {
         update_position();
         draw(vector_generator, window);
     }
-    else if (status >= TRUE_EXPLOSION_START)
+    else
     {
         draw_explosion(vector_generator, window);
         status += (twos_complement(status) >> 4) + 1;

@@ -151,8 +151,8 @@ s16 Vector_Generator::apply_global_scale(s16 delta) const
 
 void Vector_Generator::draw_vector(s16 raw_delta_x, s16 raw_delta_y, u8 brightness, bool flip_x, bool flip_y, RenderWindow& window)
 {
-    const s16 delta_x = (flip_x ? -raw_delta_x : raw_delta_x);
-    const s16 delta_y = (flip_y ? -raw_delta_y : raw_delta_y);
+    const s16 delta_x = flip_x ? -raw_delta_x : raw_delta_x;
+    const s16 delta_y = flip_y ? -raw_delta_y : raw_delta_y;
     if (brightness)
     {
         const float adjusted_x = current_x + x_offset;

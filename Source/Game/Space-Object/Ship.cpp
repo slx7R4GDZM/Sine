@@ -29,13 +29,16 @@ void Ship::crash(u8& player_lives, u8& ship_spawn_timer)
 
 void Ship::update(u8 fast_timer, u8 direction, Offset explosion_x[], Offset explosion_y[], bool thrusting, Vector_Generator& vector_generator, RenderWindow& window)
 {
-    if (status == ALIVE)
+    if (!status)
+        return;
+
+    if (status < TRUE_EXPLOSION_START)
     {
         update_position();
         const bool draw_thrust = thrusting && fast_timer & 4;
         draw(direction, draw_thrust, vector_generator, window);
     }
-    else if (status >= TRUE_EXPLOSION_START)
+    else
     {
         handle_explosion(explosion_x, explosion_y, vector_generator, window);
         if (fast_timer & 1)

@@ -16,7 +16,7 @@ struct Coordinate
 
 static void wrap_position(u8& pos_major, u8 max_pos_major);
 static bool hit(u16 pos_1, u16 pos_2, u8 minimum_space);
-static Coordinate get_total_pos(const Position& pos);
+static Coordinate get_total_pos(Position pos);
 
 Space_Object::Space_Object()
 {
@@ -147,7 +147,7 @@ void Space_Object::set_position_and_size(Global_Scale scale, Vector_Generator& v
     vector_generator.process(vector_object, window);
 }
 
-Coordinate get_total_pos(const Position& pos)
+Coordinate get_total_pos(Position pos)
 {
     const Coordinate total_pos =
     {

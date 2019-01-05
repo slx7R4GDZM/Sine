@@ -27,7 +27,10 @@ void Photon::solve_position(s8 base_offset, u8& pos_major, u8& pos_minor)
 
 void Photon::update(u8 fast_timer, Vector_Generator& vector_generator, RenderWindow& window)
 {
-    if (status && status < TRUE_EXPLOSION_START)
+    if (!status)
+        return;
+
+    if (status < TRUE_EXPLOSION_START)
     {
         if ((fast_timer & 3) == 0)
             status--;
@@ -35,7 +38,7 @@ void Photon::update(u8 fast_timer, Vector_Generator& vector_generator, RenderWin
         update_position();
         draw(vector_generator, window);
     }
-    else if (status >= TRUE_EXPLOSION_START)
+    else
     {
         draw_explosion(vector_generator, window);
         status += (twos_complement(status) >> 4) + 1;

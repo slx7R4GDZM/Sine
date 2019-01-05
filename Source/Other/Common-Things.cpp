@@ -8,7 +8,7 @@
 
 bool operator>(Score score_1, Score score_2)
 {
-    for (u8 i = 1; i != UINT8_MAX; i--)
+    for (u8 i = 1; i < 2; i--)
     {
         if (score_1.points[i] > score_2.points[i])
             return true;
