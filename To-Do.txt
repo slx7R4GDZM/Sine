@@ -1,5 +1,4 @@
 add
-	small saucer aiming
 	some way to simulate analog sound
 	sounds
 	configuration gui

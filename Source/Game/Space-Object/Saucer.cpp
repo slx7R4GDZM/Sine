@@ -8,6 +8,12 @@
 #include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
+static u8 ship_saucer_distance(u8 ship_pos_hi, u8 ship_pos_lo, s8 saucer_vel, u8 saucer_pos_hi, u8 saucer_pos_lo);
+static u8 shot_x_direction(u8 x_distance, u8 y_distance);
+static u8 shot_y_direction(u8 x_distance, u8 y_distance);
+static u8 calculate_shot_angle(u8 x_distance, u8 y_distance);
+static u8 look_up_angle(u8 distance_1, u8 distance_2, bool step);
+
 void Saucer::spawn(Score player_score, u8 saucer_spawn_time_start)
 {
     if (saucer_spawn_time_start >= 128)
@@ -103,12 +109,91 @@ void Saucer::attempt_remove(u8 old_pos_x_major, u8& saucer_spawn_time, u8 saucer
     }
 }
 
+u8 Saucer::targeted_shot(Position ship_pos) const
+{
+    const u8 x_distance = ship_saucer_distance(ship_pos.x_major, ship_pos.x_minor, vel_x_major, pos.x_major, pos.x_minor);
+    const u8 y_distance = ship_saucer_distance(ship_pos.y_major, ship_pos.y_minor, vel_y_major, pos.y_major, pos.y_minor);
+    return shot_x_direction(x_distance, y_distance);
+}
+
+u8 ship_saucer_distance(u8 ship_pos_hi, u8 ship_pos_lo, s8 saucer_vel, u8 saucer_pos_hi, u8 saucer_pos_lo)
+{
+    const u8 distance_minor = ship_pos_lo - saucer_pos_lo;
+    const bool underflowed = ship_pos_lo < saucer_pos_lo;
+    const u8 distance_major = ship_pos_hi - saucer_pos_hi - underflowed;
+
+    const u8 distance = distance_major << 2 | distance_minor >> 6;
+    const u8 velocity_offset = saucer_vel >> 1;
+
+    return distance - velocity_offset;
+}
+
+u8 shot_x_direction(u8 x_distance, u8 y_distance)
+{
+    if (x_distance < 128)
+        return shot_y_direction(x_distance, y_distance);
+
+    const u8 direction = shot_y_direction(twos_complement(x_distance), y_distance);
+    return twos_complement(direction ^ 0x80);
+}
+
+u8 shot_y_direction(u8 x_distance, u8 y_distance)
+{
+    if (y_distance < 128)
+        return calculate_shot_angle(x_distance, y_distance);
+
+    const u8 direction = calculate_shot_angle(x_distance, twos_complement(y_distance));
+    return twos_complement(direction);
+}
+
+u8 calculate_shot_angle(u8 x_distance, u8 y_distance)
+{
+    if (x_distance == y_distance)
+        return 0x20;
+
+    if (x_distance > y_distance)
+        return look_up_angle(y_distance, x_distance, false);
+
+    const u8 direction = look_up_angle(x_distance, y_distance, true);
+    return twos_complement(direction - 0x40);
+}
+
+u8 look_up_angle(u8 distance_1, u8 distance_2, bool step)
+{
+    u8 offset = 0;
+    for (u8 i = 0; i < 4; i++)
+    {
+        offset = offset << 1 | step;
+        distance_1 <<= 1;
+        if (distance_1 < distance_2)
+            step = false;
+        else
+        {
+            distance_1 -= distance_2;
+            step = true;
+        }
+    }
+    offset = offset << 1 | step;
+    offset &= 0xF;
+    return SHOT_ANGLE_TABLE[offset];
+}
+
+s8 Saucer::shot_offset(bool accurate_shot)
+{
+    s8 offset = random_byte() & SHOT_OFFSET_AND[accurate_shot];
+    if (offset < 0)
+        offset |= SHOT_OFFSET_OR[accurate_shot];
+
+    return offset + accurate_shot;
+}
+
 u8 Saucer::get_size(bool bonus) const
 {
-    if (status == SMALL_SAUCER && bonus)
-        return BONUS_SIZE_3;
     if (status == LARGE_SAUCER)
         return LARGE_SAUCER_SIZE + (bonus ? BONUS_SIZE_2 : 0);
+
+    if (status == SMALL_SAUCER && bonus)
+        return BONUS_SIZE_3;
 
     return 0;
 }

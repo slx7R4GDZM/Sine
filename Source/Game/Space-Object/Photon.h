@@ -14,6 +14,6 @@ public:
     static void fire_photon(Photon photon[], u8 max_photons, u8 direction, Space_Object space_object);
     static bool any(const Photon photon[], u8 max_photons);
 private:
-    static void solve_position(s8 base_offset, u8& pos_major, u8& pos_minor);
+    static void offset_position(s8 base_offset, u8& pos_major, u8& pos_minor);
     void draw(Vector_Generator& vector_generator, RenderWindow& window) const;
 };

@@ -15,11 +15,11 @@ void Photon::spawn(u8 direction, s8 vel_x, s8 vel_y, Position base_pos)
     vel_y_major = clamp_s8((  lookup_sine(direction) >> 1) + vel_y, -111, 111);
 
     pos = base_pos;
-    solve_position(lookup_cosine(direction), pos.x_major, pos.x_minor);
-    solve_position(  lookup_sine(direction), pos.y_major, pos.y_minor);
+    offset_position(lookup_cosine(direction), pos.x_major, pos.x_minor);
+    offset_position(  lookup_sine(direction), pos.y_major, pos.y_minor);
 }
 
-void Photon::solve_position(s8 base_offset, u8& pos_major, u8& pos_minor)
+void Photon::offset_position(s8 base_offset, u8& pos_major, u8& pos_minor)
 {
     const s8 pos_offset = ((base_offset >> 1) * 3) >> 1;
     update_position_axis(pos_major, pos_minor, pos_offset);

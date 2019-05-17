@@ -46,6 +46,10 @@ Game::Game()
         starting_lives = 3;
 
     // startup
+    player[0].ship.pos.x_major = 0;
+    player[0].ship.pos.y_major = 0;
+    player[0].ship.pos.x_minor = 0;
+    player[0].ship.pos.y_minor = 0;
     player[0].asteroids_per_wave = 2;
     player[0].asteroid_count = 0;
     player[0].saucer_spawn_and_shot_time = 0;
@@ -881,7 +885,7 @@ void Game::handle_ship_stuff(Player& player)
         handle_saucer_stuff(player);
 }
 
-void Game::handle_saucer_stuff(Player& player) const
+void Game::handle_saucer_stuff(Player& player)
 {
     if (fast_timer & 3)
         return;
@@ -911,13 +915,14 @@ void Game::handle_saucer_stuff(Player& player) const
     }
     else if (player.saucer_spawn_and_shot_time == 0)
     {
-        u8 saucer_direction;
-        //if (player.saucer.status == LARGE_SAUCER)
+        if (player.saucer.status == LARGE_SAUCER)
             saucer_direction = random_byte();
-        //else if (player_score[current_player].points[1] < 0x35)
-            // accuracy of +- 16;
-        //else
-            // accuracy of +- 8;
+        else
+        {
+            saucer_direction = player.saucer.targeted_shot(player.ship.pos);
+            const bool accurate_shot = player_score[current_player].points[1] >= 0x35;
+            saucer_direction += Saucer::shot_offset(accurate_shot);
+        }
         Photon::fire_photon(player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
         player.saucer_spawn_and_shot_time = 10;
     }

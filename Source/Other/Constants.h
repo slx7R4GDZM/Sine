@@ -65,6 +65,18 @@ const u8 LARGE_SAUCER_SIZE = 30;
 const u8 LARGE_SAUCER_POINTS = 0x20;
 const u8 SMALL_SAUCER_POINTS = 0x99;
 const u8 MINIMUM_SAUCER_SPAWN_TIME = 32;
+const u8 SHOT_ANGLE_TABLE[] =
+{
+    0x00, 0x02, 0x05, 0x07, 0x0A, 0x0C, 0x0F, 0x11, 0x13, 0x15, 0x17, 0x19, 0x1A, 0x1C, 0x1D, 0x1F
+};
+const u8 SHOT_OFFSET_AND[] =
+{
+    0x8F, 0x87
+};
+const u8 SHOT_OFFSET_OR[] =
+{
+    0x70, 0x78
+};
 
 // ship
 const u8 ALIVE = 1;

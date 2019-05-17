@@ -65,7 +65,7 @@ private:
     static void crash_asteroid(Player& player, u8 crashed_ast);
     static bool spawn_asteroid(Player& player, u8 crashed_ast, u8 ast_size, u8& new_ast);
     void handle_ship_stuff(Player& player);
-    void handle_saucer_stuff(Player& player) const;
+    void handle_saucer_stuff(Player& player);
 
     Settings_Handler settings;
     RenderWindow window;
@@ -87,6 +87,7 @@ private:
     u8 fast_timer;
     u8 slow_timer;
     u8 ship_direction;
+    u8 saucer_direction;
     u8 ship_vel_x_minor;
     u8 ship_vel_y_minor;
     // sound stuff will go here
