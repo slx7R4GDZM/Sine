@@ -36,6 +36,7 @@ U8 player_text_timer;
 U8 fast_timer;
 U8 slow_timer;
 U8 ship_direction;
+U8 saucer_direction;
 U8 ship_vel_x_minor;
 U8 ship_vel_y_minor;
 // sound stuff will go here
@@ -91,13 +92,14 @@ U0 handle_saucer_stuff(Player* player)
     }
     else if (player->saucer_spawn_and_shot_time == 0)
     {
-        U8 saucer_direction;
-        //if (player->saucer.status == LARGE_SAUCER)
+        if (player->saucer.status == LARGE_SAUCER)
             saucer_direction = random_byte();
-        //else if (player_score[current_player].points[1] < 0x35)
-            // accuracy of +- 16;
-        //else
-            // accuracy of +- 8;
+        else
+        {
+            saucer_direction = targeted_shot(player->saucer, player->ship.pos);
+            Bool accurate_shot = player_score[current_player].points[1] >= 0x35;
+            saucer_direction += shot_offset(accurate_shot);
+        }
         fire_photon(player->saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player->saucer);
         player->saucer_spawn_and_shot_time = 10;
     }
@@ -209,14 +211,14 @@ U0 crash_asteroid(Player* player, U8 crashed_ast)
     if (!spawn_asteroid(player, crashed_ast, ast_size, &new_ast))
         return;
 
-    offset_position(player->asteroid[new_ast].pos.x_minor,
-                    player->asteroid[new_ast].vel_x_major);
+    offset_asteroid_position(player->asteroid[new_ast].pos.x_minor,
+                             player->asteroid[new_ast].vel_x_major);
 
     if (!spawn_asteroid(player, crashed_ast, ast_size, &new_ast))
         return;
 
-    offset_position(player->asteroid[new_ast].pos.y_minor,
-                    player->asteroid[new_ast].vel_y_major);
+    offset_asteroid_position(player->asteroid[new_ast].pos.y_minor,
+                             player->asteroid[new_ast].vel_y_major);
 }
 
 U0 attempt_asteroid_wave_spawn(Player* player)
@@ -895,6 +897,10 @@ U0 initialize_memory()
         for (x = 0; x < MAX_SHIP_PHOTONS; x++)
             player[i].ship_photon[x].status = 0;
     }
+    player[0].ship.pos.x_major = 0;
+    player[0].ship.pos.y_major = 0;
+    player[0].ship.pos.x_minor = 0;
+    player[0].ship.pos.y_minor = 0;
     player[0].asteroids_per_wave = 2;
     player[0].asteroid_count = 0;
     player[0].saucer_spawn_and_shot_time = 0;

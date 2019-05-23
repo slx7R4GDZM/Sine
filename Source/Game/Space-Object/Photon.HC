@@ -10,7 +10,7 @@
 #include "Other/Constants.HC"
 #include "Other/Vectors.HC"
 
-U0 solve_position(I8 base_offset, U8* pos_major, U8* pos_minor)
+U0 offset_photon_position(I8 base_offset, U8* pos_major, U8* pos_minor)
 {
     I8 pos_offset = ((base_offset >> 1) * 3) >> 1;
     update_position_axis(pos_major, pos_minor, pos_offset);
@@ -23,8 +23,8 @@ U0 spawn_photon(Space_Object* photon, U8 direction, I8 vel_x, I8 vel_y, Position
     photon->vel_y_major = clamp_I8((  lookup_sine(direction) >> 1) + vel_y, -111, 111);
 
     MemCpy(&photon->pos, &base_pos, sizeof(Position));
-    solve_position(lookup_cosine(direction), &photon->pos.x_major, &photon->pos.x_minor);
-    solve_position(  lookup_sine(direction), &photon->pos.y_major, &photon->pos.y_minor);
+    offset_photon_position(lookup_cosine(direction), &photon->pos.x_major, &photon->pos.x_minor);
+    offset_photon_position(  lookup_sine(direction), &photon->pos.y_major, &photon->pos.y_minor);
 }
 
 U0 draw_photon(Space_Object* photon, Vector_Generator* vector_generator, CDC* dc)

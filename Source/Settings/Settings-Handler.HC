@@ -287,19 +287,19 @@ U0 init_settings_handler(Settings_Handler* settings, CDoc* std_out)
 
 U0 output_settings(Settings_Handler* settings, CDoc* std_out)
 {
-    DocPrint(std_out, "----------------------------------------");
+    DocPrint(std_out, "--------------------------------------");
     U64 i;
     for (i = 0; i < TOTAL_BUTTONS; i++)
         DocPrint(std_out, "\n%18s = %s", BUTTON_TABLE[i], ScanCode2KeyName(settings->button_scan_code[i]));
 
-    DocPrint(std_out, "\n----------------------------------------");
+    DocPrint(std_out, "\n--------------------------------------");
     DocPrint(std_out, "\nLanguage = %u", settings->option_switch >> 6);
     DocPrint(std_out, "\nStarting-Lives = %u", (settings->option_switch >> 5) & 0x01);
     DocPrint(std_out, "\nCenter-Coin-Multiplier = %u", (settings->option_switch >> 4) & 0x01);
     DocPrint(std_out, "\nRight-Coin-Multiplier = %u", (settings->option_switch >> 2) & 0x03);
     DocPrint(std_out, "\nCoinage = %u", settings->option_switch & 0x03);
 
-    DocPrint(std_out, "\n----------------------------------------");
+    DocPrint(std_out, "\n--------------------------------------");
     DocPrint(std_out, "\nStarting-Border = %u", settings->starting_border);
     DocPrint(std_out, "\nStarting-X-Resolution = %u", settings->start_resolution.x);
     DocPrint(std_out, "\nStarting-Y-Resolution = %u", settings->start_resolution.y);
@@ -307,11 +307,11 @@ U0 output_settings(Settings_Handler* settings, CDoc* std_out)
     DocPrint(std_out, "\nStart-Window-Position-Y = %d", settings->starting_win_pos.y);
     DocPrint(std_out, "\nMouse-Cursor-Visible = %u", settings->mouse_cursor_visible);
 
-    DocPrint(std_out, "\n----------------------------------------");
+    DocPrint(std_out, "\n--------------------------------------");
     DocPrint(std_out, "\nCrop-Ratio = %n", settings->crop_ratio);
     DocPrint(std_out, "\nGamma-Correction = %n", settings->gamma_correction);
     DocPrint(std_out, "\nFrame-Limit-Mode = %u", settings->frame_limiter_mode);
-    DocPrint(std_out, "\n----------------------------------------\n");
+    DocPrint(std_out, "\n--------------------------------------\n");
 }
 
 #endif

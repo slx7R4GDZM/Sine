@@ -26,7 +26,7 @@ I8 set_asteroid_velocity(I8 old_velocity)
     return velocity;
 }
 
-U0 offset_position(U8* pos_minor, I8 vel_major)
+U0 offset_asteroid_position(U8* pos_minor, I8 vel_major)
 {
     *pos_minor ^= (vel_major & 31) * 2;
 }

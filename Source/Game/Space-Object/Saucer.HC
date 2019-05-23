@@ -116,6 +116,87 @@ U0 update_saucer(Space_Object* saucer, U8 fast_timer, U8* saucer_spawn_time, U8 
     }
 }
 
+U8 look_up_angle(U8 distance_1, U8 distance_2, Bool step)
+{
+    U8 offset = 0;
+    U64 i;
+    for (i = 0; i < 4; i++)
+    {
+        offset = offset << 1 | step;
+        distance_1 <<= 1;
+        if (distance_1 < distance_2)
+            step = FALSE;
+        else
+        {
+            distance_1 -= distance_2;
+            step = TRUE;
+        }
+    }
+    offset = offset << 1 | step;
+    offset &= 0xF;
+    return SHOT_ANGLE_TABLE[offset];
+}
+
+U8 calculate_shot_angle(U8 x_distance, U8 y_distance)
+{
+    if (x_distance == y_distance)
+        return 0x20;
+
+    if (x_distance > y_distance)
+        return look_up_angle(y_distance, x_distance, FALSE);
+
+    U8 direction = look_up_angle(x_distance, y_distance, TRUE);
+    return twos_complement(direction - 0x40);
+}
+
+U8 shot_y_direction(U8 x_distance, U8 y_distance)
+{
+    if (y_distance < 128)
+        return calculate_shot_angle(x_distance, y_distance);
+
+    U8 direction = calculate_shot_angle(x_distance, twos_complement(y_distance));
+    return twos_complement(direction);
+}
+
+U8 shot_x_direction(U8 x_distance, U8 y_distance)
+{
+    if (x_distance < 128)
+        return shot_y_direction(x_distance, y_distance);
+
+    U8 direction = shot_y_direction(twos_complement(x_distance), y_distance);
+    return twos_complement(direction ^ 0x80);
+}
+
+U8 ship_saucer_distance(U8 ship_pos_hi, U8 ship_pos_lo, I8 saucer_vel, U8 saucer_pos_hi, U8 saucer_pos_lo)
+{
+    U8 distance_minor = to_U8(ship_pos_lo - saucer_pos_lo);
+    Bool underflowed = ship_pos_lo < saucer_pos_lo;
+    U8 distance_major = ship_pos_hi - saucer_pos_hi - underflowed;
+
+    U8 distance = distance_major << 2 | distance_minor >> 6;
+    U8 velocity_offset = saucer_vel >> 1;
+
+    return distance - velocity_offset;
+}
+
+U8 targeted_shot(Space_Object saucer, Position ship_pos)
+{
+    U8 x_distance = ship_saucer_distance(ship_pos.x_major, ship_pos.x_minor,
+                                         saucer.vel_x_major, saucer.pos.x_major, saucer.pos.x_minor);
+    U8 y_distance = ship_saucer_distance(ship_pos.y_major, ship_pos.y_minor,
+                                         saucer.vel_y_major, saucer.pos.y_major, saucer.pos.y_minor);
+    return shot_x_direction(x_distance, y_distance);
+}
+
+U8 shot_offset(Bool accurate_shot)
+{
+    U8 offset = random_byte() & SHOT_OFFSET_AND[accurate_shot];
+    if (offset >= 128)
+        offset |= SHOT_OFFSET_OR[accurate_shot];
+
+    return offset + accurate_shot;
+}
+
 U8 get_saucer_size(Space_Object saucer, Bool bonus)
 {
     if (saucer.status == LARGE_SAUCER)
