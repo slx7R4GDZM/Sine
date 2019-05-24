@@ -79,9 +79,9 @@ R"(# Lines starting with # are ignored by the program
 #==============================================================================
 
 # Escape F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 Pause
-# Tilde Num1 Num2 Num3 Num4 Num5 Num6 Num7 Num8 Num9 Num0 Dash Equal BackSpace
-# Tab Q W E R T Y U I O P LBracket RBracket BackSlash
-#      A S D F G H J K L SemiColon Quote Return
+# Tilde Num1 Num2 Num3 Num4 Num5 Num6 Num7 Num8 Num9 Num0 Hyphen Equal
+# Tab Q W E R T Y U I O P LBracket RBracket Backslash                 Backspace
+#      A S D F G H J K L Semicolon Quote Enter
 # LShift Z X C V B N M Comma Period Slash RShift
 # LControl LSystem LAlt Space RAlt RSystem Menu RControl
 # Insert Home PageUp  Divide Multiply Subtract
