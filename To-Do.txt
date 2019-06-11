@@ -4,7 +4,6 @@ add
 	configuration gui
 	support for non kb input
 	vector monitor shader
-	cmake (or meson?) file
 
 re-do correctly
 	vector generator
