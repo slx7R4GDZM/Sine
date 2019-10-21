@@ -26,23 +26,23 @@ class Settings_Handler
 
 U0 set_position_and_resolution(Vector2U16 win_res, Vector2I16 win_pos, Bool border)
 {
-    Fs->win_left = win_pos.x / 8 + border;
-    Fs->win_right = Fs->win_left + win_res.x / 8 - 1;
+    Fs->win_left = win_pos.x / FONT_WIDTH + border;
+    Fs->win_right = Fs->win_left + win_res.x / FONT_WIDTH - 1;
 
-    Fs->win_top = win_pos.y / 8 + border;
-    Fs->win_bottom = Fs->win_top + win_res.y / 8 - 1;
+    Fs->win_top = win_pos.y / FONT_HEIGHT + border;
+    Fs->win_bottom = Fs->win_top + win_res.y / FONT_HEIGHT - 1;
 
     TaskDerivedValsUpdate();
 }
 
-I16 get_start_position(I16 starting_position, Bool border, I16 lower_edge)
+I16 get_start_position(I16 starting_position, Bool border, I16 lower_edge, U8 font_size)
 {
     if (starting_position != -1)
         return starting_position;
     if (border)
-        return (lower_edge - 1) * 8;
+        return (lower_edge - 1) * font_size;
 
-    return lower_edge * 8;
+    return lower_edge * font_size;
 }
 
 U0 set_up_startup_window(Settings_Handler* settings)
@@ -51,8 +51,8 @@ U0 set_up_startup_window(Settings_Handler* settings)
     WinBorder(border);
 
     Vector2I16 pos;
-    pos.x = get_start_position(settings->starting_win_pos.x, border, Fs->win_left);
-    pos.y = get_start_position(settings->starting_win_pos.y, border, Fs->win_top);
+    pos.x = get_start_position(settings->starting_win_pos.x, border, Fs->win_left, FONT_WIDTH);
+    pos.y = get_start_position(settings->starting_win_pos.y, border, Fs->win_top, FONT_HEIGHT);
 
     set_position_and_resolution(settings->start_resolution, pos, border);
     ms.show = settings->mouse_cursor_visible;
@@ -120,18 +120,18 @@ U0 parse_settings(Settings_Handler* settings, CDoc* std_out, U8* setting, U8* va
     else if (StrCmp(setting, "Starting-Border") == 0)
         settings->starting_border = clamp_I64_string(std_out, setting, value, WIN_NORMAL, WIN_BORDERLESS);
     else if (StrCmp(setting, "Starting-X-Resolution") == 0)
-        settings->start_resolution.x = round_to_eights(clamp_I64_string(std_out, setting, value, 8, 640));
+        settings->start_resolution.x = round_to_eights(clamp_I64_string(std_out, setting, value, FONT_WIDTH, I16_MAX));
     else if (StrCmp(setting, "Starting-Y-Resolution") == 0)
-        settings->start_resolution.y = round_to_eights(clamp_I64_string(std_out, setting, value, 8, 480));
+        settings->start_resolution.y = round_to_eights(clamp_I64_string(std_out, setting, value, FONT_HEIGHT, I16_MAX));
     else if (StrCmp(setting, "Start-Window-Position-X") == 0)
     {
-        settings->starting_win_pos.x = clamp_I64_string(std_out, setting, value, -1, 632);
+        settings->starting_win_pos.x = clamp_I64_string(std_out, setting, value, I16_MIN, I16_MAX);
         if (settings->starting_win_pos.x != -1)
             settings->starting_win_pos.x = round_to_eights(settings->starting_win_pos.x);
     }
     else if (StrCmp(setting, "Start-Window-Position-Y") == 0)
     {
-        settings->starting_win_pos.y = clamp_I64_string(std_out, setting, value, -1, 472);
+        settings->starting_win_pos.y = clamp_I64_string(std_out, setting, value, I16_MIN, I16_MAX);
         if (settings->starting_win_pos.y != -1)
             settings->starting_win_pos.y = round_to_eights(settings->starting_win_pos.y);
     }

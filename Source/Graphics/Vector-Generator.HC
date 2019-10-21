@@ -35,8 +35,8 @@ U0 crop_with_extra_space(Vector_Generator* vector_generator, U32 axis_to_crop, F
 
 U0 set_resolution_scale(Vector_Generator* vg)
 {
-    vg->resolution.x = (Fs->win_right - Fs->win_left + 1) * 8;
-    vg->resolution.y = (Fs->win_bottom - Fs->win_top + 1) * 8;
+    vg->resolution.x = (Fs->win_right - Fs->win_left + 1) * FONT_WIDTH;
+    vg->resolution.y = (Fs->win_bottom - Fs->win_top + 1) * FONT_HEIGHT;
     if (vg->crop_ratio < 1.0)
     {
         if (vg->resolution.x > vg->resolution.y * vg->crop_ratio)
