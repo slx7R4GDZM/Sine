@@ -31,7 +31,7 @@ Releases for Windows and [TempleOS](https://github.com/slx7R4GDZM/Sine/tree/Holy
 
 ## Compiling
 
-Sine was designed to compile with SFML 2.4.2 under MinGW-w64 7.1.0 POSIX Threads using the C++14 flag.
+See [Building.md](Build/Building.md) for build instructions.
 
 ## What's with the strange constants?
 

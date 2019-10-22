@@ -28,8 +28,6 @@ private:
     void parse_file_settings(std::ifstream& input);
     void parse_buttons(const string& setting, const string& value);
     void parse_settings(const string& setting, const string& value);
-    template <typename T>
-    static T clamp_string_value(const string& setting, const string& value, T min_v, T max_v);
 
     void handle_window_creation(RenderWindow& win);
     void handle_fullscreen_creation(RenderWindow& win);

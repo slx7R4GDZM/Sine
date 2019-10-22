@@ -12,6 +12,8 @@
 #include "../Other/Text.h"
 
 static string get_next(const string& line, unsigned& position);
+static template <typename T>
+T clamp_string_value(const string& setting, const string& value, T min_v, T max_v);
 
 Settings_Handler::Settings_Handler()
     : button_key_code{Kb::Space, Kb::E, Kb::Left, Kb::Down, Kb::Right, Kb::Num1, Kb::Num2, Kb::W, Kb::D, Kb::A, Kb::F11, Kb::Escape}
@@ -162,7 +164,7 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
 }
 
 template <typename T>
-T Settings_Handler::clamp_string_value(const string& setting, const string& value, T min_v, T max_v)
+T clamp_string_value(const string& setting, const string& value, T min_v, T max_v)
 {
     const T var_v = static_cast<T>(std::stod(value));
     if (var_v >= min_v && var_v <= max_v)
