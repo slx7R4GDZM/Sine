@@ -23,7 +23,7 @@ public:
     friend class Photon;
 
     static u8 limit_position(u8 pos_major, u8 max_pos_major);
-    bool collide(Space_Object object, u8 minimum_space) const;
+    bool collide(Space_Object object, u8 radius) const;
 protected:
     Space_Object();
 

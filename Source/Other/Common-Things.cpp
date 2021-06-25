@@ -36,6 +36,18 @@ bool underflowed_u8(u8 var_current, u8 var_previous)
     return var_current > var_previous;
 }
 
+u8 sbc(u8 num_1, u8 num_2, bool& carry)
+{
+    int num = num_1 - num_2 - !carry;
+    carry = num >= 0;
+    return num;
+}
+
+u8 ror(u8 num, bool carry)
+{
+    return carry << 7 | num >> 1;
+}
+
 u8 random_byte()
 {
     return std::rand() & 255;

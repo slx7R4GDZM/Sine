@@ -38,17 +38,14 @@ const u8 SINE_TABLE[] =
 const u8 INDISCERNIBLE = 0;
 const u8 TRUE_EXPLOSION_START = 128;
 const u8 EXPLOSION_START = 160;
-const u8 BONUS_SIZE_1 = 71;
-const u8 BONUS_SIZE_2 = 50;
-const u8 BONUS_SIZE_3 = 62;
 const u8 MAX_X_POS_MAJOR = 31;
 const u8 MAX_Y_POS_MAJOR = 23;
 
 // asteroid
 const u8 MAX_ASTEROIDS = 27;
-const u8 LARGE_ASTEROID_SIZE = 90;
-const u8 MEDIUM_ASTEROID_SIZE = 30;
-const u8 SMALL_ASTEROID_SIZE = 0;
+const u8 LARGE_ASTEROID_HITBOX = 132;
+const u8 MEDIUM_ASTEROID_HITBOX = 72;
+const u8 SMALL_ASTEROID_HITBOX = 42;
 const u8 LARGE_ASTEROID_POINTS = 0x2;
 const u8 MEDIUM_ASTEROID_POINTS = 0x5;
 const u8 SMALL_ASTEROID_POINTS = 0x10;
@@ -58,28 +55,9 @@ const u8 SMALL_ASTEROID = 0x01;
 const u8 ASTEROID_SIZE = 0x07;
 const u8 ASTEROID_TYPE = 0x18;
 
-// saucer
-const u8 LARGE_SAUCER = 2;
-const u8 SMALL_SAUCER = 1;
-const u8 LARGE_SAUCER_SIZE = 30;
-const u8 LARGE_SAUCER_POINTS = 0x20;
-const u8 SMALL_SAUCER_POINTS = 0x99;
-const u8 MINIMUM_SAUCER_SPAWN_TIME = 32;
-const u8 SHOT_ANGLE_TABLE[] =
-{
-    0x00, 0x02, 0x05, 0x07, 0x0A, 0x0C, 0x0F, 0x11, 0x13, 0x15, 0x17, 0x19, 0x1A, 0x1C, 0x1D, 0x1F
-};
-const u8 SHOT_OFFSET_AND[] =
-{
-    0x8F, 0x87
-};
-const u8 SHOT_OFFSET_OR[] =
-{
-    0x70, 0x78
-};
-
 // ship
 const u8 ALIVE = 1;
+const u8 SHIP_HITBOX = 28;
 const s8 MIN_VEL = -64;
 const u8 MAX_VEL = 63;
 const struct
@@ -96,7 +74,27 @@ const struct
     {-40, -40}
 };
 
+// saucer
+const u8 LARGE_SAUCER = 2;
+const u8 SMALL_SAUCER = 1;
+const u8 LARGE_SAUCER_HITBOX = 37; // should be 36 but the carry causes it to be 37
+const u8 SMALL_SAUCER_HITBOX = 19; // same as above but with 18
+const u8 LARGE_SAUCER_POINTS = 0x20;
+const u8 SMALL_SAUCER_POINTS = 0x99;
+const u8 MINIMUM_SAUCER_SPAWN_TIME = 32;
+const u8 SHOT_ANGLE_TABLE[] =
+{
+    0x00, 0x02, 0x05, 0x07, 0x0A, 0x0C, 0x0F, 0x11, 0x13, 0x15, 0x17, 0x19, 0x1A, 0x1C, 0x1D, 0x1F
+};
+const u8 SHOT_OFFSET_AND[] =
+{
+    0x8F, 0x87
+};
+const u8 SHOT_OFFSET_OR[] =
+{
+    0x70, 0x78
+};
+
 // photon
 const u8 MAX_SAUCER_PHOTONS = 2;
 const u8 MAX_SHIP_PHOTONS = 4;
-const u8 PHOTON_SIZE = 43;

@@ -190,12 +190,9 @@ s8 Saucer::shot_offset(bool accurate_shot)
 u8 Saucer::get_size(bool bonus) const
 {
     if (status == LARGE_SAUCER)
-        return LARGE_SAUCER_SIZE + (bonus ? BONUS_SIZE_2 : 0);
+        return bonus ? MEDIUM_ASTEROID_HITBOX : LARGE_SAUCER_HITBOX;
 
-    if (status == SMALL_SAUCER && bonus)
-        return BONUS_SIZE_3;
-
-    return 0;
+    return bonus ? SMALL_ASTEROID_HITBOX : SMALL_SAUCER_HITBOX;
 }
 
 u8 Saucer::get_points() const

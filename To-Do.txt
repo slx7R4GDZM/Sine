@@ -6,10 +6,12 @@ add
 	vector monitor shader
 
 re-do correctly
+	insertion of high scores
 	vector generator
 	denightmarify spaceobject deletion?
 	input limiter for photons, coins, etc
-	fix fps limiter being slightly off from 60
+	clean up handle_collision
+	fix fps limiter being slightly off from 60 when using sleep
 	replace pragma onces with include guards and get rid of other non-standard stuff like case ranges
 	replace more magic numbers with constants
 	shorten some super long lines

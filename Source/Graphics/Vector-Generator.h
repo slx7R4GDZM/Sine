@@ -20,7 +20,7 @@ private:
 
     void draw_long_vector(Opcode opcode, const u16 vector_object[], u16& iteration, bool flip_x, bool flip_y, RenderWindow& window);
     void load_absolute(const u16 vector_object[], u16& iteration);
-    void draw_short_vector(const u16 vector_object[], u16& iteration, bool flip_x, bool flip_y, bool brighten, RenderWindow& window);
+    void draw_short_vector(const u16 vector_object[], u16 iteration, bool flip_x, bool flip_y, bool brighten, RenderWindow& window);
 
     s16 apply_global_scale(s16 delta) const;
 

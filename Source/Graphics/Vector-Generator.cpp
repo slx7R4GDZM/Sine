@@ -116,7 +116,7 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u16& iteration)
     global_scale = static_cast<Global_Scale>(vector_object[iteration] >> 12);
 }
 
-void Vector_Generator::draw_short_vector(const u16 vector_object[], u16& iteration, bool flip_x, bool flip_y, bool brighten, RenderWindow& window)
+void Vector_Generator::draw_short_vector(const u16 vector_object[], u16 iteration, bool flip_x, bool flip_y, bool brighten, RenderWindow& window)
 {
     s16 delta_x = (vector_object[iteration] & 0x0003) << 8;
     s16 delta_y =  vector_object[iteration] & 0x0300;

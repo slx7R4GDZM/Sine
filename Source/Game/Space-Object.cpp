@@ -8,15 +8,8 @@
 #include "../Other/Constants.h"
 #include "../Other/Vectors.h"
 
-struct Coordinate
-{
-    u16 position_x;
-    u16 position_y;
-};
-
 static void wrap_position(u8& pos_major, u8 max_pos_major);
-static bool hit(u16 pos_1, u16 pos_2, u8 minimum_space);
-static Coordinate get_total_pos(Position pos);
+static bool miss(u8 pos_major_1, u8 pos_minor_1, u8 pos_major_2, u8 pos_minor_2, u8& distance_LSB);
 
 Space_Object::Space_Object()
 {
@@ -84,32 +77,45 @@ u8 Space_Object::limit_position(u8 pos_major, u8 max_pos_major)
     return pos_major;
 }
 
-bool Space_Object::collide(Space_Object object, u8 minimum_space) const
+bool Space_Object::collide(Space_Object object, u8 radius) const
 {
-    if (status && status < TRUE_EXPLOSION_START
-     && object.status && object.status < TRUE_EXPLOSION_START)
-    {
-        const Coordinate pos_1 = get_total_pos(pos);
-        const Coordinate pos_2 = get_total_pos(object.pos);
-        if (hit(pos_1.position_x, pos_2.position_x, minimum_space)
-         && hit(pos_1.position_y, pos_2.position_y, minimum_space))
-            return true;
-    }
-    return false;
+    if (       status == INDISCERNIBLE ||        status >= TRUE_EXPLOSION_START
+     || object.status == INDISCERNIBLE || object.status >= TRUE_EXPLOSION_START)
+        return false;
+
+    u8 x_distance;
+    u8 y_distance;
+    if (miss(pos.x_major, pos.x_minor, object.pos.x_major, object.pos.x_minor, x_distance)
+     || miss(pos.y_major, pos.y_minor, object.pos.y_major, object.pos.y_minor, y_distance))
+        return false;
+
+    if (x_distance > radius || y_distance > radius)
+        return false;
+
+    const int combined_distance = x_distance + y_distance;
+    const int circular_hitbox = radius + (radius >> 1); // radius * 1.5, approximation of sqrt 2
+
+    return combined_distance < circular_hitbox;
 }
 
-bool hit(u16 pos_1, u16 pos_2, u8 minimum_space)
+bool miss(u8 pos_major_1, u8 pos_minor_1, u8 pos_major_2, u8 pos_minor_2, u8& distance_LSB)
 {
-    if (pos_1 < pos_2)
-    {
-        if (pos_2 - pos_1 < minimum_space * 2)
-            return true;
-    }
-    else
-    {
-        if (pos_1 - pos_2 <= minimum_space * 2)
-            return true;
-    }
+    bool carry = 1;
+    distance_LSB = sbc(pos_minor_2, pos_minor_1, carry);
+
+    u8 distance_MSB = sbc(pos_major_2, pos_major_1, carry);
+    carry = distance_MSB & 1;
+    distance_MSB &= 0xFE;
+
+    distance_LSB = ror(distance_LSB, carry);
+
+    if (distance_MSB == 0)
+        return false;
+
+    if (distance_MSB != 0xFE)
+        return true;
+
+    distance_LSB = ~distance_LSB;
     return false;
 }
 
@@ -145,14 +151,4 @@ void Space_Object::set_position_and_size(Global_Scale scale, Vector_Generator& v
                           RTSL << 12
     };
     vector_generator.process(vector_object, window);
-}
-
-Coordinate get_total_pos(Position pos)
-{
-    const Coordinate total_pos =
-    {
-        static_cast<u16>(pos.x_major << 8 | pos.x_minor),
-        static_cast<u16>(pos.y_major << 8 | pos.y_minor)
-    };
-    return total_pos;
 }

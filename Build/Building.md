@@ -1,6 +1,6 @@
 # Building Sine
 
-## Requirements
+## Minimum requirements
 
 - SFML 2.0
 - CMake 3.13.0
