@@ -87,7 +87,7 @@ void draw_digit(u8 digit, bool& drawn_digit, bool last_digit, bool brighten, Vec
 
 void draw_digit(u8 digit, Vector_Generator& vector_generator, RenderWindow& window, bool brighten)
 {
-    vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[digit + 1], false, false, brighten);
+    vector_generator.process(CHARACTER_TABLE, window, CHARACTER_OFFSET_TABLE[digit + 1], 0, brighten);
 }
 
 void set_position_and_size(u8 cur_x, u8 cur_y, Global_Scale scale, Vector_Generator& vector_generator, RenderWindow& window)

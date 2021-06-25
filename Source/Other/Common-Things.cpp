@@ -5,6 +5,7 @@
 #include "Common-Things.h"
 
 #include <cstdlib>
+#include <random>
 
 bool operator>(Score score_1, Score score_2)
 {
@@ -36,24 +37,26 @@ bool underflowed_u8(u8 var_current, u8 var_previous)
     return var_current > var_previous;
 }
 
-u8 sbc(u8 num_1, u8 num_2, bool& carry)
+float random(float minimum, float maximum, bool inclusive)
 {
-    int num = num_1 - num_2 - !carry;
-    carry = num >= 0;
-    return num;
+    if (inclusive)
+        maximum = std::nextafter(maximum, maximum + 1);
+
+    static std::uniform_real_distribution<float> distribution(minimum, maximum);
+    static std::mt19937_64 generator(std::time(nullptr));
+
+    return distribution(generator);
 }
 
-u8 ror(u8 num, bool carry)
+u8 random_u8()
 {
-    return carry << 7 | num >> 1;
+    static std::uniform_int_distribution<u8> distribution(0, UINT8_MAX);
+    static std::mt19937_64 generator(std::time(nullptr));
+
+    return distribution(generator);
 }
 
-u8 random_byte()
-{
-    return std::rand() & 255;
-}
-
-s8 clamp_s8(s8 value, s8 min_value, s8 max_value)
+float clamp(float value, float min_value, float max_value)
 {
     if (value < min_value)
         return min_value;

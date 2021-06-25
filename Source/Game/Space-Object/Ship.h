@@ -10,12 +10,12 @@ class Ship : public Space_Object
 {
 public:
     void spawn();
-    void crash(u8& player_lives, u8& ship_spawn_timer);
-    void update(u8 fast_timer, u8 direction, Offset explosion_x[], Offset explosion_y[], bool thrusting, Vector_Generator& vector_generator, RenderWindow& window);
-    void add_thrust(u8 direction, u8& vel_x_minor, u8& vel_y_minor);
-    void dampen_velocity(u8& vel_x_minor, u8& vel_y_minor);
+    void crash(u8& player_lives, float& ship_spawn_timer);
+    void update(float delta_time, u8 fast_timer, float direction, float explosion_x[], float explosion_y[], bool thrusting, Vector_Generator& vector_generator, RenderWindow& window);
+    void add_thrust(float delta_time, float direction);
+    void dampen_velocity(float delta_time);
 private:
-    void draw(u8 direction, bool draw_thrust, Vector_Generator& vector_generator, RenderWindow& window) const;
-    void handle_explosion(Offset explosion_x[], Offset explosion_y[], Vector_Generator& vector_generator, RenderWindow& window) const;
-    u16 update_explosion_offset(Offset& offset, s8 velocity) const;
+    void draw(float direction, bool draw_thrust, Vector_Generator& vector_generator, RenderWindow& window) const;
+    void handle_explosion(float delta_time, float explosion_x[], float explosion_y[], Vector_Generator& vector_generator, RenderWindow& window) const;
+    void update_explosion_offset(float delta_time, float& offset, float velocity) const;
 };

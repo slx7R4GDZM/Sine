@@ -99,7 +99,8 @@ enum Opcode
     JSRL,
     RTSL,
     JMPL,
-    SVEC
+    SVEC,
+    EQIV
 };
 
 enum Language
@@ -144,21 +145,14 @@ struct Option_Switch
     u8 coinage                : 2;
 };
 
-struct Offset
-{
-    u8 minor;
-    u8 major;
-};
-
 bool operator> (Score score_1, Score score_2);
 bool operator<=(Score score_1, Score score_2);
 
 bool overflowed_u8(u8 var_current, u8 var_previous);
 bool underflowed_u8(u8 var_current, u8 var_previous);
-u8 sbc(u8 num_1, u8 num_2, bool& carry);
-u8 ror(u8 num, bool carry);
-u8 random_byte();
-s8 clamp_s8(s8 value, s8 min_value, s8 max_value);
+float random(float minimum, float maximum, bool inclusive = false);
+u8 random_u8();
+float clamp(float value, float min_value, float max_value);
 void add_to_number(u8 number[], u8 num_size, u8 to_add, bool bonus);
 bool add_BCD(u8& number, u8 to_add, bool overflow);
 u8 twos_complement(u8 number);

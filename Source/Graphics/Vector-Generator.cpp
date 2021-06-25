@@ -8,7 +8,6 @@
 #include <SFML/Graphics.hpp>
 #include "../Settings/Settings-Handler.h"
 
-const float PI = std::atan(1) * 4;
 const float DESIRED_LINE_WIDTH = 0.75f;
 const float MINIMUM_LINE_WIDTH = 0.5f;
 const u16 INTERNAL_RES = 1024;
@@ -54,7 +53,7 @@ void Vector_Generator::crop_with_extra_space(u32 axis_to_crop, float& crop_offse
     scale_offset = 0;
 }
 
-void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, u16 iteration, bool flip_x, bool flip_y, bool brighten)
+void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, u16 iteration, float rotation_radians, bool brighten)
 {
     bool done = false;
     while (!done)
@@ -63,7 +62,7 @@ void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, 
         switch (opcode) // case ranges are not an official C++ standard
         {
         case VCTR_0 ... VCTR_9:
-            draw_long_vector(opcode, vector_object, iteration, flip_x, flip_y, window);
+            draw_long_vector(opcode, vector_object, iteration, rotation_radians, window);
             break;
         case LABS:
             load_absolute(vector_object, iteration);
@@ -72,7 +71,7 @@ void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, 
             done = true;
             break;
         case SVEC:
-            draw_short_vector(vector_object, iteration, flip_x, flip_y, brighten, window);
+            draw_short_vector(vector_object, iteration, rotation_radians, brighten, window);
             break;
         default:
             cerr << "Process: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
@@ -85,13 +84,13 @@ void Vector_Generator::process(const u16 vector_object[], RenderWindow& window, 
 
 // opcodes
 
-void Vector_Generator::draw_long_vector(Opcode opcode, const u16 vector_object[], u16& iteration, bool flip_x, bool flip_y, RenderWindow& window)
+void Vector_Generator::draw_long_vector(Opcode opcode, const u16 vector_object[], u16& iteration, float rotation_radians, RenderWindow& window)
 {
-    s16 delta_y = vector_object[iteration]     & 0x03FF;
-    s16 delta_x = vector_object[iteration + 1] & 0x03FF;
+    float delta_y = vector_object[iteration]     & 0x03FF;
+    float delta_x = vector_object[iteration + 1] & 0x03FF;
 
-    delta_y = apply_global_scale(delta_y >> (9 - opcode));
-    delta_x = apply_global_scale(delta_x >> (9 - opcode));
+    delta_y = apply_global_scale(delta_y, opcode - 9);
+    delta_x = apply_global_scale(delta_x, opcode - 9);
 
     if (vector_object[iteration++] & 0x0400)
         delta_y = -delta_y;
@@ -100,7 +99,7 @@ void Vector_Generator::draw_long_vector(Opcode opcode, const u16 vector_object[]
 
     const u8 brightness = vector_object[iteration] >> 12;
 
-    draw_vector(delta_x, delta_y, brightness, flip_x, flip_y, window);
+    draw_vector(delta_x, delta_y, brightness, rotation_radians, window);
 }
 
 void Vector_Generator::load_absolute(const u16 vector_object[], u16& iteration)
@@ -116,16 +115,16 @@ void Vector_Generator::load_absolute(const u16 vector_object[], u16& iteration)
     global_scale = static_cast<Global_Scale>(vector_object[iteration] >> 12);
 }
 
-void Vector_Generator::draw_short_vector(const u16 vector_object[], u16 iteration, bool flip_x, bool flip_y, bool brighten, RenderWindow& window)
+void Vector_Generator::draw_short_vector(const u16 vector_object[], u16 iteration, float rotation_radians, bool brighten, RenderWindow& window)
 {
-    s16 delta_x = (vector_object[iteration] & 0x0003) << 8;
-    s16 delta_y =  vector_object[iteration] & 0x0300;
+    float delta_x = (vector_object[iteration] & 0x0003) << 8;
+    float delta_y =  vector_object[iteration] & 0x0300;
 
     const u8 local_scale = (vector_object[iteration] & 0x0008) >>  2
                          | (vector_object[iteration] & 0x0800) >> 11;
 
-    delta_x = apply_global_scale(delta_x >> (7 - local_scale));
-    delta_y = apply_global_scale(delta_y >> (7 - local_scale));
+    delta_x = apply_global_scale(delta_x, local_scale - 7);
+    delta_y = apply_global_scale(delta_y, local_scale - 7);
 
     if (vector_object[iteration] & 0x0004)
         delta_x = -delta_x;
@@ -136,23 +135,27 @@ void Vector_Generator::draw_short_vector(const u16 vector_object[], u16 iteratio
     if (brighten)
         brightness += 2;
 
-    draw_vector(delta_x, delta_y, brightness, flip_x, flip_y, window);
+    draw_vector(delta_x, delta_y, brightness, rotation_radians, window);
 }
 
-s16 Vector_Generator::apply_global_scale(s16 delta) const
+float Vector_Generator::apply_global_scale(float delta, float local_scale) const
 {
-    if (global_scale <= MUL_128)
-        return delta << global_scale;
+    const float local_scaled_delta = delta * std::pow(2, local_scale);
 
-    return delta >> (16 - global_scale);
+    if (global_scale < DIV_256)
+        return local_scaled_delta * std::pow(2, global_scale);
+
+    return local_scaled_delta * std::pow(2, global_scale - 16);
 }
 
 // drawing stuff
 
-void Vector_Generator::draw_vector(s16 raw_delta_x, s16 raw_delta_y, u8 brightness, bool flip_x, bool flip_y, RenderWindow& window)
+void Vector_Generator::draw_vector(float raw_delta_x, float raw_delta_y, u8 brightness, float rotation_radians, RenderWindow& window)
 {
-    const s16 delta_x = flip_x ? -raw_delta_x : raw_delta_x;
-    const s16 delta_y = flip_y ? -raw_delta_y : raw_delta_y;
+    const float height = std::sin(rotation_radians);
+    const float width = std::cos(rotation_radians);
+    const float delta_x = raw_delta_x * width - raw_delta_y * height;
+    const float delta_y = raw_delta_x * height + raw_delta_y * width;
     if (brightness)
     {
         const float adjusted_x = current_x + x_offset;
@@ -170,7 +173,7 @@ void Vector_Generator::draw_vector(s16 raw_delta_x, s16 raw_delta_y, u8 brightne
     current_y += delta_y;
 }
 
-void Vector_Generator::draw_wide_line_segment(float start_x, float start_y, s16 delta_x, s16 delta_y, sf::Color vector_color, RenderWindow& window) const
+void Vector_Generator::draw_wide_line_segment(float start_x, float start_y, float delta_x, float delta_y, sf::Color vector_color, RenderWindow& window) const
 {
     if (delta_x || delta_y)
     {
@@ -198,7 +201,7 @@ void Vector_Generator::draw_wide_line_segment(float start_x, float start_y, s16 
     }
 }
 
-void Vector_Generator::draw_thin_line_segment(float start_x, float start_y, s16 delta_x, s16 delta_y, sf::Color vector_color, RenderWindow& window) const
+void Vector_Generator::draw_thin_line_segment(float start_x, float start_y, float delta_x, float delta_y, sf::Color vector_color, RenderWindow& window) const
 {
     if (delta_x || delta_y)
     {
@@ -219,4 +222,65 @@ void Vector_Generator::draw_thin_line_segment(float start_x, float start_y, s16 
         };
         window.draw(point, 1, sf::Points);
     }
+}
+
+// float vector object functions
+
+void Vector_Generator::process(const float vector_object[], RenderWindow& window, u16 iteration, float rotation_radians, bool brighten)
+{
+    bool done = false;
+    while (!done)
+    {
+        const float opcode = vector_object[iteration++];
+        if (opcode < LABS)
+            draw_long_vector(opcode, vector_object, iteration, rotation_radians, window);
+        else if (opcode == LABS)
+            load_absolute(vector_object, iteration);
+        else if (opcode == RTSL)
+            done = true;
+        else if (opcode == SVEC)
+            draw_short_vector(vector_object, iteration, rotation_radians, brighten, window);
+        else if (opcode == EQIV)
+        {
+            // only implemented SVEC in EQIV because other opcodes weren't needed
+            const u16 old_vector_object[] = {static_cast<u16>(vector_object[iteration])};
+            draw_short_vector(old_vector_object, 0, rotation_radians, brighten, window);
+            iteration++;
+        }
+        else
+        {
+            cerr << "Process: invalid opcode \"" << static_cast<u16>(opcode) << "\"\n";
+            done = true;
+            break;
+        }
+    }
+}
+
+void Vector_Generator::draw_long_vector(float opcode, const float vector_object[], u16& iteration, float rotation_radians, RenderWindow& window)
+{
+    const float delta_x = apply_global_scale(vector_object[iteration++], opcode - 9);
+    const float delta_y = apply_global_scale(vector_object[iteration++], opcode - 9);
+    const float brightness = vector_object[iteration++];
+
+    draw_vector(delta_x, delta_y, brightness, rotation_radians, window);
+}
+
+void Vector_Generator::load_absolute(const float vector_object[], u16& iteration)
+{
+    current_x = vector_object[iteration++];
+    current_y = vector_object[iteration++];
+    global_scale = vector_object[iteration++];
+}
+
+void Vector_Generator::draw_short_vector(const float vector_object[], u16& iteration, float rotation_radians, bool brighten, RenderWindow& window)
+{
+    const float local_scale = vector_object[iteration + 2] + 1;
+    const float delta_x = apply_global_scale(vector_object[iteration++], local_scale);
+    const float delta_y = apply_global_scale(vector_object[iteration], local_scale);
+    iteration += 2;
+    float brightness = vector_object[iteration++];
+    if (brighten)
+        brightness += 2;
+
+    draw_vector(delta_x, delta_y, brightness, rotation_radians, window);
 }

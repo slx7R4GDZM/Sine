@@ -192,8 +192,12 @@ Gamma-Correction 1.0
 # 1 = Enabled
 V-Sync-Enabled 0
 
+## The FPS to run the game at
+# -1 = Unlocked frame rate
+Frame-Rate-Limit 120
+
 ## Whether to use busy waiting or sleeping to limit FPS
-# 0 = Use sleeping (default)
-# 1 = Use busy waiting; this has high CPU usage, but it's consistent
-Frame-Limit-Mode 0
+# 0 = Use sleeping
+# 1 = Use busy waiting; this has high CPU usage, but it's consistent (default)
+Frame-Limit-Mode 1
 )";

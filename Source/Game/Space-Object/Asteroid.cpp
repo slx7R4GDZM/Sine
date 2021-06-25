@@ -8,74 +8,67 @@
 #include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
-static s8 set_asteroid_velocity(s8 old_velocity);
+static float set_asteroid_velocity(float old_velocity);
 
 void Asteroid::spawn_wave_asteroid()
 {
-    status = (random_byte() & ASTEROID_TYPE) | LARGE_ASTEROID;
-    vel_x_major = set_asteroid_velocity(0);
-    vel_y_major = set_asteroid_velocity(0);
+    status = (random_u8() & ASTEROID_TYPE) | LARGE_ASTEROID;
+    vel_x = set_asteroid_velocity(0);
+    vel_y = set_asteroid_velocity(0);
 
-    const u8 random = random_byte();
-    if (random & 1)
+    if (random_u8() & 1)
     {
-        pos.x_major = 0;
-        pos.y_major = random / 2 & 31;
-        if (pos.y_major >= 24)
-            pos.y_major -= 8;
+        pos.x = 0;
+        pos.y = random(0, MAX_Y_POS);
     }
     else
     {
-        pos.x_major = random / 2 & 31;
-        pos.y_major = 0;
+        pos.x = random(0, MAX_X_POS);
+        pos.y = 0;
     }
-    pos.x_minor = 0;
-    pos.y_minor = 0;
 }
 
-void Asteroid::spawn_split_asteroid(u8 asteroid_size, s8 vel_x, s8 vel_y, Position pos)
+void Asteroid::spawn_split_asteroid(u8 asteroid_size, float vel_x, float vel_y, Position pos)
 {
-    status = (random_byte() & ASTEROID_TYPE) | asteroid_size >> 1;
-    vel_x_major = set_asteroid_velocity(vel_x);
-    vel_y_major = set_asteroid_velocity(vel_y);
+    status = (random_u8() & ASTEROID_TYPE) | asteroid_size >> 1;
+    this->vel_x = set_asteroid_velocity(vel_x);
+    this->vel_y = set_asteroid_velocity(vel_y);
     this->pos = pos;
 }
 
-s8 set_asteroid_velocity(s8 old_velocity)
+float set_asteroid_velocity(float old_velocity)
 {
-    // random offset from -16 to 15
-    s8 offset = random_byte() & 0x8F;
-    if (offset < 0)
-        offset |= 0xF0;
-
-    s8 velocity = old_velocity + offset;
+    float velocity = old_velocity + random(-15.5f, 15.5f, true);
     if (velocity < 0)
-        velocity = clamp_s8(velocity, -31, -6);
+        velocity = clamp(velocity, -31, -6);
     else
-        velocity = clamp_s8(velocity,   6, 31);
+        velocity = clamp(velocity,   6, 31);
 
     return velocity;
 }
 
-void Asteroid::offset_position(u8& pos_minor, s8 vel_major)
+void Asteroid::offset_position(float& position, float velocity)
 {
-    pos_minor ^= (vel_major & 31) * 2;
+    u8 pos_minor = (position - std::floor(position)) * 256;
+    pos_minor ^= (static_cast<s8>(velocity) & 31) * 2;
+
+    position = std::floor(position) + pos_minor / 256.0f;
 }
 
-void Asteroid::update(u8& asteroid_count, u8& asteroid_wave_spawn_time, Vector_Generator& vector_generator, RenderWindow& window)
+void Asteroid::update(float delta_time, u8& asteroid_count, float& asteroid_wave_spawn_time, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (!status)
         return;
 
     if (status < TRUE_EXPLOSION_START)
     {
-        update_position();
+        update_position(delta_time);
         draw(vector_generator, window);
     }
     else
     {
         draw_explosion(vector_generator, window);
-        status += (twos_complement(status) >> 4) + 1;
+        advance_explosion(((twos_complement(status) >> 4) + 1) * delta_time);
         if (status == INDISCERNIBLE)
         {
             asteroid_count--;
@@ -157,8 +150,8 @@ bool Asteroid::blocking_spawn(const Asteroid asteroid[])
     {
         if (asteroid[i].status != INDISCERNIBLE)
         {
-            if (asteroid[i].pos.x_major >= 12 && asteroid[i].pos.x_major <= 19
-             && asteroid[i].pos.y_major >=  8 && asteroid[i].pos.y_major <= 15)
+            if (asteroid[i].pos.x >= 12 && asteroid[i].pos.x <= 20
+             && asteroid[i].pos.y >=  8 && asteroid[i].pos.y <= 16)
                 return true;
         }
     }

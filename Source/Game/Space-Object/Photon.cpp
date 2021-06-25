@@ -8,40 +8,42 @@
 #include "../../Other/Constants.h"
 #include "../../Other/Vectors.h"
 
-void Photon::spawn(u8 direction, s8 vel_x, s8 vel_y, Position base_pos)
+void Photon::spawn(float delta_time, float direction, float vel_x, float vel_y, Position base_pos)
 {
     status = 18;
-    vel_x_major = clamp_s8((lookup_cosine(direction) >> 1) + vel_x, -111, 111);
-    vel_y_major = clamp_s8((  lookup_sine(direction) >> 1) + vel_y, -111, 111);
+    photon_life = status * 4;
+    this->vel_x = clamp((lookup_cosine(direction) * 64) + vel_x, -111, 111);
+    this->vel_y = clamp((  lookup_sine(direction) * 64) + vel_y, -111, 111);
 
     pos = base_pos;
-    offset_position(lookup_cosine(direction), pos.x_major, pos.x_minor);
-    offset_position(  lookup_sine(direction), pos.y_major, pos.y_minor);
+    offset_position(delta_time, lookup_cosine(direction) * 128, pos.x);
+    offset_position(delta_time,   lookup_sine(direction) * 128, pos.y);
 }
 
-void Photon::offset_position(s8 base_offset, u8& pos_major, u8& pos_minor)
+void Photon::offset_position(float delta_time, float base_offset, float& pos)
 {
-    const s8 pos_offset = ((base_offset >> 1) * 3) >> 1;
-    update_position_axis(pos_major, pos_minor, pos_offset);
+    const float pos_offset = base_offset * 0.75f;
+    update_position_axis(delta_time, pos, pos_offset);
 }
 
-void Photon::update(u8 fast_timer, Vector_Generator& vector_generator, RenderWindow& window)
+void Photon::update(float delta_time, Vector_Generator& vector_generator, RenderWindow& window)
 {
     if (!status)
         return;
 
     if (status < TRUE_EXPLOSION_START)
     {
-        if ((fast_timer & 3) == 0)
-            status--;
+        photon_life -= delta_time;
+        if (photon_life <= 0)
+            status = INDISCERNIBLE;
 
-        update_position();
+        update_position(delta_time);
         draw(vector_generator, window);
     }
     else
     {
         draw_explosion(vector_generator, window);
-        status += (twos_complement(status) >> 4) + 1;
+        advance_explosion(((twos_complement(status) >> 4) + 1) * delta_time);
     }
 }
 
@@ -51,15 +53,16 @@ void Photon::draw(Vector_Generator& vector_generator, RenderWindow& window) cons
     vector_generator.process(PHOTON, window);
 }
 
-void Photon::fire_photon(Photon photon[], u8 max_photons, u8 direction, Space_Object space_object)
+void Photon::fire_photon(float delta_time, Photon photon[], u8 max_photons, float direction, Space_Object space_object)
 {
     for (u8 i = 0; i < max_photons; i++)
     {
         if (photon[i].status == INDISCERNIBLE)
         {
-            photon[i].spawn(direction,
-                            space_object.vel_x_major,
-                            space_object.vel_y_major,
+            photon[i].spawn(delta_time,
+                            direction,
+                            space_object.vel_x,
+                            space_object.vel_y,
                             space_object.pos);
             return;
         }

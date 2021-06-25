@@ -9,11 +9,13 @@
 class Photon : public Space_Object
 {
 public:
-    void spawn(u8 direction, s8 vel_x, s8 vel_y, Position base_pos);
-    void update(u8 fast_timer, Vector_Generator& vector_generator, RenderWindow& window);
-    static void fire_photon(Photon photon[], u8 max_photons, u8 direction, Space_Object space_object);
+    void spawn(float delta_time, float direction, float vel_x, float vel_y, Position base_pos);
+    void update(float delta_time, Vector_Generator& vector_generator, RenderWindow& window);
+    static void fire_photon(float delta_time, Photon photon[], u8 max_photons, float direction, Space_Object space_object);
     static bool any(const Photon photon[], u8 max_photons);
+
+    float photon_life;
 private:
-    static void offset_position(s8 base_offset, u8& pos_major, u8& pos_minor);
+    static void offset_position(float delta_time, float base_offset, float& pos);
     void draw(Vector_Generator& vector_generator, RenderWindow& window) const;
 };

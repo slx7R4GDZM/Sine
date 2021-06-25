@@ -12,6 +12,7 @@
 
 Game::Game()
     : game_activity(RUN_WITH_INPUT)
+    , delta_time(1)
     , current_player(0)
     , last_game_player_count(0)
     , player_count(0)
@@ -19,15 +20,15 @@ Game::Game()
     , name_entry_letter_pos(0)
     , player_HS_place{176, 176}
     , names_HS{}
+    , high_score_input_delay(4)
     , player_score{}
     , player_lives{}
     , hyperspace_flag(0)
     , player_text_timer(0)
+    , fast_timer_float(0)
     , fast_timer(0)
     , slow_timer(0)
     , ship_direction(0)
-    , ship_vel_x_minor(0)
-    , ship_vel_y_minor(0)
     , credits(0)
     , pre_credit_coins(0)
     , ship_explosion_x{}
@@ -37,6 +38,7 @@ Game::Game()
     settings.create_startup_window(window);
     settings.output_settings();
     Vector_Generator vector_generator(settings);
+    target_frame_time = nanoseconds(1s) / settings.get_frame_rate_limit();
 
     // settings
     option_switch = settings.get_option_switch();
@@ -46,10 +48,8 @@ Game::Game()
         starting_lives = 3;
 
     // startup
-    player[0].ship.pos.x_major = 0;
-    player[0].ship.pos.y_major = 0;
-    player[0].ship.pos.x_minor = 0;
-    player[0].ship.pos.y_minor = 0;
+    player[0].ship.pos.x = 0;
+    player[0].ship.pos.y = 0;
     player[0].asteroids_per_wave = 2;
     player[0].asteroid_count = 0;
     player[0].saucer_spawn_and_shot_time = 0;
@@ -60,14 +60,21 @@ Game::Game()
     player[0].asteroids_to_slow_saucer_spawn = 0;
 
     // main loop
+    steady_clock::time_point start_time = steady_clock::now();
     while (window.isOpen())
     {
-        const steady_clock::time_point start_time = steady_clock::now();
+        duration<float> previous_frame_duration = steady_clock::now() - start_time;
+        start_time = steady_clock::now();
         process_events(vector_generator, window);
         if (game_activity != PAUSE)
         {
-            window.clear();
+            if (previous_frame_duration >= 1s)
+            {
+                delta_time = 1;
+                continue;
+            }
 
+            window.clear();
             if (game_activity == RUN_WITH_INPUT)
             {
                 input.update(settings);
@@ -116,10 +123,14 @@ Game::Game()
             draw_number(high_score_table[0].points, 2, vector_generator, window, true);
             draw_copyright(vector_generator);
 
-            if (fast_timer == 255)
+            delta_time = previous_frame_duration / SIXTY_FPS_FRAME_TIME;
+            fast_timer_float += delta_time;
+            if (fast_timer_float >= 256)
+            {
+                fast_timer_float -= 256;
                 slow_timer++;
-
-            fast_timer++;
+            }
+            fast_timer = fast_timer_float;
 
             window.display();
         }
@@ -164,11 +175,11 @@ void Game::limit_FPS(steady_clock::time_point start_time) const
     if (settings.get_frame_limiter_mode() == SLEEPING)
     {
         const nanoseconds time_elapsed = steady_clock::now() - start_time;
-        if (time_elapsed < TARGET_FRAME_TIME)
-            std::this_thread::sleep_for(TARGET_FRAME_TIME - time_elapsed);
+        if (time_elapsed < target_frame_time)
+            std::this_thread::sleep_for(target_frame_time - time_elapsed);
     }
     else
-        while (steady_clock::now() - start_time < TARGET_FRAME_TIME);
+        while (steady_clock::now() - start_time < target_frame_time);
 }
 
 void Game::draw_multiplayer_scores(Vector_Generator& vector_generator)
@@ -438,12 +449,14 @@ void Game::attract_mode(Vector_Generator& vector_generator)
 
 void Game::update_player(Vector_Generator& vector_generator)
 {
-    if (player_text_timer)
+    if (player_text_timer > 0)
     {
         set_position_and_size(100, 182, MUL_2, vector_generator, window);
         draw_text(PLAYER_, option_switch.language, vector_generator, window);
         draw_digit(current_player + 1, vector_generator, window);
-        player_text_timer--;
+        player_text_timer -= delta_time;
+        if (player_text_timer < 0)
+            player_text_timer = 0;
     }
     else if (!player_lives[current_player] && !Photon::any(player[current_player].ship_photon, MAX_SHIP_PHOTONS))
     {
@@ -615,42 +628,44 @@ void Game::handle_HS_entry_input()
             slow_timer = 244;
         }
     }
-    if ((fast_timer & 7) == 0)
+
+    if (input.is_pressed(ROTATE_LEFT))
+        change_HS_entry_letter(11, 36,  1, names_HS[player_HS_place[current_player] + name_entry_letter_pos]);
+    else if (input.is_pressed(ROTATE_RIGHT))
+        change_HS_entry_letter(36, 11, -1, names_HS[player_HS_place[current_player] + name_entry_letter_pos]);
+    else
+        high_score_input_delay = 4;
+}
+
+void Game::change_HS_entry_letter(u8 wrap_to_char, u8 wrap_from_char, s8 offset, u8& current_letter)
+{
+    if (high_score_input_delay > 0)
+        high_score_input_delay -= delta_time;
+    else
     {
-        if (input.is_pressed(ROTATE_LEFT))
-        {
-            if (names_HS[player_HS_place[current_player] + name_entry_letter_pos] == 0)
-                names_HS[player_HS_place[current_player] + name_entry_letter_pos] = 11;
-            else if (names_HS[player_HS_place[current_player] + name_entry_letter_pos] == 36)
-                names_HS[player_HS_place[current_player] + name_entry_letter_pos] = 0;
-            else
-                names_HS[player_HS_place[current_player] + name_entry_letter_pos]++;
-        }
-        else if (input.is_pressed(ROTATE_RIGHT))
-        {
-            if (names_HS[player_HS_place[current_player] + name_entry_letter_pos] == 11)
-                names_HS[player_HS_place[current_player] + name_entry_letter_pos] = 0;
-            else if (names_HS[player_HS_place[current_player] + name_entry_letter_pos] == 0)
-                names_HS[player_HS_place[current_player] + name_entry_letter_pos] = 36;
-            else
-                names_HS[player_HS_place[current_player] + name_entry_letter_pos]--;
-        }
+        high_score_input_delay += 8;
+        if (current_letter == 0)
+            current_letter = wrap_to_char;
+        else if (current_letter == wrap_from_char)
+            current_letter = 0;
+        else
+            current_letter += offset;
     }
 }
 
 void Game::update_space_objects(Player& player, Vector_Generator& vector_generator)
 {
     for (u8 i = 0; i < MAX_ASTEROIDS; i++)
-        player.asteroid[i].update(player.asteroid_count, player.asteroid_wave_spawn_time, vector_generator, window);
+        player.asteroid[i].update(delta_time, player.asteroid_count, player.asteroid_wave_spawn_time, vector_generator, window);
 
-    player.ship.update(fast_timer, ship_direction, ship_explosion_x, ship_explosion_y, input.is_pressed(THRUST), vector_generator, window);
-    player.saucer.update(fast_timer, player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start, vector_generator, window);
+    player.ship.update(delta_time, fast_timer, ship_direction, ship_explosion_x, ship_explosion_y, input.is_pressed(THRUST), vector_generator, window);
+    player.saucer.update(delta_time, fast_timer, player.saucer_spawn_and_shot_time, player.saucer_spawn_time_start, vector_generator, window);
 
     for (u8 i = 0; i < MAX_SAUCER_PHOTONS; i++)
-        player.saucer_photon[i].update(fast_timer, vector_generator, window);
+        player.saucer_photon[i].update(delta_time, vector_generator, window);
 
     for (u8 i = 0; i < MAX_SHIP_PHOTONS; i++)
-        player.ship_photon[i].update(fast_timer, vector_generator, window);
+        player.ship_photon[i].update(delta_time, vector_generator, window);
 
     handle_collision(player);
 }
@@ -718,7 +733,7 @@ void Game::handle_collision(Player& player)
                 crashed = true;
             }
         }
-        if (player.ship_photon[i].collide(player.ship, SMALL_ASTEROID_HITBOX))
+        if (player.ship_photon[i].collide(player.ship, SMALL_ASTEROID_HITBOX) && player.ship_photon[i].photon_life <= 68)
         {
             player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
             player.ship_photon[i].status = INDISCERNIBLE;
@@ -749,10 +764,10 @@ void Game::clear_space_objects(Player& player)
 
 void Game::attempt_asteroid_wave_spawn(Player& player)
 {
-    if (player.asteroid_wave_spawn_time)
-        player.asteroid_wave_spawn_time--;
+    if (player.asteroid_wave_spawn_time > 0)
+        player.asteroid_wave_spawn_time -= delta_time;
 
-    if (player.asteroid_count == 0 && player.saucer.status == INDISCERNIBLE && !player.asteroid_wave_spawn_time)
+    if (player.asteroid_count == 0 && player.saucer.status == INDISCERNIBLE && player.asteroid_wave_spawn_time <= 0)
     {
         if (player.asteroids_per_wave < 10)
             player.asteroids_per_wave += 2;
@@ -783,14 +798,14 @@ void Game::crash_asteroid(Player& player, u8 crashed_ast)
     if (!spawn_asteroid(player, crashed_ast, ast_size, new_ast))
         return;
 
-    Asteroid::offset_position(player.asteroid[new_ast].pos.x_minor,
-                              player.asteroid[new_ast].vel_x_major);
+    Asteroid::offset_position(player.asteroid[new_ast].pos.x,
+                              player.asteroid[new_ast].vel_x);
 
     if (!spawn_asteroid(player, crashed_ast, ast_size, new_ast))
         return;
 
-    Asteroid::offset_position(player.asteroid[new_ast].pos.y_minor,
-                              player.asteroid[new_ast].vel_y_major);
+    Asteroid::offset_position(player.asteroid[new_ast].pos.y,
+                              player.asteroid[new_ast].vel_y);
 }
 
 bool Game::spawn_asteroid(Player& player, u8 crashed_ast, u8 ast_size, u8& new_ast)
@@ -801,8 +816,8 @@ bool Game::spawn_asteroid(Player& player, u8 crashed_ast, u8 ast_size, u8& new_a
         {
             new_ast = i;
             player.asteroid[i].spawn_split_asteroid(ast_size,
-                                                    player.asteroid[crashed_ast].vel_x_major,
-                                                    player.asteroid[crashed_ast].vel_y_major,
+                                                    player.asteroid[crashed_ast].vel_x,
+                                                    player.asteroid[crashed_ast].vel_y,
                                                     player.asteroid[crashed_ast].pos);
             player.asteroid_count++;
             return true;
@@ -815,29 +830,33 @@ void Game::handle_ship_stuff(Player& player)
 {
     // on_press should be handled slightly differently, also need a limit on the photon shooting speed?
     if (input.on_press(FIRE) && !player_text_timer && !player.ship_spawn_timer)
-        Photon::fire_photon(player.ship_photon, MAX_SHIP_PHOTONS, ship_direction, player.ship);
+        Photon::fire_photon(delta_time, player.ship_photon, MAX_SHIP_PHOTONS, ship_direction, player.ship);
     if (input.is_pressed(HYPERSPACE) && !player_text_timer && !player.ship_spawn_timer)
     {
         player.ship.status = INDISCERNIBLE;
-        player.ship.vel_x_major = 0;
-        player.ship.vel_y_major = 0;
+        player.ship.vel_x = 0;
+        player.ship.vel_y = 0;
         player.ship_spawn_timer = 48;
 
-        player.ship.pos.x_major = Space_Object::limit_position(random_byte() & 31, 28);
+        player.ship.pos.x = random(3, 29, true);
+        player.ship.pos.y = random(3, 21, true);
         hyperspace_flag = 1;
-        u8 pos_y_major = random_byte() & 31;
-        if (pos_y_major >= 24)
+        u8 chance = random_u8() & 31;
+        if (chance >= 24)
         {
-            pos_y_major = (pos_y_major & 7) * 2 + 4;
-            if (pos_y_major >= player.asteroid_count)
+            chance = (chance & 7) * 2 + 4;
+            if (chance >= player.asteroid_count)
                 hyperspace_flag = 128;
         }
-        player.ship.pos.y_major = Space_Object::limit_position(pos_y_major, 20);
     }
     if (player.ship_spawn_timer > 0 && player.ship.status < TRUE_EXPLOSION_START)
     {
         if (player.ship_spawn_timer > 1)
-            player.ship_spawn_timer--;
+        {
+            player.ship_spawn_timer -= delta_time;
+            if (player.ship_spawn_timer < 1)
+                player.ship_spawn_timer = 1;
+        }
         else if (player.ship_spawn_timer == 1)
         {
             // ship trying to spawn
@@ -867,19 +886,27 @@ void Game::handle_ship_stuff(Player& player)
     if (input.is_pressed(ROTATE_LEFT))
     {
         if (!player.ship_spawn_timer)
-            ship_direction += 3;
+        {
+            ship_direction += 3.0f / 256 * (2 * PI) * delta_time;
+            if (ship_direction >= 2 * PI)
+                ship_direction -= 2 * PI;
+        }
     }
     else if (input.is_pressed(ROTATE_RIGHT))
     {
         if (!player.ship_spawn_timer)
-            ship_direction -= 3;
+        {
+            ship_direction -= 3.0f / 256 * (2 * PI) * delta_time;
+            if (ship_direction < 0)
+                ship_direction += 2 * PI;
+        }
     }
-    if ((fast_timer & 1) == 0 && !player.ship_spawn_timer)
+    if (!player.ship_spawn_timer)
     {
         if (input.is_pressed(THRUST))
-            player.ship.add_thrust(ship_direction, ship_vel_x_minor, ship_vel_y_minor);
+            player.ship.add_thrust(delta_time, ship_direction);
         else
-            player.ship.dampen_velocity(ship_vel_x_minor, ship_vel_y_minor);
+            player.ship.dampen_velocity(delta_time);
     }
     if (player.ship.status && player.ship.status < TRUE_EXPLOSION_START)
         handle_saucer_stuff(player);
@@ -887,22 +914,19 @@ void Game::handle_ship_stuff(Player& player)
 
 void Game::handle_saucer_stuff(Player& player)
 {
-    if (fast_timer & 3)
-        return;
-
-    player.saucer_spawn_and_shot_time--;
+    player.saucer_spawn_and_shot_time -= delta_time / 4;
     if (player.saucer.status == INDISCERNIBLE)
     {
-        if (player.block_saucer_spawn_time)
-            player.block_saucer_spawn_time--;
+        if (player.block_saucer_spawn_time > 0)
+            player.block_saucer_spawn_time -= delta_time;
 
-        if (player.saucer_spawn_and_shot_time == 0)
+        if (player.saucer_spawn_and_shot_time <= 0)
         {
             player.saucer_spawn_and_shot_time = 18;
             if (player.asteroid_count == 0)
                 return;
 
-            if (player.block_saucer_spawn_time
+            if (player.block_saucer_spawn_time > 0
              && player.asteroid_count >= player.asteroids_to_slow_saucer_spawn)
                 return;
 
@@ -913,17 +937,17 @@ void Game::handle_saucer_stuff(Player& player)
             player.saucer.spawn(player_score[current_player], player.saucer_spawn_time_start);
         }
     }
-    else if (player.saucer_spawn_and_shot_time == 0)
+    else if (player.saucer_spawn_and_shot_time <= 0)
     {
         if (player.saucer.status == LARGE_SAUCER)
-            saucer_direction = random_byte();
+            saucer_direction = random(0, 2 * PI);
         else
         {
             saucer_direction = player.saucer.targeted_shot(player.ship.pos);
             const bool accurate_shot = player_score[current_player].points[1] >= 0x35;
-            saucer_direction += Saucer::shot_offset(accurate_shot);
+            saucer_direction += Saucer::shot_offset(accurate_shot) / 256 * (2 * PI);
         }
-        Photon::fire_photon(player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
+        Photon::fire_photon(delta_time, player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
         player.saucer_spawn_and_shot_time = 10;
     }
 }

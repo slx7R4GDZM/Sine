@@ -26,11 +26,11 @@ private:
         Photon ship_photon[MAX_SHIP_PHOTONS];
         u8 asteroids_per_wave;
         u8 asteroid_count;
-        u8 saucer_spawn_and_shot_time;
+        float saucer_spawn_and_shot_time;
         u8 saucer_spawn_time_start;
-        u8 block_saucer_spawn_time;
-        u8 ship_spawn_timer;
-        u8 asteroid_wave_spawn_time;
+        float block_saucer_spawn_time;
+        float ship_spawn_timer;
+        float asteroid_wave_spawn_time;
         u8 asteroids_to_slow_saucer_spawn;
     };
 
@@ -56,12 +56,13 @@ private:
     void handle_HS_entry(Vector_Generator& vector_generator);
     void draw_HS_entry_screen(Vector_Generator& vector_generator);
     void handle_HS_entry_input();
+    void change_HS_entry_letter(u8 char_1, u8 char_2, s8 offset, u8& current_letter);
 
     void update_space_objects(Player& player, Vector_Generator& vector_generator);
     void handle_collision(Player& player);
     static void clear_space_objects(Player& player);
 
-    static void attempt_asteroid_wave_spawn(Player& player);
+    void attempt_asteroid_wave_spawn(Player& player);
     static void crash_asteroid(Player& player, u8 crashed_ast);
     static bool spawn_asteroid(Player& player, u8 crashed_ast, u8 ast_size, u8& new_ast);
     void handle_ship_stuff(Player& player);
@@ -71,6 +72,8 @@ private:
     RenderWindow window;
     Input_Handler input;
     Inactive_Mode game_activity;
+    float delta_time;
+    nanoseconds target_frame_time;
 
     u8 current_player;
     u8 last_game_player_count;
@@ -79,22 +82,22 @@ private:
     u8 name_entry_letter_pos;
     u8 player_HS_place[MAX_PLAYERS];
     u8 names_HS[MAX_HS_COUNT * HS_NAME_LENGTH];
+    float high_score_input_delay;
     Score player_score[MAX_PLAYERS];
     u8 starting_lives;
     u8 player_lives[MAX_PLAYERS];
     u8 hyperspace_flag;
-    u8 player_text_timer;
+    float player_text_timer;
+    float fast_timer_float;
     u8 fast_timer;
     u8 slow_timer;
-    u8 ship_direction;
-    u8 saucer_direction;
-    u8 ship_vel_x_minor;
-    u8 ship_vel_y_minor;
+    float ship_direction;
+    float saucer_direction;
     // sound stuff will go here
     u8 credits;
     Option_Switch option_switch;
     u8 pre_credit_coins;
-    Offset ship_explosion_x[6];
-    Offset ship_explosion_y[6];
+    float ship_explosion_x[6];
+    float ship_explosion_y[6];
     Player player[MAX_PLAYERS];
 };

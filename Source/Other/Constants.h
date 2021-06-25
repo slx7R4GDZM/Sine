@@ -4,9 +4,12 @@
 
 #pragma once
 
+#include <cmath>
 #include "Common-Things.h"
 
-const nanoseconds TARGET_FRAME_TIME = 16666666ns;
+const nanoseconds SIXTY_FPS_FRAME_TIME = 16666666ns;
+
+const float PI = std::atan(1) * 4;
 
 const string SETTINGS_FILENAME = "Sine-Settings.cfg";
 
@@ -38,8 +41,8 @@ const u8 SINE_TABLE[] =
 const u8 INDISCERNIBLE = 0;
 const u8 TRUE_EXPLOSION_START = 128;
 const u8 EXPLOSION_START = 160;
-const u8 MAX_X_POS_MAJOR = 31;
-const u8 MAX_Y_POS_MAJOR = 23;
+const float MAX_X_POS = 32;
+const float MAX_Y_POS = 24;
 
 // asteroid
 const u8 MAX_ASTEROIDS = 27;
@@ -58,12 +61,12 @@ const u8 ASTEROID_TYPE = 0x18;
 // ship
 const u8 ALIVE = 1;
 const u8 SHIP_HITBOX = 28;
-const s8 MIN_VEL = -64;
-const u8 MAX_VEL = 63;
+const float MIN_VEL = -63.5f;
+const float MAX_VEL = 63.5f;
 const struct
 {
-    s8 x;
-    s8 y;
+    float x;
+    float y;
 } EXPLOSION_VELOCITY[] =
 {
     {-40,  30},
@@ -82,18 +85,6 @@ const u8 SMALL_SAUCER_HITBOX = 19; // same as above but with 18
 const u8 LARGE_SAUCER_POINTS = 0x20;
 const u8 SMALL_SAUCER_POINTS = 0x99;
 const u8 MINIMUM_SAUCER_SPAWN_TIME = 32;
-const u8 SHOT_ANGLE_TABLE[] =
-{
-    0x00, 0x02, 0x05, 0x07, 0x0A, 0x0C, 0x0F, 0x11, 0x13, 0x15, 0x17, 0x19, 0x1A, 0x1C, 0x1D, 0x1F
-};
-const u8 SHOT_OFFSET_AND[] =
-{
-    0x8F, 0x87
-};
-const u8 SHOT_OFFSET_OR[] =
-{
-    0x70, 0x78
-};
 
 // photon
 const u8 MAX_SAUCER_PHOTONS = 2;
