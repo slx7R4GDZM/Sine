@@ -202,14 +202,14 @@ U8 get_saucer_size(Space_Object saucer, Bool bonus)
     if (saucer.status == LARGE_SAUCER)
     {
         if (bonus)
-            return LARGE_SAUCER_SIZE + BONUS_SIZE_2;
+            return MEDIUM_ASTEROID_HITBOX;
 
-        return LARGE_SAUCER_SIZE;
+        return LARGE_SAUCER_HITBOX;
     }
     if (bonus)
-        return BONUS_SIZE_3;
+        return SMALL_ASTEROID_HITBOX;
 
-    return 0;
+    return SMALL_SAUCER_HITBOX;
 }
 
 U8 get_saucer_points(Space_Object saucer)

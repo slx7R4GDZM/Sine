@@ -157,23 +157,23 @@ U0 load_absolute(Vector_Generator* vector_generator, U16* vector_object, U16* it
     vector_generator->global_scale = vector_object[*iteration] >> 12;
 }
 
-U0 draw_short_vector(Vector_Generator* vector_generator, U16* vector_object, U16* iteration, Bool flip_x, Bool flip_y, Bool brighten, CDC* dc)
+U0 draw_short_vector(Vector_Generator* vector_generator, U16* vector_object, U16 iteration, Bool flip_x, Bool flip_y, Bool brighten, CDC* dc)
 {
-    I16 delta_x = (vector_object[*iteration] & 0x0003) << 8;
-    I16 delta_y = vector_object[*iteration] & 0x0300;
+    I16 delta_x = (vector_object[iteration] & 0x0003) << 8;
+    I16 delta_y = vector_object[iteration] & 0x0300;
 
-    U8 local_scale = (vector_object[*iteration] & 0x0008) >>  2
-                   | (vector_object[*iteration] & 0x0800) >> 11;
+    U8 local_scale = (vector_object[iteration] & 0x0008) >>  2
+                   | (vector_object[iteration] & 0x0800) >> 11;
 
     delta_x = apply_global_scale(vector_generator, delta_x >> (7 - local_scale));
     delta_y = apply_global_scale(vector_generator, delta_y >> (7 - local_scale));
 
-    if (vector_object[*iteration] & 0x0004)
+    if (vector_object[iteration] & 0x0004)
         delta_x = -delta_x;
-    if (vector_object[*iteration] & 0x0400)
+    if (vector_object[iteration] & 0x0400)
         delta_y = -delta_y;
 
-    U8 brightness = (vector_object[*iteration] & 0x00F0) >> 4;
+    U8 brightness = (vector_object[iteration] & 0x00F0) >> 4;
     if (brighten)
         brightness += 2;
 
@@ -198,7 +198,7 @@ U0 process(Vector_Generator* vector_generator, U16* vector_object, CDC* dc, U16 
             done = TRUE;
             break;
         case SVEC:
-            draw_short_vector(vector_generator, vector_object, &iteration, flip_x, flip_y, brighten, dc);
+            draw_short_vector(vector_generator, vector_object, iteration, flip_x, flip_y, brighten, dc);
             break;
         default:
             Print("Process: invalid opcode \"%u\"\n", opcode);

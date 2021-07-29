@@ -25,18 +25,6 @@ class Space_Object
     Position pos;
 };
 
-class Coordinate
-{
-    U16 position_x;
-    U16 position_y;
-};
-
-U0 get_total_pos(Coordinate* total_pos, Position pos)
-{
-    total_pos->position_x = pos.x_major << 8 | pos.x_minor;
-    total_pos->position_y = pos.y_major << 8 | pos.y_minor;
-}
-
 I8 lookup_sine(U8 direction)
 {
     if (direction <= 64)
@@ -98,35 +86,46 @@ U8 limit_position(U8 pos_major, U8 max_pos_major)
     return pos_major;
 }
 
-Bool hit(U16 pos_1, U16 pos_2, U8 minimum_space)
+Bool miss(U8 pos_major_1, U8 pos_minor_1, U8 pos_major_2, U8 pos_minor_2, U8* distance_LSB)
 {
-    if (pos_1 < pos_2)
-    {
-        if (pos_2 - pos_1 < minimum_space * 2)
-            return TRUE;
-    }
-    else
-    {
-        if (pos_1 - pos_2 <= minimum_space * 2)
-            return TRUE;
-    }
+    Bool carry = 1;
+    *distance_LSB = sbc(pos_minor_2, pos_minor_1, &carry);
+
+    U8 distance_MSB = sbc(pos_major_2, pos_major_1, &carry);
+    carry = distance_MSB & 1;
+    distance_MSB &= 0xFE;
+
+    *distance_LSB = ror(*distance_LSB, carry);
+
+    if (distance_MSB == 0)
+        return FALSE;
+
+    if (distance_MSB != 0xFE)
+        return TRUE;
+
+    *distance_LSB = ~*distance_LSB;
     return FALSE;
 }
 
-Bool collide(Space_Object o1, Space_Object o2, U8 minimum_space)
+Bool collide(Space_Object o1, Space_Object o2, U8 radius)
 {
-    if (o1.status && o1.status < TRUE_EXPLOSION_START
-     && o2.status && o2.status < TRUE_EXPLOSION_START)
-    {
-        Coordinate pos_1;
-        Coordinate pos_2;
-        get_total_pos(&pos_1, o1.pos);
-        get_total_pos(&pos_2, o2.pos);
-        if (hit(pos_1.position_x, pos_2.position_x, minimum_space)
-         && hit(pos_1.position_y, pos_2.position_y, minimum_space))
-            return TRUE;
-    }
-    return FALSE;
+    if (o1.status == INDISCERNIBLE || o1.status >= TRUE_EXPLOSION_START
+     || o2.status == INDISCERNIBLE || o2.status >= TRUE_EXPLOSION_START)
+        return FALSE;
+
+    U8 x_distance;
+    U8 y_distance;
+    if (miss(o1.pos.x_major, o1.pos.x_minor, o2.pos.x_major, o2.pos.x_minor, &x_distance)
+     || miss(o1.pos.y_major, o1.pos.y_minor, o2.pos.y_major, o2.pos.y_minor, &y_distance))
+        return FALSE;
+
+    if (x_distance > radius || y_distance > radius)
+        return FALSE;
+
+    U16 combined_distance = x_distance + y_distance;
+    U8 circular_hitbox = radius + (radius >> 1); // radius * 1.5, approximation of sqrt 2
+
+    return combined_distance < circular_hitbox;
 }
 
 U0 set_position_and_size(Space_Object* space_object, U8 scale, Vector_Generator* vector_generator, CDC* dc)

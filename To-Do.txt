@@ -8,10 +8,12 @@ add
 	support for non kb input (possible in TempleOS?)
 
 re-do correctly
+	insertion of high scores
 	less huge elses and more early returns
 	vector generator
 	denightmarify spaceobject deletion?
 	input limiter for photons, coins, etc
+	clean up handle_collision
 	replace more magic numbers with constants
 	shorten some super long lines
 	get rid of passing window and vectorgenerator to everything

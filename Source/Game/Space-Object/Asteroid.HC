@@ -124,13 +124,13 @@ U8 get_asteroid_size(Space_Object asteroid)
     switch (asteroid.status & ASTEROID_SIZE)
     {
     case LARGE_ASTEROID:
-        return LARGE_ASTEROID_SIZE;
+        return LARGE_ASTEROID_HITBOX;
         break;
     case MEDIUM_ASTEROID:
-        return MEDIUM_ASTEROID_SIZE;
+        return MEDIUM_ASTEROID_HITBOX;
         break;
     case SMALL_ASTEROID:
-        return SMALL_ASTEROID_SIZE;
+        return SMALL_ASTEROID_HITBOX;
         break;
     }
 }

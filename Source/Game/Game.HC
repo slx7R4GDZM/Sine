@@ -278,7 +278,7 @@ U0 handle_collision(Player* player)
     U64 i;
     for (i = 0; player->ship.status == ALIVE && i < MAX_ASTEROIDS; i++)
     {
-        if (collide(player->ship, player->asteroid[i], BONUS_SIZE_1 + get_asteroid_size(player->asteroid[i])))
+        if (collide(player->ship, player->asteroid[i], SHIP_HITBOX + get_asteroid_size(player->asteroid[i])))
         {
             add_points(get_asteroid_points(player->asteroid[i]), FALSE);
             crash_asteroid(player, i);
@@ -289,13 +289,13 @@ U0 handle_collision(Player* player)
     // saucer
     for (i = 0; (player->saucer.status == LARGE_SAUCER || player->saucer.status == SMALL_SAUCER) && i < MAX_ASTEROIDS; i++)
     {
-        if (collide(player->saucer, player->asteroid[i], get_saucer_size(player->saucer, TRUE) + get_asteroid_size(player->asteroid[i])))
+        if (collide(player->saucer, player->asteroid[i], get_saucer_size(player->saucer, FALSE) + get_asteroid_size(player->asteroid[i])))
         {
             crash_asteroid(player, i);
             crash_saucer(&player->saucer, &player->saucer_spawn_and_shot_time, player->saucer_spawn_time_start);
         }
     }
-    if (collide(player->saucer, player->ship, get_saucer_size(player->saucer, TRUE)))
+    if (collide(player->saucer, player->ship, get_saucer_size(player->saucer, FALSE) + SMALL_ASTEROID_HITBOX))
     {
         add_points(get_saucer_points(player->saucer), player->saucer.status == SMALL_SAUCER);
         crash_ship(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
@@ -309,14 +309,14 @@ U0 handle_collision(Player* player)
     {
         for (x = 0, crashed = FALSE; x < MAX_ASTEROIDS && !crashed; x++)
         {
-            if (collide(player->saucer_photon[i], player->asteroid[x], PHOTON_SIZE + get_asteroid_size(player->asteroid[x])))
+            if (collide(player->saucer_photon[i], player->asteroid[x], get_asteroid_size(player->asteroid[x])))
             {
                 crash_asteroid(player, x);
                 player->saucer_photon[i].status = INDISCERNIBLE;
                 crashed = TRUE;
             }
         }
-        if (collide(player->saucer_photon[i], player->ship, PHOTON_SIZE))
+        if (collide(player->saucer_photon[i], player->ship, SMALL_ASTEROID_HITBOX))
         {
             crash_ship(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
             player->saucer_photon[i].status = INDISCERNIBLE;
@@ -328,7 +328,7 @@ U0 handle_collision(Player* player)
     {
         for (x = 0, crashed = FALSE; x < MAX_ASTEROIDS && !crashed; x++)
         {
-            if (collide(player->ship_photon[i], player->asteroid[x], PHOTON_SIZE + get_asteroid_size(player->asteroid[x])))
+            if (collide(player->ship_photon[i], player->asteroid[x], get_asteroid_size(player->asteroid[x])))
             {
                 add_points(get_asteroid_points(player->asteroid[x]), FALSE);
                 crash_asteroid(player, x);
@@ -336,12 +336,12 @@ U0 handle_collision(Player* player)
                 crashed = TRUE;
             }
         }
-        if (collide(player->ship_photon[i], player->ship, PHOTON_SIZE))
+        if (collide(player->ship_photon[i], player->ship, SMALL_ASTEROID_HITBOX))
         {
             crash_ship(&player->ship, &player_lives[current_player], &player->ship_spawn_timer);
             player->ship_photon[i].status = INDISCERNIBLE;
         }
-        if (collide(player->ship_photon[i], player->saucer, PHOTON_SIZE + get_saucer_size(player->saucer, FALSE)))
+        if (collide(player->ship_photon[i], player->saucer, get_saucer_size(player->saucer, TRUE)))
         {
             add_points(get_saucer_points(player->saucer), player->saucer.status == SMALL_SAUCER);
             crash_saucer(&player->saucer, &player->saucer_spawn_and_shot_time, player->saucer_spawn_time_start);

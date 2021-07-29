@@ -130,6 +130,18 @@ Bool underflowed_U8(U8 var_current, U8 var_previous)
     return var_current > var_previous;
 }
 
+U8 sbc(U8 num_1, U8 num_2, Bool* carry)
+{
+    I16 num = num_1 - num_2 - !*carry;
+    *carry = num >= 0;
+    return num;
+}
+
+U8 ror(U8 num, Bool carry)
+{
+    return carry << 7 | num >> 1;
+}
+
 U8 random_byte()
 {
     return RandU16() & 0xFF;

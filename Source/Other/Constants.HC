@@ -44,17 +44,14 @@ static U8 SINE_TABLE[65] =
 #define INDISCERNIBLE 0
 #define TRUE_EXPLOSION_START 128
 #define EXPLOSION_START 160
-#define BONUS_SIZE_1 71
-#define BONUS_SIZE_2 50
-#define BONUS_SIZE_3 62
 #define MAX_X_POS_MAJOR 31
 #define MAX_Y_POS_MAJOR 23
 
 // asteroid
 #define MAX_ASTEROIDS 27
-#define LARGE_ASTEROID_SIZE 90
-#define MEDIUM_ASTEROID_SIZE 30
-#define SMALL_ASTEROID_SIZE 0;
+#define LARGE_ASTEROID_HITBOX 132
+#define MEDIUM_ASTEROID_HITBOX 72
+#define SMALL_ASTEROID_HITBOX 42
 #define LARGE_ASTEROID_POINTS 0x2
 #define MEDIUM_ASTEROID_POINTS 0x5
 #define SMALL_ASTEROID_POINTS 0x10
@@ -64,10 +61,26 @@ static U8 SINE_TABLE[65] =
 #define ASTEROID_SIZE 0x07
 #define ASTEROID_TYPE 0x18
 
+// ship
+#define ALIVE 1
+#define SHIP_HITBOX 28
+#define MIN_VEL -64
+#define MAX_VEL 63
+static Velocity EXPLOSION_VELOCITY[6] =
+{
+    {-40,  30},
+    { 50, -20},
+    {  0, -60},
+    { 60,  20},
+    { 10,  70},
+    {-40, -40}
+};
+
 // saucer
 #define LARGE_SAUCER 2
 #define SMALL_SAUCER 1
-#define LARGE_SAUCER_SIZE 30
+#define LARGE_SAUCER_HITBOX 37 // should be 36 but the carry causes it to be 37
+#define SMALL_SAUCER_HITBOX 19 // same as above but with 18
 #define LARGE_SAUCER_POINTS 0x20
 #define SMALL_SAUCER_POINTS 0x99
 #define MINIMUM_SAUCER_SPAWN_TIME 32
@@ -84,23 +97,8 @@ static U8 SHOT_OFFSET_OR[2] =
     0x70, 0x78
 };
 
-// ship
-#define ALIVE 1
-#define MIN_VEL -64
-#define MAX_VEL 63
-static Velocity EXPLOSION_VELOCITY[6] =
-{
-    {-40,  30},
-    { 50, -20},
-    {  0, -60},
-    { 60,  20},
-    { 10,  70},
-    {-40, -40}
-};
-
 // photon
 #define MAX_SAUCER_PHOTONS 2
 #define MAX_SHIP_PHOTONS 4
-#define PHOTON_SIZE 43
 
 #endif
