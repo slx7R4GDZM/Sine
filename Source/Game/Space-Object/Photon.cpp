@@ -11,19 +11,20 @@
 void Photon::spawn(float delta_time, float direction, float vel_x, float vel_y, Position base_pos)
 {
     status = 18;
-    photon_life = status * 4;
+    photon_life = status * 4 - delta_time - 1;
     this->vel_x = clamp((lookup_cosine(direction) * 64) + vel_x, -111, 111);
     this->vel_y = clamp((  lookup_sine(direction) * 64) + vel_y, -111, 111);
 
     pos = base_pos;
-    offset_position(delta_time, lookup_cosine(direction) * 128, pos.x);
-    offset_position(delta_time,   lookup_sine(direction) * 128, pos.y);
+    offset_position(delta_time, lookup_cosine(direction) * 128, vel_x, pos.x);
+    offset_position(delta_time,   lookup_sine(direction) * 128, vel_y, pos.y);
 }
 
-void Photon::offset_position(float delta_time, float base_offset, float& pos)
+void Photon::offset_position(float delta_time, float base_offset, float vel, float& pos)
 {
     const float pos_offset = base_offset * 0.75f;
-    update_position_axis(delta_time, pos, pos_offset);
+    update_position_axis(1, pos, pos_offset);
+    update_position_axis(delta_time, pos, vel);
 }
 
 void Photon::update(float delta_time, Vector_Generator& vector_generator, RenderWindow& window)

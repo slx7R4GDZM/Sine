@@ -13,9 +13,9 @@ public:
     void update(float delta_time, Vector_Generator& vector_generator, RenderWindow& window);
     static void fire_photon(float delta_time, Photon photon[], u8 max_photons, float direction, Space_Object space_object);
     static bool any(const Photon photon[], u8 max_photons);
+private:
+    static void offset_position(float delta_time, float base_offset, float vel, float& pos);
+    void draw(Vector_Generator& vector_generator, RenderWindow& window) const;
 
     float photon_life;
-private:
-    static void offset_position(float delta_time, float base_offset, float& pos);
-    void draw(Vector_Generator& vector_generator, RenderWindow& window) const;
 };

@@ -10,7 +10,7 @@
 
 static float set_asteroid_velocity(float old_velocity);
 
-void Asteroid::spawn_wave_asteroid()
+void Asteroid::spawn_wave_asteroid(float delta_time)
 {
     status = (random_u8() & ASTEROID_TYPE) | LARGE_ASTEROID;
     vel_x = set_asteroid_velocity(0);
@@ -26,6 +26,7 @@ void Asteroid::spawn_wave_asteroid()
         pos.x = random(0, MAX_X_POS);
         pos.y = 0;
     }
+    update_position(delta_time);
 }
 
 void Asteroid::spawn_split_asteroid(u8 asteroid_size, float vel_x, float vel_y, Position pos)

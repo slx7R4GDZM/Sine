@@ -733,7 +733,7 @@ void Game::handle_collision(Player& player)
                 crashed = true;
             }
         }
-        if (player.ship_photon[i].collide(player.ship, SMALL_ASTEROID_HITBOX) && player.ship_photon[i].photon_life <= 68)
+        if (player.ship_photon[i].collide(player.ship, SMALL_ASTEROID_HITBOX))
         {
             player.ship.crash(player_lives[current_player], player.ship_spawn_timer);
             player.ship_photon[i].status = INDISCERNIBLE;
@@ -780,7 +780,7 @@ void Game::attempt_asteroid_wave_spawn(Player& player)
 
         for (u8 i = 0; i < player.asteroids_per_wave; i++)
         {
-            player.asteroid[i].spawn_wave_asteroid();
+            player.asteroid[i].spawn_wave_asteroid(-player.asteroid_wave_spawn_time);
             player.asteroid_count++;
         }
     }
@@ -830,7 +830,7 @@ void Game::handle_ship_stuff(Player& player)
 {
     // on_press should be handled slightly differently, also need a limit on the photon shooting speed?
     if (input.on_press(FIRE) && !player_text_timer && !player.ship_spawn_timer)
-        Photon::fire_photon(delta_time, player.ship_photon, MAX_SHIP_PHOTONS, ship_direction, player.ship);
+        Photon::fire_photon(0, player.ship_photon, MAX_SHIP_PHOTONS, ship_direction, player.ship);
     if (input.is_pressed(HYPERSPACE) && !player_text_timer && !player.ship_spawn_timer)
     {
         player.ship.status = INDISCERNIBLE;
@@ -922,7 +922,8 @@ void Game::handle_saucer_stuff(Player& player)
 
         if (player.saucer_spawn_and_shot_time <= 0)
         {
-            player.saucer_spawn_and_shot_time = 18;
+            const float saucer_spawn_time = player.saucer_spawn_and_shot_time * -4;
+            player.saucer_spawn_and_shot_time += 18;
             if (player.asteroid_count == 0)
                 return;
 
@@ -934,7 +935,7 @@ void Game::handle_saucer_stuff(Player& player)
             if (new_saucer_spawn_time_start >= MINIMUM_SAUCER_SPAWN_TIME)
                 player.saucer_spawn_time_start = new_saucer_spawn_time_start;
 
-            player.saucer.spawn(player_score[current_player], player.saucer_spawn_time_start);
+            player.saucer.spawn(saucer_spawn_time, player_score[current_player], player.saucer_spawn_time_start);
         }
     }
     else if (player.saucer_spawn_and_shot_time <= 0)
@@ -947,7 +948,8 @@ void Game::handle_saucer_stuff(Player& player)
             const bool accurate_shot = player_score[current_player].points[1] >= 0x35;
             saucer_direction += Saucer::shot_offset(accurate_shot) / 256 * (2 * PI);
         }
-        Photon::fire_photon(delta_time, player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
-        player.saucer_spawn_and_shot_time = 10;
+        const float saucer_shot_time = player.saucer_spawn_and_shot_time * -4;
+        Photon::fire_photon(saucer_shot_time, player.saucer_photon, MAX_SAUCER_PHOTONS, saucer_direction, player.saucer);
+        player.saucer_spawn_and_shot_time += 10;
     }
 }

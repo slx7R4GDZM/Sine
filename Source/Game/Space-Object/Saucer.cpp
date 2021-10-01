@@ -10,7 +10,7 @@
 
 static float ship_saucer_distance(float ship_pos, float saucer_vel, float saucer_pos);
 
-void Saucer::spawn(Score player_score, u8 saucer_spawn_time_start)
+void Saucer::spawn(float delta_time, Score player_score, u8 saucer_spawn_time_start)
 {
     if (saucer_spawn_time_start >= 128)
         status = LARGE_SAUCER;
@@ -40,7 +40,10 @@ void Saucer::spawn(Score player_score, u8 saucer_spawn_time_start)
 
     vel_y = 0;
     pos.y = random(0, MAX_Y_POS);
+
     vertical_delay = random(0, 128, true);
+    determine_vertical_velocity(delta_time);
+    update_position(delta_time);
 }
 
 void Saucer::crash(float& saucer_spawn_time, u8 saucer_spawn_time_start)
@@ -56,12 +59,7 @@ void Saucer::update(float delta_time, u8 fast_timer, float& saucer_spawn_time, u
 
     if (status < TRUE_EXPLOSION_START)
     {
-        vertical_delay -= delta_time;
-        if (vertical_delay <= 0)
-        {
-            determine_vertical_velocity();
-            vertical_delay += 128;
-        }
+        determine_vertical_velocity(delta_time);
 
         const float old_pos_x = pos.x;
         update_position(delta_time);
@@ -77,19 +75,29 @@ void Saucer::update(float delta_time, u8 fast_timer, float& saucer_spawn_time, u
     }
 }
 
-void Saucer::determine_vertical_velocity()
+void Saucer::determine_vertical_velocity(float& delta_time)
 {
-    switch (random_u8() & 3)
+    if (vertical_delay <= delta_time)
     {
-    case 0:
-        vel_y = -16;
-        break;
-    case 3:
-        vel_y = 16;
-        break;
-    default:
-        vel_y = 0;
-        break;
+        update_position(vertical_delay);
+
+        const float initial_delta_time = delta_time;
+        delta_time -= vertical_delay;
+        vertical_delay -= initial_delta_time;
+
+        switch (random_u8() & 3)
+        {
+        case 0:
+            vel_y = -16;
+            break;
+        case 3:
+            vel_y = 16;
+            break;
+        default:
+            vel_y = 0;
+            break;
+        }
+        vertical_delay += 128;
     }
 }
 
