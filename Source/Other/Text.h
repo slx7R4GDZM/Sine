@@ -194,7 +194,7 @@ V-Sync-Enabled 0
 
 ## The FPS to run the game at
 # -1 = Unlocked frame rate
-Frame-Rate-Limit 120
+Frame-Rate-Limit 120.0
 
 ## Whether to use busy waiting or sleeping to limit FPS
 # 0 = Use sleeping

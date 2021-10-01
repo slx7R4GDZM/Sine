@@ -160,9 +160,9 @@ void Settings_Handler::parse_settings(const string& setting, const string& value
         enable_v_sync = clamp_string_value(setting, value, false, true);
     else if (setting == "Frame-Rate-Limit")
     {
-        frame_rate_limit = clamp_string_value(setting, value, -1, INT32_MAX);
-        if (frame_rate_limit == 0 || frame_rate_limit == 1)
-            frame_rate_limit = 120;
+        frame_rate_limit = std::stod(value);
+        if (frame_rate_limit != -1)
+            frame_rate_limit = clamp_string_value(setting, value, 2.0f, FLT_MAX);
     }
     else if (setting == "Frame-Limit-Mode")
         frame_limiter_mode = clamp_string_value(setting, value, SLEEPING, BUSY_WAITING);
@@ -331,7 +331,7 @@ Inactive_Mode Settings_Handler::get_inactive_mode() const
     return inactive_mode;
 }
 
-int Settings_Handler::get_frame_rate_limit() const
+float Settings_Handler::get_frame_rate_limit() const
 {
     return frame_rate_limit;
 }

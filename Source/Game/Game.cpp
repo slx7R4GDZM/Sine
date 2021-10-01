@@ -38,7 +38,7 @@ Game::Game()
     settings.create_startup_window(window);
     settings.output_settings();
     Vector_Generator vector_generator(settings);
-    target_frame_time = nanoseconds(1s) / settings.get_frame_rate_limit();
+    target_frame_time = duration_cast<nanoseconds>(1s / settings.get_frame_rate_limit());
 
     // settings
     option_switch = settings.get_option_switch();

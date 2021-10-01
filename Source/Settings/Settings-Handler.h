@@ -22,7 +22,7 @@ public:
     Option_Switch get_option_switch() const;
     sf::Vector2u get_resolution() const;
     Inactive_Mode get_inactive_mode() const;
-    int get_frame_rate_limit() const;
+    float get_frame_rate_limit() const;
     Frame_Limiter_Mode get_frame_limiter_mode() const;
     void get_settings(float& crop_ratio, u8 gamma_table[]) const;
 private:
@@ -50,6 +50,6 @@ private:
     sf::ContextSettings context_settings;
     float gamma_correction;
     bool enable_v_sync;
-    int frame_rate_limit;
+    float frame_rate_limit;
     Frame_Limiter_Mode frame_limiter_mode;
 };

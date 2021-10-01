@@ -232,7 +232,7 @@ void Vector_Generator::process(const float vector_object[], RenderWindow& window
     while (!done)
     {
         const float opcode = vector_object[iteration++];
-        if (opcode < LABS)
+        if (opcode <= VCTR_9)
             draw_long_vector(opcode, vector_object, iteration, rotation_radians, window);
         else if (opcode == LABS)
             load_absolute(vector_object, iteration);
